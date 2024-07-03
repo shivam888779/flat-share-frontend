@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: "Roboto", sans-serif;
+}
+
+:root {
+
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.form_input_field{
+  border: 2px solid gray;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: #f4f4f4;
+  width:100% ;
+
+}
+.form_label{
+  font-size: 1.25rem;
+}
+.form_error{
+  color: #ec2e2e;
+  
+}
