@@ -40,3 +40,8 @@ body {
   color: #ec2e2e;
   
 }
+
+.main{
+  max-width: 1400px;
+  margin: 0 auto;
+}

@@ -1,4 +1,4 @@
-import { LogInForm } from "@/component"
+import { LogInForm } from "@/component";
 import { useGlobalContext } from "@/global-context"
 
 const LogIn = () =>{

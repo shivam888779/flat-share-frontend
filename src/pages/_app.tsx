@@ -5,10 +5,11 @@ import { ThemeProvider } from "@mui/material";
 import theme from "../styles/global-theme"
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <ThemeProvider theme={theme}>
+  return <div className="main"><ThemeProvider theme={theme}>
     <GlobalContextProvider>
       <Component {...pageProps} />
     </GlobalContextProvider>
   </ThemeProvider>
+  </div> 
 
 }

@@ -24,6 +24,15 @@ const theme = createTheme({
     ...palette,
   },
   components: {
+    MuiIconButton:{
+      styleOverrides :{root:{
+          
+          backgroundColor:palette.primary.light,
+          "&:hover":{
+            backgroundColor:palette.primary.dark,
+          }
+        }}
+    },
     MuiButton: {
       variants: [
         {
@@ -147,60 +156,60 @@ const theme = createTheme({
     ].join(","),
 
     h1: {
-      fontSize: "2rem",
+      fontSize: "2.5rem",
       lineHeight: "1.25rem",
       color: "#000",
       fontWeight: 700,
     },
     h2: {
-      fontSize: "1.5rem",
+      fontSize: "2rem",
       lineHeight: "1.25rem",
       color: "#000",
       fontWeight: 700,
     },
     h3: {
+      fontSize: "1.5rem",
+      lineHeight: "20px",
+      color: "#000",
+      fontWeight: 700,
+    },
+    h4: {
       fontSize: "1.25rem",
       lineHeight: "20px",
       color: "#000",
-      fontWeight: 500,
-    },
-    h4: {
-      fontSize: 16,
-      lineHeight: "20px",
-      color: "#000",
-      fontWeight: 600,
+      fontWeight: 700,
     },
     h5: {
-      fontSize: 12,
+      fontSize: "1rem",
       lineHeight: "20px",
       color: "#000",
-      fontWeight: 500,
+      fontWeight: 700,
     },
     h6: {
-      fontSize: 12,
+      fontSize: '0.75rem',
       lineHeight: "20px",
       color: "#000",
-      fontWeight: 500,
+      fontWeight: 700,
     },
     subtitle1: {
-      fontSize: 14,
+      fontSize: '1.25rem',
       color: "#4f4c4c",
       fontWeight: 500,
     },
     subtitle2: {
-      fontSize: 12,
+      fontSize: '1rem',
       lineHeight: "1.5rem",
       color: "#000",
       fontWeight: 500,
     },
     body1: {
-      fontSize: 12,
+      fontSize: '1.5rem',
       lineHeight: "1.25rem",
       color: "#000",
       fontWeight: 500,
     },
     body2: {
-      fontSize: 12,
+      fontSize:  '0.85rem',
       lineHeight: "1rem",
       color: "#000",
       fontWeight: 500,
