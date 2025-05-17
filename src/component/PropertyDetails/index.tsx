@@ -35,7 +35,7 @@ const PropertyDetails = () => {
         <CustomizedCrousal/>
         <hr />
         <Typography variant="h3" mt={4}>My Preferences</Typography>
-        <CustomizedRoundedIcon/>
+        {/* <CustomizedRoundedIcon/> */}
         <hr />
         <Typography variant="h3" mt={4}>Accommodations</Typography>
         <Chips/>
