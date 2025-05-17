@@ -10,6 +10,7 @@ import { sendOtpApi, verifyOtpApi } from "@/pages/login/apis";
 import { ILoginFormValues, IMobileFormValues, IOtpFormValues } from "@/types/user";
 import { useGlobalContext } from "@/global-context";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 
 
@@ -52,7 +53,6 @@ const LogInForm = () => {
 
   const router = useRouter()
 
-  console.log(state)
 
   const handleEmailSubmit = (values: ILoginFormValues) => {
     console.log("Email Login Data", values);
@@ -75,11 +75,11 @@ const LogInForm = () => {
 
     if (data?.status) {
       localStorage.setItem("authToken", data?.data?.token)
-      setState({userData:data?.data})
-      if(data?.data?.verified){
+      setState({ userData: data?.data })
+      if (data?.data?.verified) {
         router.push("/")
       }
-      else{
+      else {
         router.push('/create-profile')
       }
     }
@@ -218,7 +218,7 @@ const LogInForm = () => {
         )}
 
         <Typography variant="body2" className="text-center text-gray-500 mt-6">
-          Dont have an account? <a href="/register" className="text-blue-500">Sign up here</a>
+          Dont have an account? <Link href="/register" className="text-blue-500">Sign up here</Link>
         </Typography>
       </Box>
     </Box>

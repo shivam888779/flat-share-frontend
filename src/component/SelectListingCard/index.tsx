@@ -3,27 +3,39 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import CardActionArea from '@mui/material/CardActionArea';
+import { useRouter } from 'next/router';
 
-const SelectListingCard =()=>{
+interface Props {
+  handleDialogOpen: () => void;
+  title: string;
+  description?: string;
+  image: string;
+  route: string;
+}
 
-    return <Card sx={{ maxWidth: 345 }}>
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          height="140"
-          image="/static/images/cards/contemplative-reptile.jpg"
-          alt="green iguana"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            Lizard
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Lizards are a widespread group of squamate reptiles, with over 6,000
-            species, ranging across all continents except Antarctica
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-    </Card>
+const SelectListingCard = (props: Props) => {
+
+  const router = useRouter()
+
+  const { handleDialogOpen, title, route, description, image } = props;
+
+  return <Card sx={{ maxWidth: 345 }}>
+    <CardActionArea onClick={() => router.push(route)} >
+      <CardMedia
+        component="img"
+        height="140"
+        image={image || "/static/images/cards/contemplative-reptile.jpg"}
+        alt="green iguana"
+      />
+      <CardContent>
+        <Typography gutterBottom variant="h5" component="div">
+          {title}
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          {description}
+        </Typography>
+      </CardContent>
+    </CardActionArea>
+  </Card>
 }
 export default SelectListingCard;
