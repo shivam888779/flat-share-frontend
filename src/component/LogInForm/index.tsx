@@ -6,30 +6,23 @@ import { Button, TextField, Typography, Divider, Box, IconButton } from "@mui/ma
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import { useState } from "react";
+import { sendOtpApi, verifyOtpApi } from "@/pages/login/apis";
+import { ILoginFormValues, IMobileFormValues, IOtpFormValues } from "@/types/user";
+import { useGlobalContext } from "@/global-context";
+import { useRouter } from "next/router";
 
-interface LoginFormValues {
-  email: string;
-  password: string;
-}
 
-interface MobileFormValues {
-  mobile: string;
-}
 
-interface OtpFormValues {
-  otp: string;
-}
-
-const emailInitialValues: LoginFormValues = {
+const emailInitialValues: ILoginFormValues = {
   email: "",
   password: "",
 };
 
-const mobileInitialValues: MobileFormValues = {
+const mobileInitialValues: IMobileFormValues = {
   mobile: "",
 };
 
-const otpInitialValues: OtpFormValues = {
+const otpInitialValues: IOtpFormValues = {
   otp: "",
 };
 
@@ -55,18 +48,41 @@ const LogInForm = () => {
   const [isOtpSent, setIsOtpSent] = useState(false); // Track if OTP is sent
   const [mobileNumber, setMobileNumber] = useState(""); // Store mobile number for OTP verification
 
-  const handleEmailSubmit = (values: LoginFormValues) => {
+  const { state, setState } = useGlobalContext();
+
+  const router = useRouter()
+
+  console.log(state)
+
+  const handleEmailSubmit = (values: ILoginFormValues) => {
     console.log("Email Login Data", values);
   };
 
-  const handleMobileSubmit = (values: MobileFormValues) => {
+  const handleMobileSubmit = async (values: IMobileFormValues) => {
     console.log("Mobile Login Data", values);
-    setIsOtpSent(true); // Simulate OTP sent
+    const { data } = await sendOtpApi({ phoneNo: values?.mobile })
+    console.log(data)
+    if (data?.status) {
+      setIsOtpSent(true);
+    }
     setMobileNumber(values.mobile);
   };
 
-  const handleOtpSubmit = (values: OtpFormValues) => {
+  const handleOtpSubmit = async (values: IOtpFormValues) => {
     console.log("OTP Verified for Mobile:", mobileNumber);
+    const { data } = await verifyOtpApi({ otp: values?.otp, phoneNo: mobileNumber })
+    console.log(data)
+
+    if (data?.status) {
+      localStorage.setItem("authToken", data?.data?.token)
+      setState({userData:data?.data})
+      if(data?.data?.verified){
+        router.push("/")
+      }
+      else{
+        router.push('/create-profile')
+      }
+    }
     // Handle OTP verification logic
   };
 

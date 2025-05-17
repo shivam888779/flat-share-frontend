@@ -2,9 +2,13 @@
 import { Box, Button, Divider, Stack } from "@mui/material";
 import { FilterNavbar, Footer, Header, UserDetailsCrad } from "../component";
 import { KeyboardDoubleArrowDown } from "@mui/icons-material";
+import { useGlobalContext } from "@/global-context";
 
 export default function Home() {
   const a = Array(10).fill(0);
+
+  const {state} = useGlobalContext();
+  console.log(state)
   return (
     <Box  width={"100%"}>
       <Header />
