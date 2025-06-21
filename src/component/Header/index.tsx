@@ -3,9 +3,11 @@ import { green } from "@mui/material/colors";
 import Image from "next/image";
 import { useState } from "react";
 import SelectListingCard from "../SelectListingCard";
+import { useRouter } from "next/router";
 
 const Header = () => {
 
+    const router = useRouter()
     const [openDialog, setOpenDialog] = useState(false);
     const handleDialogOpen = () => {
         setOpenDialog(!openDialog);
@@ -25,7 +27,7 @@ const Header = () => {
             <Box>
                 <Stack direction="row" >
                     <Button color="secondary" onClick={handleDialogOpen}> Sign Up </Button>
-                    <Button color="secondary" >Log In</Button>
+                    <Button color="secondary" onClick={()=>router.push("/login")} >Log In</Button>
                 </Stack>
             </Box>
         </Stack>

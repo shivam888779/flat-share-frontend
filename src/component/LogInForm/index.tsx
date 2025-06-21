@@ -61,7 +61,6 @@ const LogInForm = () => {
   const handleMobileSubmit = async (values: IMobileFormValues) => {
     console.log("Mobile Login Data", values);
     const { data } = await sendOtpApi({ phoneNo: values?.mobile })
-    console.log(data)
     if (data?.status) {
       setIsOtpSent(true);
     }
@@ -71,7 +70,6 @@ const LogInForm = () => {
   const handleOtpSubmit = async (values: IOtpFormValues) => {
     console.log("OTP Verified for Mobile:", mobileNumber);
     const { data } = await verifyOtpApi({ otp: values?.otp, phoneNo: mobileNumber })
-    console.log(data)
 
     if (data?.status) {
       localStorage.setItem("authToken", data?.data?.token)

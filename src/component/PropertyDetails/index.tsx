@@ -1,7 +1,6 @@
 import { LocationCity } from "@mui/icons-material";
 import { Box, Stack, Typography } from "@mui/material";
 import CustomizedCrousal from "../CustomizedCrousal";
-import CustomizedRoundedIcon from "../CustomizedRoundedIcon";
 import Chips from "../Chips";
 
 const PropertyDetails = () => {

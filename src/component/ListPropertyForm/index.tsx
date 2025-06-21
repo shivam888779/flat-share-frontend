@@ -1,64 +1,120 @@
 // pages/PropertyForm.tsx
-
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { Button, TextField, Typography, MenuItem, Box } from "@mui/material";
+import {
+    Button,
+    TextField,
+    Typography,
+    MenuItem,
+    Box,
+} from "@mui/material";
 import { useState } from "react";
-import CustomizedRoundedIcon from "@/component/CustomizedRoundedIcon";
+import {
+    LocationSearch,
+    CustomizedRoundedSelect,
+    CustomizedSelectChip,
+    SelectSingleOption,
+} from "@/custom-component";
+import { ILocation } from "@/types/property";
 
-// Define the initial values and schema for the form validation
+// ----------------------
+// Type Definitions
+// ----------------------
 interface PropertyFormValues {
-    title: string;
-    propertyType: string;
-    rentPrice: string;
-    deposit: string;
-    address: string;
-    amenities: string;
-    highLights: Array<Number>;
-    availableDate: string;
-    parking: string;
+    typeId: number;
+    rentPrice: number;
+    deposit: number;
+    resources: number[]; 
+    preferences: number[]; 
+    highLights: number[];
+    availableFrom: string;
     description: string;
+    partnerGender: string;
 }
-
-const initialValues: PropertyFormValues = {
-    title: "",
-    propertyType: "",
-    rentPrice: "",
-    deposit: "",
-    address: "",
-    amenities: "",
-    availableDate: "",
-    parking: "",
-    description: "",
-    highLights: []
-};
-
-// Define validation schema using Yup
-const validationSchema = Yup.object({
-    title: Yup.string().required("Title is required"),
-    propertyType: Yup.string().required("Property type is required"),
-    rentPrice: Yup.string().required("Rent price is required"),
-    deposit: Yup.string().required("Deposit is required"),
-    address: Yup.string().required("Address is required"),
-    amenities: Yup.string().required("Amenities are required"),
-    availableDate: Yup.string().required("Available date is required"),
-    description: Yup.string().required("Description is required"),
-});
-
 
 interface Props {
     type: string;
 }
 
+// ----------------------
+// Initial Values
+// ----------------------
+const initialValues: PropertyFormValues = {
+    typeId: 0,
+    rentPrice: 0,
+    deposit: 0,
+    resources: [],
+    preferences: [],
+    availableFrom: "",
+    description: "",
+    highLights: [],
+    partnerGender: "male"
+};
 
-const PropertyListingForm = (props: Props) => {
+// ----------------------
+// Validation Schema
+// ----------------------
+const validationSchema = Yup.object({
+    typeId: Yup.number().required("Property type is required"),
+    partnerGender: Yup.string().required("Gender is required"),
+    rentPrice: Yup.number()
+        .typeError("Rent price must be a number")
+        .min(1, "Must be greater than 0")
+        .required("Rent price is required"),
+    deposit: Yup.number()
+        .typeError("Deposit must be a number")
+        .min(0, "Cannot be negative")
+        .required("Deposit is required"),
+    availableFrom: Yup.string().required("Available date is required"),
+    description: Yup.string()
+        .min(10, "Description should be at least 10 characters")
+        .required("Description is required"),
+});
 
-    const { type } = props;
-
+const schema = [
+    {
+        name: "Male",
+        key: "male"
+    },
+    {
+        name: "Female",
+        key: "female"
+    },
+    {
+        name: "Any",
+        key: "any"
+    }
+]
+const propertyTypes = [
+    {
+        name: "Room",
+        key: 1
+    },
+    {
+        name: "Flat",
+        key: 2
+    },
+    {
+        name: "Villa",
+        key:3
+    }
+]
+ const resources = [
+                { id: 1, name: "Gym", imgSrc: "https://www.flatmate.in/dumbbell.png" },
+                { id: 2, name: "park", imgSrc: "https://www.flatmate.in/dumbbell.png" },
+                { id: 3, name: "Swimming pool", imgSrc: "https://www.flatmate.in/dumbbell.png" },
+                { id: 4, name: "made", imgSrc: "https://www.flatmate.in/dumbbell.png" },
+                { id: 5, name: "AC", imgSrc: "https://www.flatmate.in/dumbbell.png" },
+                { id: 6, name: "fan", imgSrc: "https://www.flatmate.in/dumbbell.png" },
+                { id: 7, name: "cooler", imgSrc: "https://www.flatmate.in/dumbbell.png" },
+                { id: 8, name: "water", imgSrc: "https://www.flatmate.in/dumbbell.png" },
+        ]
+const PropertyListingForm = ({ type }: Props) => {
+    const [location, setLocation] = useState<ILocation>();
     const [submitted, setSubmitted] = useState(false);
 
     const handleSubmit = (values: PropertyFormValues) => {
-        console.log("Property Details", values);
+        console.log("Property Details", { ...values, location });
         setSubmitted(true);
     };
 
@@ -78,52 +134,29 @@ const PropertyListingForm = (props: Props) => {
                         <Form>
                             <div className="mb-4">
                                 <label className="font-semibold">Property Title</label>
-                                <CustomizedRoundedIcon setFieldValue={setFieldValue} selectedHighLights={values?.highLights} />
-                            </div>
-                            <div className="mb-4">
-                                <label className="font-semibold">Property Title</label>
-                                <TextField
-                                    name="title"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={values.title}
-                                    onChange={handleChange}
-                                    error={touched.title && Boolean(errors.title)}
-                                    helperText={touched.title && errors.title}
+                                <CustomizedRoundedSelect
+                                    setFieldValue={setFieldValue}
+                                    selectedHighLights={values.highLights}
                                 />
-
-                                {/* <LocationSearchBar /> */}
                             </div>
-
 
                             <div className="mb-4">
-                                <label className="font-semibold">Property Type</label>
-                                <TextField
-                                    select
-                                    name="propertyType"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={values.propertyType}
-                                    onChange={handleChange}
-                                    error={touched.propertyType && Boolean(errors.propertyType)}
-                                    helperText={touched.propertyType && errors.propertyType}
-                                >
-                                    <MenuItem value="Apartment">Apartment</MenuItem>
-                                    <MenuItem value="House">House</MenuItem>
-                                    <MenuItem value="Villa">Villa</MenuItem>
-                                    <MenuItem value="Studio">Studio</MenuItem>
-                                </TextField>
+                                <label className="font-semibold">Location</label>
+                                <LocationSearch setLocation={setLocation} />
                             </div>
 
-
-
-
-
+                            <div className="mb-4">
+                                <div className="mb-4">
+                                <label className="font-semibold">Property Type</label>
+                                <SelectSingleOption setFieldValue={setFieldValue} selectedValue={values?.typeId} fieldKey={"typeId"} schema={propertyTypes} />
+                            </div>
+                            </div>
 
                             <div className="mb-4">
                                 <label className="font-semibold">Rent Price</label>
                                 <TextField
                                     name="rentPrice"
+                                    type="number"
                                     variant="outlined"
                                     fullWidth
                                     value={values.rentPrice}
@@ -134,9 +167,15 @@ const PropertyListingForm = (props: Props) => {
                             </div>
 
                             <div className="mb-4">
+                                <label className="font-semibold">Looking for</label>
+                                <SelectSingleOption setFieldValue={setFieldValue} selectedValue={values?.partnerGender} fieldKey={"partnerGender"} schema={schema} />
+                            </div>
+
+                            <div className="mb-4">
                                 <label className="font-semibold">Deposit</label>
                                 <TextField
                                     name="deposit"
+                                    type="number"
                                     variant="outlined"
                                     fullWidth
                                     value={values.deposit}
@@ -147,62 +186,38 @@ const PropertyListingForm = (props: Props) => {
                             </div>
 
                             <div className="mb-4">
-                                <label className="font-semibold">Address</label>
-                                <TextField
-                                    name="address"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={values.address}
-                                    onChange={handleChange}
-                                    error={touched.address && Boolean(errors.address)}
-                                    helperText={touched.address && errors.address}
+                                <label className="font-semibold">Amenities</label>
+                                <CustomizedSelectChip
+                                    setFieldValue={setFieldValue}
+                                    selectedResources={values.resources}
+                                    fieldKey = {"resources"}
+                                    schema ={resources}
                                 />
                             </div>
-
-
-
                             <div className="mb-4">
-                                <label className="font-semibold">Amenities</label>
-                                <TextField
-                                    name="amenities"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={values.amenities}
-                                    onChange={handleChange}
-                                    error={touched.amenities && Boolean(errors.amenities)}
-                                    helperText={touched.amenities && errors.amenities}
+                                <label className="font-semibold">Preferences</label>
+                                <CustomizedSelectChip
+                                    setFieldValue={setFieldValue}
+                                    selectedResources={values.preferences}
+                                    fieldKey = {"preferences"}
+                                       schema ={resources}
                                 />
                             </div>
 
                             <div className="mb-4">
                                 <label className="font-semibold">Available Date</label>
                                 <TextField
-                                    name="availableDate"
+                                    name="availableFrom"
                                     type="date"
                                     variant="outlined"
                                     fullWidth
-                                    value={values.availableDate}
+                                    value={values.availableFrom}
                                     onChange={handleChange}
-                                    error={touched.availableDate && Boolean(errors.availableDate)}
-                                    helperText={touched.availableDate && errors.availableDate}
+                                    error={touched.availableFrom && Boolean(errors.availableFrom)}
+                                    helperText={touched.availableFrom && errors.availableFrom}
                                     InputLabelProps={{ shrink: true }}
                                 />
                             </div>
-
-                            <div className="mb-4">
-                                <label className="font-semibold">Parking</label>
-                                <TextField
-                                    name="parking"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={values.parking}
-                                    onChange={handleChange}
-                                    error={touched.parking && Boolean(errors.parking)}
-                                    helperText={touched.parking && errors.parking}
-                                />
-                            </div>
-
-
 
                             <div className="mb-4">
                                 <label className="font-semibold">Description</label>

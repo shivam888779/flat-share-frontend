@@ -52,7 +52,6 @@ const OTPInput = ({ length = 4, onComplete,phoneNumber }: InputProps) => {
     if (newPin.every((digit) => digit !== '')) {
       onComplete(newPin.join(''));
       api.post("/otp/verify-otp",{otp:newPin.join('')})
-      console.log(newPin.join(''))
     }
   };
 
