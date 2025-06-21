@@ -73,6 +73,7 @@ const LogInForm = () => {
 
     if (data?.status) {
       localStorage.setItem("authToken", data?.data?.token)
+      console.log(data?.data)
       setState({ userData: data?.data })
       if (data?.data?.verified) {
         router.push("/")

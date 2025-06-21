@@ -8,6 +8,7 @@ export default function Home() {
   const a = Array(10).fill(0);
 
   const {state} = useGlobalContext();
+  console.log(state)
   return (
     <Box  width={"100%"}>
       <Header />

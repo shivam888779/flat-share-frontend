@@ -5,6 +5,7 @@ import React, {
   useReducer,
   ReactNode,
   Dispatch,
+  useEffect,
 } from "react";
 import { IInitialState } from "./initial-state-type";
 import { initialStateData } from "./initial-state";
@@ -31,10 +32,29 @@ interface GlobalContextProviderProps {
   children: ReactNode;
 }
 
-const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({ children }) => {
+const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
+  children,
+}) => {
   const [state, setState] = useReducer(simpleReducer, initialStateData);
 
-  const providerValue = useMemo(() => ({ state, setState }), [state, setState]);
+  const providerValue = useMemo(() => ({ state, setState }), [state]);
+
+  useEffect(() => {
+    if (state !== initialStateData) {
+      localStorage.setItem("state", JSON.stringify(state));
+    }
+  }, [state]);
+
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem("state");
+      if (savedState) {
+        setState(JSON.parse(savedState));
+      }
+    } catch (e) {
+      console.error("Could not load state from local storage", e);
+    }
+  }, []);
 
   return (
     <GlobalContext.Provider value={providerValue}>
@@ -45,7 +65,4 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({ children 
 
 export const useGlobalContext = () => useContext(GlobalContext);
 
-export {
-  GlobalContextProvider,
-  GlobalContext,
-};
+export { GlobalContextProvider, GlobalContext };
