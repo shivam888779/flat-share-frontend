@@ -30,14 +30,14 @@ const validationSchema = Yup.object({
 const CreateProfileForm = () => {
   const { state, setState } = useGlobalContext();
   const [submitted, setSubmitted] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const router = useRouter();
 
   const handleSubmit = async (values: ICreateProfilePayLoad) => {
     console.log(values);
     const result = await generateSignedUrl({
       entity: "profile",
-      file: selectedFile,
+      file: selectedFiles[0],
     });
     if (result.publicUrl) {
       const { data } = await createProfileApi({...values,profileImage:result?.publicUrl});
@@ -123,7 +123,7 @@ const CreateProfileForm = () => {
                   Profile Image
                 </label>
                 <ImageUpload
-                  setSelectedFile={setSelectedFile}
+                  setSelectedFiles={setSelectedFiles}
                 />
                 {touched.profileImage && errors.profileImage && (
                   <Typography variant="body2" className="text-red-600 mt-1">
