@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import SubscriptionDetailCard from "../SubscriptionDetailCard";
 import { useGlobalContext } from "@/global-context";
+import { updateProfileApi } from "@/pages/my-profile/apis";
 
 const MyProfileComponent = () => {
   const { state, setState } = useGlobalContext();
@@ -22,41 +23,20 @@ const MyProfileComponent = () => {
     setProfileData(state?.userData);
   }, [state]);
 
-  // In a real application, you would fetch this data
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     try {
-  //       const response = await fetch('/api/user/4'); // Example endpoint
-  //       const data = await response.json();
-  //       setProfileData(data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch user data:", error);
-  //     }
-  //   };
-  //   fetchUserData();
-  // }, []);
-
   const handleChange = (event: any) => {
     const { name, value } = event.target;
     setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
-    // Here you would typically send the updated data to your backend
-    // For example:
-    // try {
-    //   const response = await fetch('/api/user/4', {
-    //     method: 'PUT',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(profileData),
-    //   });
-    //   if (!response.ok) throw new Error('Failed to save profile data');
-    //   const updatedData = await response.json();
-    //   setProfileData(updatedData);
-    //   setIsEditMode(false);
-    // } catch (error) {
-    //   console.error("Failed to save profile data:", error);
-    // }
+    try {
+      const { data } = await updateProfileApi(profileData);
+      setState({ userData: data?.data });
+      setProfileData(data?.data);
+      setIsEditMode(false);
+    } catch (error) {
+      console.error("Failed to save profile data:", error);
+    }
     console.log("Saved data:", profileData);
     setIsEditMode(false); // Exit edit mode after saving
   };
@@ -105,7 +85,7 @@ const MyProfileComponent = () => {
             name="phoneNo"
             value={profileData.phoneNo}
             onChange={handleChange}
-            disabled={!isEditMode}
+            disabled={true}
             placeholder="Phone Number..."
           />
         </Box>

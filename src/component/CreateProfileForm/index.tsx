@@ -8,6 +8,7 @@ import { createProfileApi } from "@/pages/create-profile/apis";
 import { ICreateProfilePayLoad } from "@/types/user";
 import { useGlobalContext } from "@/global-context";
 import { useRouter } from "next/router";
+import ImageUpload from "../ImageUpload";
 
 
 
@@ -43,6 +44,8 @@ const CreateProfileForm = () => {
       
     }
   };
+
+  console.log(process.env.NEXT_PUBLIC_API_URL,"process.env.NEXT_PUBLIC_API_URL")
 
   return (
     <Box maxWidth="sm" mt={8} mx="auto">
@@ -103,7 +106,7 @@ const CreateProfileForm = () => {
               </div>
 
               <div className="mb-4">
-                <label className="font-semibold">Image URL</label>
+                {/* <label className="font-semibold">Image URL</label>
                 <TextField
                   name="profileImage"
                   variant="outlined"
@@ -112,7 +115,8 @@ const CreateProfileForm = () => {
                   onChange={handleChange}
                   error={touched.profileImage && Boolean(errors.profileImage)}
                   helperText={touched.profileImage && errors.profileImage}
-                />
+                /> */}
+                <ImageUpload entity="profile" onUploadSuccess={()=>{console.log("uploaded")}} key={"7888"}/>
               </div>
 
               <div className="flex justify-center">

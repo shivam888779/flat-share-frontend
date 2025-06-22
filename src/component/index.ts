@@ -11,6 +11,7 @@ import MyProfileComponent from "./MyProfileComponent";
 import SubscriptionDetailCard from "./SubscriptionDetailCard";
 import ListPropertyForm from "./ListPropertyForm";
 import RegisterForm from "./RegistrationForm";
+import ImageUpload from "./ImageUpload";
 
 export {
     Header,
@@ -25,5 +26,6 @@ export {
     MyProfileComponent,
     SubscriptionDetailCard,
     ListPropertyForm,
-    RegisterForm
+    RegisterForm,
+    ImageUpload
 }
