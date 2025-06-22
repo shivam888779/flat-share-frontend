@@ -28,6 +28,7 @@ const Header = () => {
                 <Stack direction="row" >
                     <Button color="secondary" onClick={handleDialogOpen}> Sign Up </Button>
                     <Button color="secondary" onClick={()=>router.push("/login")} >Log In</Button>
+                    <Button color="secondary" onClick={()=>router.push("/my-profile")} >Profile</Button>
                 </Stack>
             </Box>
         </Stack>

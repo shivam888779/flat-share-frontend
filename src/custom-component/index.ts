@@ -6,5 +6,5 @@ export {
     LocationSearch,
     CustomizedRoundedSelect,
     CustomizedSelectChip,
-    SelectSingleOption
+    SelectSingleOption,
 }

@@ -26,8 +26,9 @@ const theme = createTheme({
   components: {
     MuiIconButton:{
       styleOverrides :{root:{
-          
-          backgroundColor:palette.primary.light,
+
+             
+          backgroundColor:"none",
           "&:hover":{
             backgroundColor:palette.primary.dark,
           }

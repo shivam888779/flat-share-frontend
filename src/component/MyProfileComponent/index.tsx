@@ -6,18 +6,23 @@ import {
   Stack,
   TextField,
   Typography,
+  Avatar,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import SubscriptionDetailCard from "../SubscriptionDetailCard";
 import { useGlobalContext } from "@/global-context";
 import { updateProfileApi } from "@/pages/my-profile/apis";
+import generateSignedUrl from "@/utils/generateSignedUrl";
+import { useGlobalSnackbar } from "@/hooks/useSnackbar";
+
 
 const MyProfileComponent = () => {
   const { state, setState } = useGlobalContext();
   const [isEditMode, setIsEditMode] = useState(false);
-
   const [profileData, setProfileData] = useState(state?.userData);
-  console.log(state, profileData);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const snackbar = useGlobalSnackbar();
+
 
   useEffect(() => {
     setProfileData(state?.userData);
@@ -28,21 +33,55 @@ const MyProfileComponent = () => {
     setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      // Optional: show a temporary preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileData((prev) => ({
+          ...prev,
+          profileImage: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = async () => {
     try {
-      const { data } = await updateProfileApi(profileData);
+      let updatedImageUrl = profileData.profileImage;
+
+      if (selectedFile) {
+        const result = await generateSignedUrl({
+          entity: "profile",
+          file: selectedFile,
+        });
+
+        if (result?.publicUrl) {
+          updatedImageUrl = result.publicUrl;
+        }
+      }
+
+      const { data } = await updateProfileApi({
+        ...profileData,
+        profileImage: updatedImageUrl,
+      });
+
       setState({ userData: data?.data });
+      snackbar.success(data?.message)   
       setProfileData(data?.data);
+      setSelectedFile(null);
       setIsEditMode(false);
     } catch (error) {
       console.error("Failed to save profile data:", error);
     }
-    console.log("Saved data:", profileData);
-    setIsEditMode(false); // Exit edit mode after saving
   };
 
   return (
-    <Box className="shadow-md rounded-lg p-8 my-16 mx-auto w-[55%]">
+    <Box width={{xs:"100%",md:"55%"}} className="xs:shadow-none md:shadow-md rounded-lg p-8 my-16 mx-auto">
+ 
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography variant="h3">My Profile</Typography>
         {!isEditMode && (
@@ -52,6 +91,24 @@ const MyProfileComponent = () => {
         )}
       </Stack>
       <hr className="my-6" />
+
+      {/* Profile Image */}
+      <Box mb={4} textAlign="center">
+        <Avatar
+          src={profileData.profileImage || ""}
+          alt="Profile"
+          sx={{ width: 120, height: 120, margin: "0 auto", mb: 1 }}
+        />
+        {isEditMode && (
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="block mx-auto"
+          />
+        )}
+      </Box>
+
       <Stack direction={"row"} gap={6} className="justify-between flex-wrap">
         <Box>
           <Typography variant="subtitle2" mb={0.5} ml={0.25}>
@@ -127,18 +184,18 @@ const MyProfileComponent = () => {
           <Typography variant="subtitle2" mb={0.5} ml={0.25}>
             Description
           </Typography>
-          <TextField
+          <textarea
             name="description"
-            fullWidth
-            multiline
-            rows={4}
             value={profileData.description || ""}
             onChange={handleChange}
             disabled={!isEditMode}
-            placeholder="Description..."
+            placeholder="Write something about yourself..."
+            rows={4}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
           />
         </Box>
       </Stack>
+
       {isEditMode && (
         <Button
           type="submit"
@@ -149,6 +206,7 @@ const MyProfileComponent = () => {
           Save Changes
         </Button>
       )}
+
       <hr className="my-6" />
       <Typography variant="h3">Subscription Details</Typography>
       <SubscriptionDetailCard />

@@ -9,8 +9,7 @@ import { ICreateProfilePayLoad } from "@/types/user";
 import { useGlobalContext } from "@/global-context";
 import { useRouter } from "next/router";
 import ImageUpload from "../ImageUpload";
-
-
+import generateSignedUrl from "@/utils/generateSignedUrl";
 
 // Initial values
 const initialValues: ICreateProfilePayLoad = {
@@ -25,32 +24,46 @@ const validationSchema = Yup.object({
   firstName: Yup.string().required("First name is required"),
   lastName: Yup.string().required("Last name is required"),
   gender: Yup.string().required("Gender is required"),
-  profileImage: Yup.string().required("Image URL is required"),
+  // profileImage: Yup.string().required("Image URL is required"),
 });
 
 const CreateProfileForm = () => {
-
-    const {state,setState} = useGlobalContext()
+  const { state, setState } = useGlobalContext();
   const [submitted, setSubmitted] = useState(false);
-  const router = useRouter()
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const router = useRouter();
 
-  const handleSubmit = async (values:  ICreateProfilePayLoad) => {
-    const {data} = await createProfileApi(values)
-    if (data?.status) {
-      setState({userData:{...state?.userData,...data?.data}})
-      
-        router.push("/")
-      
-      
+  const handleSubmit = async (values: ICreateProfilePayLoad) => {
+    console.log(values);
+    const result = await generateSignedUrl({
+      entity: "profile",
+      file: selectedFile,
+    });
+    if (result.publicUrl) {
+      const { data } = await createProfileApi({...values,profileImage:result?.publicUrl});
+
+      if (data?.status) {
+        setState({ userData: { ...state?.userData, ...data?.data } });
+        router.push("/");
+
+         
+      }
     }
   };
 
-  console.log(process.env.NEXT_PUBLIC_API_URL,"process.env.NEXT_PUBLIC_API_URL")
+  console.log(
+    process.env.NEXT_PUBLIC_API_URL,
+    "process.env.NEXT_PUBLIC_API_URL"
+  );
 
   return (
     <Box maxWidth="sm" mt={8} mx="auto">
-      <Box className="p-8 shadow-xl rounded-lg bg-white">
-        <Typography variant="h4" className="text-center mb-6 font-semibold text-gray-700">
+      
+      <Box className="p-8 xs:shadow-none md:shadow-md rounded-lg bg-white">
+        <Typography
+          variant="h4"
+          className="text-center mb-6 font-semibold text-gray-700"
+        >
           Create Profile
         </Typography>
 
@@ -59,7 +72,7 @@ const CreateProfileForm = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ handleChange, values, touched, errors }) => (
+          {({ handleChange, values, touched, errors, setFieldValue }) => (
             <Form>
               <div className="mb-4">
                 <label className="font-semibold">First Name</label>
@@ -106,17 +119,17 @@ const CreateProfileForm = () => {
               </div>
 
               <div className="mb-4">
-                {/* <label className="font-semibold">Image URL</label>
-                <TextField
-                  name="profileImage"
-                  variant="outlined"
-                  fullWidth
-                  value={values.profileImage}
-                  onChange={handleChange}
-                  error={touched.profileImage && Boolean(errors.profileImage)}
-                  helperText={touched.profileImage && errors.profileImage}
-                /> */}
-                <ImageUpload entity="profile" onUploadSuccess={()=>{console.log("uploaded")}} key={"7888"}/>
+                <label className="font-semibold mb-1 block">
+                  Profile Image
+                </label>
+                <ImageUpload
+                  setSelectedFile={setSelectedFile}
+                />
+                {touched.profileImage && errors.profileImage && (
+                  <Typography variant="body2" className="text-red-600 mt-1">
+                    {errors.profileImage}
+                  </Typography>
+                )}
               </div>
 
               <div className="flex justify-center">
@@ -126,7 +139,10 @@ const CreateProfileForm = () => {
               </div>
 
               {submitted && (
-                <Typography variant="body1" className="text-green-500 mt-4 text-center">
+                <Typography
+                  variant="body1"
+                  className="text-green-500 mt-4 text-center"
+                >
                   Profile Created Successfully!
                 </Typography>
               )}
