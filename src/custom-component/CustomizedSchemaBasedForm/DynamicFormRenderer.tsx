@@ -7,7 +7,7 @@ import {
     CustomizedSelectChip,
     SelectSingleOption,
 } from "@/custom-component";
-import ImageUpload from '../ImageUpload';
+import { ImageUpload } from '@/component';
 
 interface DynamicFormRendererProps {
     schema: FormFieldSchema[];

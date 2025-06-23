@@ -1,26 +1,6 @@
-// Form field schema definitions
-export interface FormFieldSchema {
-    componentType: 'roundedSelect' | 'locationSearch' | 'selectSingleOption' | 'textField' | 'selectChip' | 'imageUpload' | 'textArea';
-    name: string;
-    type: string;
-    variant?: string;
-    fullWidth?: boolean;
-    fieldKey?: string;
-    schema?: any[];
-    inputLabel: string;
-    propsKey: string[];
-    multiline?: boolean;
-    rows?: number;
-    required?: boolean;
-    validation?: any;
-    placeholder?: string;
-    min?: number;
-    max?: number;
-    step?: number;
-    InputLabelProps?: any;
-}
+import { FormFieldSchema } from "@/custom-component/CustomizedSchemaBasedForm/formSchema";
+import * as Yup from "yup";
 
-// Data schemas
 export const propertyTypes = [
     { name: "Room", key: 1 },
     { name: "Flat", key: 2 },
@@ -198,4 +178,55 @@ export const propertyFormSchema: FormFieldSchema[] = [
         propsKey: ["setSelectedFiles"],
         required: true
     }
-]; 
+];
+
+export interface PropertyFormValues {
+    typeId: number;
+    rentPrice: number;
+    deposit: number;
+    resources: number[];
+    preferences: number[];
+    highLights: number[];
+    availableFrom: string;
+    description: string;
+    partnerGender: string;
+}
+
+export interface Props {
+    type: string;
+}
+
+// ----------------------
+// Initial Values
+// ----------------------
+export const initialValues: PropertyFormValues = {
+    typeId: 0,
+    rentPrice: 0,
+    deposit: 0,
+    resources: [],
+    preferences: [],
+    availableFrom: "",
+    description: "",
+    highLights: [],
+    partnerGender: "male"
+};
+
+// ----------------------
+// Validation Schema
+// ----------------------
+export const validationSchema = Yup.object({
+    typeId: Yup.number().required("Property type is required"),
+    partnerGender: Yup.string().required("Gender is required"),
+    rentPrice: Yup.number()
+        .typeError("Rent price must be a number")
+        .min(1, "Must be greater than 0")
+        .required("Rent price is required"),
+    deposit: Yup.number()
+        .typeError("Deposit must be a number")
+        .min(0, "Cannot be negative")
+        .required("Deposit is required"),
+    availableFrom: Yup.string().required("Available date is required"),
+    description: Yup.string()
+        .min(10, "Description should be at least 10 characters")
+        .required("Description is required"),
+});
