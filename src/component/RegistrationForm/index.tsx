@@ -2,10 +2,11 @@
 
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { Button, TextField, Typography, Divider, Box, IconButton } from "@mui/material";
+import { Button, TextField, Typography, Divider, Box, IconButton, InputLabel, Stack } from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import { useState } from "react";
+import Link from "next/link";
 
 interface SignUpFormValues {
   email: string;
@@ -102,58 +103,52 @@ const RegisterForm = () => {
           >
             {({ handleChange, values, touched, errors }) => (
               <Form>
-                <div className="mb-4">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <TextField
-                    id="email"
-                    name="email"
-                    variant="outlined"
-                    fullWidth
-                    value={values.email}
-                    onChange={handleChange}
-                    error={touched.email && Boolean(errors.email)}
-                    helperText={touched.email && errors.email}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <TextField
-                    id="password"
-                    name="password"
-                    type="password"
-                    variant="outlined"
-                    fullWidth
-                    value={values.password}
-                    onChange={handleChange}
-                    error={touched.password && Boolean(errors.password)}
-                    helperText={touched.password && errors.password}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                    Confirm Password
-                  </label>
-                  <TextField
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    variant="outlined"
-                    fullWidth
-                    value={values.confirmPassword}
-                    onChange={handleChange}
-                    error={touched.confirmPassword && Boolean(errors.confirmPassword)}
-                    helperText={touched.confirmPassword && errors.confirmPassword}
-                  />
-                </div>
-                <div className="text-center mb-4">
-                  <Button type="submit" variant="contained" fullWidth color="primary" className="py-2 text-lg">
+                <Stack spacing={3}>
+                  <div>
+                    <InputLabel shrink>Email</InputLabel>
+                    <TextField
+                      id="email"
+                      name="email"
+                      variant="outlined"
+                      fullWidth
+                      value={values.email}
+                      onChange={handleChange}
+                      error={touched.email && Boolean(errors.email)}
+                      helperText={touched.email && errors.email}
+                    />
+                  </div>
+                  <div>
+                    <InputLabel shrink>Password</InputLabel>
+                    <TextField
+                      id="password"
+                      name="password"
+                      type="password"
+                      variant="outlined"
+                      fullWidth
+                      value={values.password}
+                      onChange={handleChange}
+                      error={touched.password && Boolean(errors.password)}
+                      helperText={touched.password && errors.password}
+                    />
+                  </div>
+                  <div>
+                    <InputLabel shrink>Confirm Password</InputLabel>
+                    <TextField
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      variant="outlined"
+                      fullWidth
+                      value={values.confirmPassword}
+                      onChange={handleChange}
+                      error={touched.confirmPassword && Boolean(errors.confirmPassword)}
+                      helperText={touched.confirmPassword && errors.confirmPassword}
+                    />
+                  </div>
+                  <Button type="submit" variant="contained" fullWidth color="primary" size="large">
                     Register with Email
                   </Button>
-                </div>
+                </Stack>
               </Form>
             )}
           </Formik>
@@ -166,26 +161,24 @@ const RegisterForm = () => {
           >
             {({ handleChange, values, touched, errors }) => (
               <Form>
-                <div className="mb-4">
-                  <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
-                    Enter OTP
-                  </label>
-                  <TextField
-                    id="otp"
-                    name="otp"
-                    variant="outlined"
-                    fullWidth
-                    value={values.otp}
-                    onChange={handleChange}
-                    error={touched.otp && Boolean(errors.otp)}
-                    helperText={touched.otp && errors.otp}
-                  />
-                </div>
-                <div className="text-center mb-4">
-                  <Button type="submit" variant="contained" fullWidth color="primary" className="py-2 text-lg">
+                <Stack spacing={3}>
+                  <div>
+                    <InputLabel shrink>Enter OTP</InputLabel>
+                    <TextField
+                      id="otp"
+                      name="otp"
+                      variant="outlined"
+                      fullWidth
+                      value={values.otp}
+                      onChange={handleChange}
+                      error={touched.otp && Boolean(errors.otp)}
+                      helperText={touched.otp && errors.otp}
+                    />
+                  </div>
+                  <Button type="submit" variant="contained" fullWidth color="primary" size="large">
                     Verify OTP
                   </Button>
-                </div>
+                </Stack>
               </Form>
             )}
           </Formik>
@@ -198,33 +191,36 @@ const RegisterForm = () => {
           >
             {({ handleChange, values, touched, errors }) => (
               <Form>
-                <div className="mb-4">
-                  <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
-                    Mobile Number
-                  </label>
-                  <TextField
-                    id="mobile"
-                    name="mobile"
-                    variant="outlined"
-                    fullWidth
-                    value={values.mobile}
-                    onChange={handleChange}
-                    error={touched.mobile && Boolean(errors.mobile)}
-                    helperText={touched.mobile && errors.mobile}
-                  />
-                </div>
-                <div className="text-center mb-4">
-                  <Button type="submit" variant="contained" fullWidth color="primary" className="py-2 text-lg">
+                <Stack spacing={3}>
+                  <div>
+                    <InputLabel shrink>Mobile Number</InputLabel>
+                    <TextField
+                      id="mobile"
+                      name="mobile"
+                      variant="outlined"
+                      fullWidth
+                      value={values.mobile}
+                      onChange={handleChange}
+                      error={touched.mobile && Boolean(errors.mobile)}
+                      helperText={touched.mobile && errors.mobile}
+                    />
+                  </div>
+                  <Button type="submit" variant="contained" fullWidth color="primary" size="large">
                     Send OTP
                   </Button>
-                </div>
+                </Stack>
               </Form>
             )}
           </Formik>
         )}
 
         <Typography variant="body2" className="text-center text-gray-500 mt-6">
-          Already have an account? <a href="/login" className="text-blue-500">Log in here</a>
+          Already have an account?{" "}
+          <Link href="/login" passHref>
+            <Typography component="a" color="primary">
+              Log in
+            </Typography>
+          </Link>
         </Typography>
       </Box>
     </Box>

@@ -2,7 +2,7 @@
 
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { Button, TextField, Typography, Divider, Box, IconButton } from "@mui/material";
+import { Button, TextField, Typography, Divider, Box, IconButton, Stack, InputLabel } from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import { useState } from "react";
@@ -89,23 +89,44 @@ const LogInForm = () => {
   };
 
   return (
-    <Box maxWidth={"sm"} mt={{ xs: 12, md: 8 }} mx="auto">
-      <Box className="mt-16 p-8 shadow-xl max-sm:shadow-none rounded-lg bg-white">
-        <Typography variant="h4" className="text-center mb-6 font-semibold text-gray-700">
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+      px={{ xs: 2, sm: 4, md: 8 }}
+    >
+      <Box
+        width="100%"
+        maxWidth="sm"
+        p={{ xs: 2, sm: 4, md: 6 }}
+        boxShadow={{ xs: "none", sm: "xl" }}
+        borderRadius="lg"
+        bgcolor="background.paper"
+      >
+        <Typography variant="h3" component="h1" fontWeight="bold" textAlign="center" mb={2} color="text.primary">
           Welcome Back!
         </Typography>
+        <Typography variant="subtitle1" textAlign="center" color="text.secondary" mb={4}>
+          Sign in to continue
+        </Typography>
 
-        <div className="flex justify-center mb-6">
-          <IconButton onClick={() => setIsEmailLogin(true)} className={`mr-4 ${isEmailLogin ? "bg-blue-500" : ""}`}>
-            <EmailIcon className={`text-3xl ${isEmailLogin ? "text-white" : "text-gray-500"}`} />
-          </IconButton>
-          <IconButton onClick={() => setIsEmailLogin(false)} className={`${!isEmailLogin ? "bg-blue-500" : ""}`}>
-            <PhoneIcon className={`text-3xl ${!isEmailLogin ? "text-white" : "text-gray-500"}`} />
-          </IconButton>
-        </div>
-
-        <Divider className="mb-6" />
-
+        <Stack direction="row" spacing={2} justifyContent="center" mb={4}>
+          <Button
+            variant={isEmailLogin ? "contained" : "outlined"}
+            onClick={() => setIsEmailLogin(true)}
+            startIcon={<EmailIcon />}
+          >
+            Email
+          </Button>
+          <Button
+            variant={!isEmailLogin ? "contained" : "outlined"}
+            onClick={() => setIsEmailLogin(false)}
+            startIcon={<PhoneIcon />}
+          >
+            Phone
+          </Button>
+        </Stack>
         {isEmailLogin ? (
           <Formik
             initialValues={emailInitialValues}
@@ -114,42 +135,36 @@ const LogInForm = () => {
           >
             {({ handleChange, values, touched, errors }) => (
               <Form>
-                <div className="mb-4">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <TextField
-                    id="email"
-                    name="email"
-                    variant="outlined"
-                    fullWidth
-                    value={values.email}
-                    onChange={handleChange}
-                    error={touched.email && Boolean(errors.email)}
-                    helperText={touched.email && errors.email}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <TextField
-                    id="password"
-                    name="password"
-                    type="password"
-                    variant="outlined"
-                    fullWidth
-                    value={values.password}
-                    onChange={handleChange}
-                    error={touched.password && Boolean(errors.password)}
-                    helperText={touched.password && errors.password}
-                  />
-                </div>
-                <div className="text-center mb-4">
-                  <Button type="submit" variant="contained" fullWidth color="primary" className="py-2 text-lg">
-                    Login with Email
-                  </Button>
-                </div>
+                <InputLabel shrink htmlFor="bootstrap-input">
+                  Email
+                </InputLabel>
+                <TextField
+                  id="email"
+                  name="email"
+                  variant="outlined"
+                  fullWidth
+                  value={values.email}
+                  onChange={handleChange}
+                  error={touched.email && Boolean(errors.email)}
+                  helperText={touched.email && errors.email}
+                />
+                <InputLabel shrink htmlFor="bootstrap-input">
+                  Password
+                </InputLabel>
+                <TextField
+                  id="password"
+                  name="password"
+                  type="password"
+                  variant="outlined"
+                  fullWidth
+                  value={values.password}
+                  onChange={handleChange}
+                  error={touched.password && Boolean(errors.password)}
+                  helperText={touched.password && errors.password}
+                />
+                <Button type="submit" variant="contained" fullWidth color="primary" size="large">
+                  Login with Email
+                </Button>
               </Form>
             )}
           </Formik>
@@ -162,13 +177,11 @@ const LogInForm = () => {
           >
             {({ handleChange, values, touched, errors }) => (
               <Form>
-                <div className="mb-4">
-                  <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
-                    Enter OTP
-                  </label>
+                <Stack spacing={3}>
                   <TextField
                     id="otp"
                     name="otp"
+                    label="Enter OTP"
                     variant="outlined"
                     fullWidth
                     value={values.otp}
@@ -176,12 +189,10 @@ const LogInForm = () => {
                     error={touched.otp && Boolean(errors.otp)}
                     helperText={touched.otp && errors.otp}
                   />
-                </div>
-                <div className="text-center mb-4">
-                  <Button type="submit" variant="contained" fullWidth color="primary" className="py-2 text-lg">
+                  <Button type="submit" variant="contained" fullWidth color="primary" size="large">
                     Verify OTP
                   </Button>
-                </div>
+                </Stack>
               </Form>
             )}
           </Formik>
@@ -194,13 +205,11 @@ const LogInForm = () => {
           >
             {({ handleChange, values, touched, errors }) => (
               <Form>
-                <div className="mb-4">
-                  <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
-                    Mobile Number
-                  </label>
+                <Stack spacing={3}>
                   <TextField
                     id="mobile"
                     name="mobile"
+                    label="Mobile Number"
                     variant="outlined"
                     fullWidth
                     value={values.mobile}
@@ -208,19 +217,21 @@ const LogInForm = () => {
                     error={touched.mobile && Boolean(errors.mobile)}
                     helperText={touched.mobile && errors.mobile}
                   />
-                </div>
-                <div className="text-center mb-4">
-                  <Button type="submit" variant="contained" fullWidth color="primary" className="py-2 text-lg">
+                  <Button type="submit" variant="contained" fullWidth color="primary" size="large">
                     Send OTP
                   </Button>
-                </div>
+                </Stack>
               </Form>
             )}
           </Formik>
         )}
-
-        <Typography variant="body2" className="text-center text-gray-500 mt-6">
-          Dont have an account? <Link href="/register" className="text-blue-500">Sign up here</Link>
+        <Typography variant="body2" textAlign="center" mt={4}>
+          Do not have an account?{" "}
+          <Link href="/register" passHref>
+            <Typography component="a" color="primary">
+              Sign up here
+            </Typography>
+          </Link>
         </Typography>
       </Box>
     </Box>

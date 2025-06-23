@@ -11,25 +11,73 @@ import {
     Stack
 } from "@mui/material";
 import { useState } from "react";
-import { ILocation, IPropertyFormValues } from "@/types/property";
+import { ILocation } from "@/types/property";
 import generateSignedUrl from "@/utils/generateSignedUrl";
-import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
-import { initialValues, propertyFormSchema, PropertyFormValues, Props, validationSchema } from "@/pages/list-property/data";
-import { useGlobalSnackbar } from "@/hooks/useSnackbar";
+import DynamicFormRenderer from './DynamicFormRenderer';
+import { propertyFormSchema } from './formSchema';
+import ExampleUsage from "./ExampleUsage";
 
 // ----------------------
 // Type Definitions
 // ----------------------
+interface PropertyFormValues {
+    typeId: number;
+    rentPrice: number;
+    deposit: number;
+    resources: number[];
+    preferences: number[];
+    highLights: number[];
+    availableFrom: string;
+    description: string;
+    partnerGender: string;
+}
 
+interface Props {
+    type: string;
+}
+
+// ----------------------
+// Initial Values
+// ----------------------
+const initialValues: PropertyFormValues = {
+    typeId: 0,
+    rentPrice: 0,
+    deposit: 0,
+    resources: [],
+    preferences: [],
+    availableFrom: "",
+    description: "",
+    highLights: [],
+    partnerGender: "male"
+};
+
+// ----------------------
+// Validation Schema
+// ----------------------
+const validationSchema = Yup.object({
+    typeId: Yup.number().required("Property type is required"),
+    partnerGender: Yup.string().required("Gender is required"),
+    rentPrice: Yup.number()
+        .typeError("Rent price must be a number")
+        .min(1, "Must be greater than 0")
+        .required("Rent price is required"),
+    deposit: Yup.number()
+        .typeError("Deposit must be a number")
+        .min(0, "Cannot be negative")
+        .required("Deposit is required"),
+    availableFrom: Yup.string().required("Available date is required"),
+    description: Yup.string()
+        .min(10, "Description should be at least 10 characters")
+        .required("Description is required"),
+});
 
 const PropertyListingForm = ({ type }: Props) => {
     const [location, setLocation] = useState<ILocation>();
     const [submitted, setSubmitted] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const snackbar = useGlobalSnackbar();
 
-    const handleSubmit = async (values: IPropertyFormValues) => {
+    const handleSubmit = async (values: PropertyFormValues) => {
         if (selectedFiles.length === 0) {
             // Optional: Add user feedback about requiring images
             console.error("Please select at least one image.");
@@ -69,10 +117,6 @@ const PropertyListingForm = ({ type }: Props) => {
             };
 
             console.log("Property Details with Image URLs", finalSubmission);
-                  const { data } = await listPropertyApi(finalSubmission);
-
-
-      snackbar.success(data?.message)  
             setSubmitted(true);
 
         } catch (error) {
@@ -92,7 +136,7 @@ const PropertyListingForm = ({ type }: Props) => {
 
                 <Formik
                     initialValues={initialValues}
-                    // validationSchema={validationSchema}
+                    validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
                     {({ handleChange, values, touched, errors, setFieldValue }) => (
@@ -132,6 +176,7 @@ const PropertyListingForm = ({ type }: Props) => {
                         </Form>
                     )}
                 </Formik>
+                <ExampleUsage />
             </Box>
         </Box>
     );
