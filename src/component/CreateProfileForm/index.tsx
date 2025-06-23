@@ -1,15 +1,16 @@
 // pages/CreateProfileForm.tsx
 
-import { Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { Button, TextField, Typography, MenuItem, Box, InputLabel, Stack } from "@mui/material";
+import { Button, Typography, Box, Stack } from "@mui/material";
 import { useState } from "react";
 import { createProfileApi } from "@/pages/create-profile/apis";
 import { ICreateProfilePayLoad } from "@/types/user";
 import { useGlobalContext } from "@/global-context";
 import { useRouter } from "next/router";
-import ImageUpload from "../ImageUpload";
 import generateSignedUrl from "@/utils/generateSignedUrl";
+import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
+import { createProfileFormSchema } from "@/pages/create-profile/data";
 
 // Initial values
 const initialValues: ICreateProfilePayLoad = {
@@ -45,8 +46,6 @@ const CreateProfileForm = () => {
       if (data?.status) {
         setState({ userData: { ...state?.userData, ...data?.data } });
         router.push("/");
-
-
       }
     }
   };
@@ -58,7 +57,6 @@ const CreateProfileForm = () => {
 
   return (
     <Box maxWidth="sm" mt={8} mx="auto">
-
       <Box className="p-8 xs:shadow-none md:shadow-md rounded-lg bg-white">
         <Typography
           variant="h4"
@@ -75,61 +73,16 @@ const CreateProfileForm = () => {
           {({ handleChange, values, touched, errors, setFieldValue }) => (
             <Form>
               <Stack spacing={3}>
-                <div>
-                  <InputLabel shrink>First Name</InputLabel>
-                  <TextField
-                    name="firstName"
-                    variant="outlined"
-                    fullWidth
-                    value={values.firstName}
-                    onChange={handleChange}
-                    error={touched.firstName && Boolean(errors.firstName)}
-                    helperText={touched.firstName && errors.firstName}
-                  />
-                </div>
-
-                <div>
-                  <InputLabel shrink>Last Name</InputLabel>
-                  <TextField
-                    name="lastName"
-                    variant="outlined"
-                    fullWidth
-                    value={values.lastName}
-                    onChange={handleChange}
-                    error={touched.lastName && Boolean(errors.lastName)}
-                    helperText={touched.lastName && errors.lastName}
-                  />
-                </div>
-
-                <div>
-                  <InputLabel shrink>Gender</InputLabel>
-                  <TextField
-                    select
-                    name="gender"
-                    variant="outlined"
-                    fullWidth
-                    value={values.gender}
-                    onChange={handleChange}
-                    error={touched.gender && Boolean(errors.gender)}
-                    helperText={touched.gender && errors.gender}
-                  >
-                    <MenuItem value="Male">Male</MenuItem>
-                    <MenuItem value="Female">Female</MenuItem>
-                    <MenuItem value="Other">Other</MenuItem>
-                  </TextField>
-                </div>
-
-                <div>
-                  <InputLabel shrink>Profile Image</InputLabel>
-                  <ImageUpload
-                    setSelectedFiles={setSelectedFiles}
-                  />
-                  {touched.profileImage && errors.profileImage && (
-                    <Typography variant="caption" color="error" sx={{ mt: 1 }}>
-                      {errors.profileImage}
-                    </Typography>
-                  )}
-                </div>
+                <DynamicFormRenderer
+                  schema={createProfileFormSchema}
+                  values={values}
+                  touched={touched}
+                  errors={errors}
+                  handleChange={handleChange}
+                  setFieldValue={setFieldValue}
+                  setLocation={() => { }} // Not needed for profile form
+                  setSelectedFiles={setSelectedFiles}
+                />
 
                 <Button variant="contained" color="primary" type="submit" size="large" fullWidth>
                   Create Profile

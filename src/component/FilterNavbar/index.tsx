@@ -12,7 +12,7 @@ export default function FilterNavbar() {
   };
 
   return (
-    <Stack width='100%' direction="row" mt={12} justifyContent={"space-between"}>
+    <Stack width='100%' direction="row" justifyContent={"space-between"}>
       <Tabs
         value={value}
         onChange={handleChange}
@@ -25,22 +25,22 @@ export default function FilterNavbar() {
         <Tab value="three" label="Item Three" />
       </Tabs>
       <Stack direction={"row"} gap={3}>
-      <Autocomplete
-        disablePortal
-        id="combo-box-demo"
-        options={top100Films}
-        sx={{ width: 300 }}
-        renderInput={(params) => <TextField {...params} label="Location" />}
-      />
-      <Autocomplete
-        disablePortal
-        id="combo-box-demo"
-        options={top100Films}
-        sx={{ width: 100 }}
-        renderInput={(params) => <TextField {...params} label="Gender" />}
-      />
+        <Autocomplete
+          disablePortal
+          id="combo-box-demo"
+          options={top100Films}
+          sx={{ width: 300 }}
+          renderInput={(params) => <TextField {...params} label="Location" />}
+        />
+        <Autocomplete
+          disablePortal
+          id="combo-box-demo"
+          options={top100Films}
+          sx={{ width: 100 }}
+          renderInput={(params) => <TextField {...params} label="Gender" />}
+        />
       </Stack>
-    
+
     </Stack>
   );
 }
