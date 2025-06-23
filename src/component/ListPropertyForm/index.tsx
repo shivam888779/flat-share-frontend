@@ -11,10 +11,11 @@ import {
     Stack
 } from "@mui/material";
 import { useState } from "react";
-import { ILocation } from "@/types/property";
+import { ILocation, IPropertyFormValues } from "@/types/property";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
 import { initialValues, propertyFormSchema, PropertyFormValues, Props, validationSchema } from "@/pages/list-property/data";
+import { useGlobalSnackbar } from "@/hooks/useSnackbar";
 
 // ----------------------
 // Type Definitions
@@ -26,8 +27,9 @@ const PropertyListingForm = ({ type }: Props) => {
     const [submitted, setSubmitted] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const snackbar = useGlobalSnackbar();
 
-    const handleSubmit = async (values: PropertyFormValues) => {
+    const handleSubmit = async (values: IPropertyFormValues) => {
         if (selectedFiles.length === 0) {
             // Optional: Add user feedback about requiring images
             console.error("Please select at least one image.");
@@ -67,6 +69,10 @@ const PropertyListingForm = ({ type }: Props) => {
             };
 
             console.log("Property Details with Image URLs", finalSubmission);
+                  const { data } = await listPropertyApi(finalSubmission);
+
+
+      snackbar.success(data?.message)  
             setSubmitted(true);
 
         } catch (error) {
@@ -86,7 +92,7 @@ const PropertyListingForm = ({ type }: Props) => {
 
                 <Formik
                     initialValues={initialValues}
-                    validationSchema={validationSchema}
+                    // validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
                     {({ handleChange, values, touched, errors, setFieldValue }) => (
