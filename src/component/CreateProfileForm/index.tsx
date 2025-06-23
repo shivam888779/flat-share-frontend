@@ -2,7 +2,7 @@
 
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { Button, TextField, Typography, MenuItem, Box } from "@mui/material";
+import { Button, TextField, Typography, MenuItem, Box, InputLabel, Stack } from "@mui/material";
 import { useState } from "react";
 import { createProfileApi } from "@/pages/create-profile/apis";
 import { ICreateProfilePayLoad } from "@/types/user";
@@ -40,13 +40,13 @@ const CreateProfileForm = () => {
       file: selectedFiles[0],
     });
     if (result.publicUrl) {
-      const { data } = await createProfileApi({...values,profileImage:result?.publicUrl});
+      const { data } = await createProfileApi({ ...values, profileImage: result?.publicUrl });
 
       if (data?.status) {
         setState({ userData: { ...state?.userData, ...data?.data } });
         router.push("/");
 
-         
+
       }
     }
   };
@@ -58,7 +58,7 @@ const CreateProfileForm = () => {
 
   return (
     <Box maxWidth="sm" mt={8} mx="auto">
-      
+
       <Box className="p-8 xs:shadow-none md:shadow-md rounded-lg bg-white">
         <Typography
           variant="h4"
@@ -74,78 +74,77 @@ const CreateProfileForm = () => {
         >
           {({ handleChange, values, touched, errors, setFieldValue }) => (
             <Form>
-              <div className="mb-4">
-                <label className="font-semibold">First Name</label>
-                <TextField
-                  name="firstName"
-                  variant="outlined"
-                  fullWidth
-                  value={values.firstName}
-                  onChange={handleChange}
-                  error={touched.firstName && Boolean(errors.firstName)}
-                  helperText={touched.firstName && errors.firstName}
-                />
-              </div>
+              <Stack spacing={3}>
+                <div>
+                  <InputLabel shrink>First Name</InputLabel>
+                  <TextField
+                    name="firstName"
+                    variant="outlined"
+                    fullWidth
+                    value={values.firstName}
+                    onChange={handleChange}
+                    error={touched.firstName && Boolean(errors.firstName)}
+                    helperText={touched.firstName && errors.firstName}
+                  />
+                </div>
 
-              <div className="mb-4">
-                <label className="font-semibold">Last Name</label>
-                <TextField
-                  name="lastName"
-                  variant="outlined"
-                  fullWidth
-                  value={values.lastName}
-                  onChange={handleChange}
-                  error={touched.lastName && Boolean(errors.lastName)}
-                  helperText={touched.lastName && errors.lastName}
-                />
-              </div>
+                <div>
+                  <InputLabel shrink>Last Name</InputLabel>
+                  <TextField
+                    name="lastName"
+                    variant="outlined"
+                    fullWidth
+                    value={values.lastName}
+                    onChange={handleChange}
+                    error={touched.lastName && Boolean(errors.lastName)}
+                    helperText={touched.lastName && errors.lastName}
+                  />
+                </div>
 
-              <div className="mb-4">
-                <label className="font-semibold">Gender</label>
-                <TextField
-                  select
-                  name="gender"
-                  variant="outlined"
-                  fullWidth
-                  value={values.gender}
-                  onChange={handleChange}
-                  error={touched.gender && Boolean(errors.gender)}
-                  helperText={touched.gender && errors.gender}
-                >
-                  <MenuItem value="Male">Male</MenuItem>
-                  <MenuItem value="Female">Female</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
-                </TextField>
-              </div>
+                <div>
+                  <InputLabel shrink>Gender</InputLabel>
+                  <TextField
+                    select
+                    name="gender"
+                    variant="outlined"
+                    fullWidth
+                    value={values.gender}
+                    onChange={handleChange}
+                    error={touched.gender && Boolean(errors.gender)}
+                    helperText={touched.gender && errors.gender}
+                  >
+                    <MenuItem value="Male">Male</MenuItem>
+                    <MenuItem value="Female">Female</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
+                  </TextField>
+                </div>
 
-              <div className="mb-4">
-                <label className="font-semibold mb-1 block">
-                  Profile Image
-                </label>
-                <ImageUpload
-                  setSelectedFiles={setSelectedFiles}
-                />
-                {touched.profileImage && errors.profileImage && (
-                  <Typography variant="body2" className="text-red-600 mt-1">
-                    {errors.profileImage}
-                  </Typography>
-                )}
-              </div>
+                <div>
+                  <InputLabel shrink>Profile Image</InputLabel>
+                  <ImageUpload
+                    setSelectedFiles={setSelectedFiles}
+                  />
+                  {touched.profileImage && errors.profileImage && (
+                    <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+                      {errors.profileImage}
+                    </Typography>
+                  )}
+                </div>
 
-              <div className="flex justify-center">
-                <Button variant="contained" color="primary" type="submit">
+                <Button variant="contained" color="primary" type="submit" size="large" fullWidth>
                   Create Profile
                 </Button>
-              </div>
 
-              {submitted && (
-                <Typography
-                  variant="body1"
-                  className="text-green-500 mt-4 text-center"
-                >
-                  Profile Created Successfully!
-                </Typography>
-              )}
+                {submitted && (
+                  <Typography
+                    variant="body1"
+                    color="success.main"
+                    sx={{ mt: 2, textAlign: 'center' }}
+                  >
+                    Profile Created Successfully!
+                  </Typography>
+                )}
+              </Stack>
             </Form>
           )}
         </Formik>

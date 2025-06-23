@@ -7,17 +7,14 @@ import {
     Typography,
     MenuItem,
     Box,
+    InputLabel,
+    Stack
 } from "@mui/material";
 import { useState } from "react";
-import {
-    LocationSearch,
-    CustomizedRoundedSelect,
-    CustomizedSelectChip,
-    SelectSingleOption,
-} from "@/custom-component";
 import { ILocation } from "@/types/property";
-import ImageUpload from '../ImageUpload';
 import generateSignedUrl from "@/utils/generateSignedUrl";
+import DynamicFormRenderer from './DynamicFormRenderer';
+import { propertyFormSchema } from './formSchema';
 
 // ----------------------
 // Type Definitions
@@ -73,44 +70,6 @@ const validationSchema = Yup.object({
         .required("Description is required"),
 });
 
-const schema = [
-    {
-        name: "Male",
-        key: "male"
-    },
-    {
-        name: "Female",
-        key: "female"
-    },
-    {
-        name: "Any",
-        key: "any"
-    }
-]
-const propertyTypes = [
-    {
-        name: "Room",
-        key: 1
-    },
-    {
-        name: "Flat",
-        key: 2
-    },
-    {
-        name: "Villa",
-        key: 3
-    }
-]
-const resources = [
-    { id: 1, name: "Gym", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 2, name: "park", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 3, name: "Swimming pool", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 4, name: "made", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 5, name: "AC", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 6, name: "fan", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 7, name: "cooler", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 8, name: "water", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-]
 const PropertyListingForm = ({ type }: Props) => {
     const [location, setLocation] = useState<ILocation>();
     const [submitted, setSubmitted] = useState(false);
@@ -123,7 +82,11 @@ const PropertyListingForm = ({ type }: Props) => {
             console.error("Please select at least one image.");
             return;
         }
-
+        console.log("values", {
+            ...values,
+            location,
+            images: ["https://www.flatmate.in/dumbbell.png"],
+        })
         setIsSubmitting(true);
 
         try {
@@ -177,126 +140,38 @@ const PropertyListingForm = ({ type }: Props) => {
                 >
                     {({ handleChange, values, touched, errors, setFieldValue }) => (
                         <Form>
-                            <div className="mb-4">
-                                <label className="font-semibold">Property Title</label>
-                                <CustomizedRoundedSelect
+                            <Stack spacing={3}>
+                                <DynamicFormRenderer
+                                    schema={propertyFormSchema}
+                                    values={values}
+                                    touched={touched}
+                                    errors={errors}
+                                    handleChange={handleChange}
                                     setFieldValue={setFieldValue}
-                                    selectedHighLights={values.highLights}
+                                    setLocation={setLocation}
+                                    setSelectedFiles={setSelectedFiles}
                                 />
-                            </div>
 
-                            <div className="mb-4">
-                                <label className="font-semibold">Location</label>
-                                <LocationSearch setLocation={setLocation} />
-                            </div>
-
-                            <div className="mb-4">
-                                <div className="mb-4">
-                                    <label className="font-semibold">Property Type</label>
-                                    <SelectSingleOption setFieldValue={setFieldValue} selectedValue={values?.typeId} fieldKey={"typeId"} schema={propertyTypes} />
-                                </div>
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="font-semibold">Rent Price</label>
-                                <TextField
-                                    name="rentPrice"
-                                    type="number"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={values.rentPrice}
-                                    onChange={handleChange}
-                                    error={touched.rentPrice && Boolean(errors.rentPrice)}
-                                    helperText={touched.rentPrice && errors.rentPrice}
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="font-semibold">Looking for</label>
-                                <SelectSingleOption setFieldValue={setFieldValue} selectedValue={values?.partnerGender} fieldKey={"partnerGender"} schema={schema} />
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="font-semibold">Deposit</label>
-                                <TextField
-                                    name="deposit"
-                                    type="number"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={values.deposit}
-                                    onChange={handleChange}
-                                    error={touched.deposit && Boolean(errors.deposit)}
-                                    helperText={touched.deposit && errors.deposit}
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="font-semibold">Amenities</label>
-                                <CustomizedSelectChip
-                                    setFieldValue={setFieldValue}
-                                    selectedResources={values.resources}
-                                    fieldKey={"resources"}
-                                    schema={resources}
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="font-semibold">Preferences</label>
-                                <CustomizedSelectChip
-                                    setFieldValue={setFieldValue}
-                                    selectedResources={values.preferences}
-                                    fieldKey={"preferences"}
-                                    schema={resources}
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="font-semibold">Available Date</label>
-                                <TextField
-                                    name="availableFrom"
-                                    type="date"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={values.availableFrom}
-                                    onChange={handleChange}
-                                    error={touched.availableFrom && Boolean(errors.availableFrom)}
-                                    helperText={touched.availableFrom && errors.availableFrom}
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="font-semibold">Description</label>
-                                <textarea
-                                    name="description"
-                                    value={values.description || ""}
-                                    onChange={handleChange}
-                                    placeholder="Write something about yourself..."
-                                    rows={4}
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="font-semibold">Property Images (up to 3)</label>
-                                <ImageUpload setSelectedFiles={setSelectedFiles} maxImages={3} />
-                            </div>
-
-                            <div className="flex justify-center">
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     type="submit"
                                     disabled={isSubmitting}
+                                    fullWidth
+                                    size="large"
                                 >
-                                    {isSubmitting ? "Submitting..." : "Submit Property"}
+                                    {isSubmitting ? 'Submitting...' : 'List Property'}
                                 </Button>
-                            </div>
 
-                            {submitted && (
-                                <Typography variant="body1" className="text-green-500 mt-4 text-center">
-                                    Property Listed Successfully!
-                                </Typography>
-                            )}
+                                {submitted && (
+                                    <Typography
+                                        variant="body1"
+                                        sx={{ color: 'green', marginTop: 2, textAlign: 'center' }}
+                                    >
+                                        Property listed successfully!
+                                    </Typography>
+                                )}
+                            </Stack>
                         </Form>
                     )}
                 </Formik>

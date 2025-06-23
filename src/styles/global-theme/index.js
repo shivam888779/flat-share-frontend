@@ -24,15 +24,17 @@ const theme = createTheme({
     ...palette,
   },
   components: {
-    MuiIconButton:{
-      styleOverrides :{root:{
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
 
-             
-          backgroundColor:"none",
-          "&:hover":{
-            backgroundColor:palette.primary.dark,
+
+          backgroundColor: "none",
+          "&:hover": {
+            backgroundColor: palette.primary.dark,
           }
-        }}
+        }
+      }
     },
     MuiButton: {
       variants: [
@@ -119,18 +121,27 @@ const theme = createTheme({
           // color : "#000",
           backgroundColor: palette.info.main,
           borderRadius: "0.75rem",
-          height: "3.70rem", 
-        
-          "& fieldset":{
-            color : "#000",
-            height: "4rem", 
+          height: "3.70rem",
+
+          "& fieldset": {
+            color: "#000",
+            height: "4rem",
             borderRadius: "0.75rem",
           },
           ".MuiInputBase-input": {
-            border:"none",
+            border: "none",
             fontSize: "1.25rem",
             borderRadius: "2rem",
           },
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontSize: "1.5rem",
+          lineHeight: "1.5rem",
+          marginTop: "1rem",
         },
       },
     },
@@ -143,7 +154,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    color: "#000",    fontFamily: [
+    color: "#000", fontFamily: [
       "montserrat",
       "sans-serif",
       "BlinkMacSystemFont",
@@ -210,7 +221,7 @@ const theme = createTheme({
       fontWeight: 500,
     },
     body2: {
-      fontSize:  '0.85rem',
+      fontSize: '0.85rem',
       lineHeight: "1rem",
       color: "#000",
       fontWeight: 500,
