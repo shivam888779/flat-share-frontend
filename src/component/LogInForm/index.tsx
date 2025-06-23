@@ -11,8 +11,9 @@ import { ILoginFormValues, IMobileFormValues, IOtpFormValues } from "@/types/use
 import { useGlobalContext } from "@/global-context";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useGlobalSnackbar } from "@/hooks/useSnackbar";
 
-
+ 
 
 const emailInitialValues: ILoginFormValues = {
   email: "",
@@ -48,7 +49,7 @@ const LogInForm = () => {
   const [isEmailLogin, setIsEmailLogin] = useState(true);
   const [isOtpSent, setIsOtpSent] = useState(false); // Track if OTP is sent
   const [mobileNumber, setMobileNumber] = useState(""); // Store mobile number for OTP verification
-
+   const snackbar = useGlobalSnackbar();
   const { state, setState } = useGlobalContext();
 
   const router = useRouter()
@@ -62,8 +63,10 @@ const LogInForm = () => {
     console.log("Mobile Login Data", values);
     const { data } = await sendOtpApi({ phoneNo: values?.mobile })
     if (data?.status) {
+      snackbar.success(data?.message+" "+data?.data?.otp)
       setIsOtpSent(true);
     }
+
     setMobileNumber(values.mobile);
   };
 

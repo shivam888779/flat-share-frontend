@@ -15,35 +15,20 @@ import {
     CustomizedSelectChip,
     SelectSingleOption,
 } from "@/custom-component";
-import { ILocation } from "@/types/property";
+import { ILocation, IPropertyFormValues } from "@/types/property";
 import ImageUpload from '../ImageUpload';
 import generateSignedUrl from "@/utils/generateSignedUrl";
-
-// ----------------------
-// Type Definitions
-// ----------------------
-interface PropertyFormValues {
-    typeId: number;
-    rentPrice: number;
-    deposit: number;
-    resources: number[];
-    preferences: number[];
-    highLights: number[];
-    availableFrom: string;
-    description: string;
-    partnerGender: string;
-}
+import { listPropertyApi } from "@/pages/list-property/apis";
+import { useGlobalSnackbar } from "@/hooks/useSnackbar";
 
 interface Props {
     type: string;
 }
 
-// ----------------------
-// Initial Values
-// ----------------------
-const initialValues: PropertyFormValues = {
+
+const initialValues: IPropertyFormValues = {
     typeId: 0,
-    rentPrice: 0,
+    rent: 0,
     deposit: 0,
     resources: [],
     preferences: [],
@@ -59,7 +44,7 @@ const initialValues: PropertyFormValues = {
 const validationSchema = Yup.object({
     typeId: Yup.number().required("Property type is required"),
     partnerGender: Yup.string().required("Gender is required"),
-    rentPrice: Yup.number()
+    rent: Yup.number()
         .typeError("Rent price must be a number")
         .min(1, "Must be greater than 0")
         .required("Rent price is required"),
@@ -116,14 +101,15 @@ const PropertyListingForm = ({ type }: Props) => {
     const [submitted, setSubmitted] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const snackbar = useGlobalSnackbar();
 
-    const handleSubmit = async (values: PropertyFormValues) => {
+    const handleSubmit = async (values: IPropertyFormValues) => {
         if (selectedFiles.length === 0) {
             // Optional: Add user feedback about requiring images
             console.error("Please select at least one image.");
             return;
         }
-
+console.log(values)
         setIsSubmitting(true);
 
         try {
@@ -153,6 +139,10 @@ const PropertyListingForm = ({ type }: Props) => {
             };
 
             console.log("Property Details with Image URLs", finalSubmission);
+                  const { data } = await listPropertyApi(finalSubmission);
+
+
+      snackbar.success(data?.message)  
             setSubmitted(true);
 
         } catch (error) {
@@ -172,7 +162,7 @@ const PropertyListingForm = ({ type }: Props) => {
 
                 <Formik
                     initialValues={initialValues}
-                    validationSchema={validationSchema}
+                    // validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
                     {({ handleChange, values, touched, errors, setFieldValue }) => (
@@ -200,14 +190,14 @@ const PropertyListingForm = ({ type }: Props) => {
                             <div className="mb-4">
                                 <label className="font-semibold">Rent Price</label>
                                 <TextField
-                                    name="rentPrice"
+                                    name="rent"
                                     type="number"
                                     variant="outlined"
                                     fullWidth
-                                    value={values.rentPrice}
+                                    value={values.rent}
                                     onChange={handleChange}
-                                    error={touched.rentPrice && Boolean(errors.rentPrice)}
-                                    helperText={touched.rentPrice && errors.rentPrice}
+                                    error={touched.rent && Boolean(errors.rent)}
+                                    helperText={touched.rent && errors.rent}
                                 />
                             </div>
 

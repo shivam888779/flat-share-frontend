@@ -20,7 +20,7 @@ const MyProfileComponent = () => {
   const { state, setState } = useGlobalContext();
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileData, setProfileData] = useState(state?.userData);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const snackbar = useGlobalSnackbar();
 
 
@@ -36,7 +36,7 @@ const MyProfileComponent = () => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
+      setSelectedFiles([file]);
       // Optional: show a temporary preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -53,10 +53,10 @@ const MyProfileComponent = () => {
     try {
       let updatedImageUrl = profileData.profileImage;
 
-      if (selectedFile) {
+      if (selectedFiles.length > 0) {
         const result = await generateSignedUrl({
           entity: "profile",
-          file: selectedFile,
+          file: selectedFiles[0],
         });
 
         if (result?.publicUrl) {
@@ -72,7 +72,7 @@ const MyProfileComponent = () => {
       setState({ userData: data?.data });
       snackbar.success(data?.message)   
       setProfileData(data?.data);
-      setSelectedFile(null);
+      setSelectedFiles([]);
       setIsEditMode(false);
     } catch (error) {
       console.error("Failed to save profile data:", error);
