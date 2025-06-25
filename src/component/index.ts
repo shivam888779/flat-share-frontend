@@ -1,5 +1,5 @@
 import FilterNavbar from "./FilterNavbar";
-import UserDetailsCrad from "./UserDetailCard"
+import PropertyDetailsCard from "./UserDetailCard"
 import Header from "./Header"
 import Footer from "./Footer";
 import OtpInput from "./OtpInput"
@@ -16,7 +16,7 @@ import ImageUpload from "./ImageUpload";
 export {
     Header,
     FilterNavbar,
-    UserDetailsCrad,
+    PropertyDetailsCard,
     Footer,
     LogInForm,
     OtpInput,

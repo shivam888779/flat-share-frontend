@@ -35,18 +35,7 @@ export const propertyHighlights = [
 
 // Main form schema
 export const propertyFormSchema: FormFieldSchema[] = [
-    {
-        componentType: "roundedSelect",
-        name: "highLights",
-        type: "select",
-        variant: undefined,
-        fullWidth: false,
-        fieldKey: undefined,
-        schema: propertyHighlights,
-        inputLabel: "Property Title",
-        propsKey: ["setFieldValue", "selectedHighLights"],
-        required: true
-    },
+ 
     {
         componentType: "locationSearch",
         name: "location",
@@ -73,7 +62,7 @@ export const propertyFormSchema: FormFieldSchema[] = [
     },
     {
         componentType: "textField",
-        name: "rentPrice",
+        name: "rent",
         type: "number",
         variant: "outlined",
         fullWidth: true,
@@ -126,6 +115,18 @@ export const propertyFormSchema: FormFieldSchema[] = [
         schema: partnerGenderSchema,
         inputLabel: "Partner Gender",
         propsKey: ["setFieldValue"],
+        required: true
+    },
+       {
+        componentType: "roundedSelect",
+        name: "highLights",
+        type: "select",
+        variant: undefined,
+        fullWidth: false,
+        fieldKey: undefined,
+        schema: propertyHighlights,
+        inputLabel: "Property Title",
+        propsKey: ["setFieldValue", "selectedHighLights"],
         required: true
     },
     {
@@ -182,8 +183,8 @@ export const propertyFormSchema: FormFieldSchema[] = [
 
 export interface PropertyFormValues {
     typeId: number;
-    rentPrice: number;
-    deposit: number;
+    rent: number|null;
+    deposit: number|null;
     resources: number[];
     preferences: number[];
     highLights: number[];
@@ -201,8 +202,8 @@ export interface Props {
 // ----------------------
 export const initialValues: PropertyFormValues = {
     typeId: 0,
-    rentPrice: 0,
-    deposit: 0,
+    rent: null,
+    deposit: null,
     resources: [],
     preferences: [],
     availableFrom: "",
@@ -217,7 +218,7 @@ export const initialValues: PropertyFormValues = {
 export const validationSchema = Yup.object({
     typeId: Yup.number().required("Property type is required"),
     partnerGender: Yup.string().required("Gender is required"),
-    rentPrice: Yup.number()
+    rent: Yup.number()
         .typeError("Rent price must be a number")
         .min(1, "Must be greater than 0")
         .required("Rent price is required"),

@@ -28,7 +28,7 @@ import { customValidationSchema } from './validationUtils';
 
 interface PropertyFormValues {
     typeId: number;
-    rentPrice: number;
+    rent: number;
     deposit: number;
     resources: number[];
     preferences: number[];
@@ -51,7 +51,7 @@ interface SchemaBasedFormProps {
 
 const initialValues: PropertyFormValues = {
     typeId: 0,
-    rentPrice: 0,
+    rent: 0,
     deposit: 0,
     resources: [],
     preferences: [],

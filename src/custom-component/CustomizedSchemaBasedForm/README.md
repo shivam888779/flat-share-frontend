@@ -62,7 +62,7 @@ function MyComponent() {
     highLights: { visible: true, required: true },
     location: { visible: true, required: true },
     typeId: { visible: true, required: true },
-    rentPrice: { visible: true, required: true },
+    rent: { visible: true, required: true },
     deposit: { visible: false, required: false }, // Hide deposit field
     availableFrom: { visible: true, required: true },
     partnerGender: { visible: true, required: true },
@@ -213,7 +213,7 @@ The `textField` component uses Material-UI with:
 ```typescript
 {
   componentType: "textField",
-  name: "rentPrice",
+  name: "rent",
   type: "number",
   variant: "outlined",
   fullWidth: true,

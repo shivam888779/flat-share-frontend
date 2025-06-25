@@ -1,15 +1,20 @@
 import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
+import { useState,useEffect } from 'react';
 import { Autocomplete, Divider, Stack, TextField } from '@mui/material';
+import { LocationSearch } from '@/custom-component';
+import { searchPropertiesApi } from '@/pages/list-property/apis';
 
-export default function FilterNavbar() {
+export default function FilterNavbar({setLocation}:{setLocation:any}) {
   const [value, setValue] = React.useState('one');
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+
+
+
 
   return (
     <Stack width='100%' direction="row" justifyContent={"space-between"}>
@@ -25,13 +30,7 @@ export default function FilterNavbar() {
         <Tab value="three" label="Item Three" />
       </Tabs>
       <Stack direction={"row"} gap={3}>
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={top100Films}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Location" />}
-        />
+       <LocationSearch setLocation={setLocation} /> 
         <Autocomplete
           disablePortal
           id="combo-box-demo"

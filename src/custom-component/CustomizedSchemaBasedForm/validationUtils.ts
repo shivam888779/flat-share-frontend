@@ -74,7 +74,7 @@ export const generateValidationSchema = (schema: FormFieldSchema[]): Yup.ObjectS
 export const customValidationSchema = Yup.object({
     typeId: Yup.number().required("Property type is required"),
     partnerGender: Yup.string().required("Gender is required"),
-    rentPrice: Yup.number()
+    rent: Yup.number()
         .typeError("Rent price must be a number")
         .min(1, "Must be greater than 0")
         .max(1000000, "Rent price cannot exceed 1,000,000")

@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['www.flatmate.in'],
+    domains: ['www.flatmate.in', 'localhost'],
   },
 };
 

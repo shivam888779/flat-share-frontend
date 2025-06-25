@@ -43,7 +43,7 @@ export const defaultFieldVisibility: FieldVisibilityConfig = {
     highLights: { visible: true, required: true },
     location: { visible: true, required: true },
     typeId: { visible: true, required: true },
-    rentPrice: { visible: true, required: true },
+    rent: { visible: true, required: true },
     deposit: { visible: true, required: true },
     availableFrom: { visible: true, required: true },
     partnerGender: { visible: true, required: true },

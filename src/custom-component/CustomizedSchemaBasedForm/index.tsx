@@ -22,7 +22,7 @@ import ExampleUsage from "./ExampleUsage";
 // ----------------------
 interface PropertyFormValues {
     typeId: number;
-    rentPrice: number;
+    rent: number;
     deposit: number;
     resources: number[];
     preferences: number[];
@@ -41,7 +41,7 @@ interface Props {
 // ----------------------
 const initialValues: PropertyFormValues = {
     typeId: 0,
-    rentPrice: 0,
+    rent: 0,
     deposit: 0,
     resources: [],
     preferences: [],
@@ -57,7 +57,7 @@ const initialValues: PropertyFormValues = {
 const validationSchema = Yup.object({
     typeId: Yup.number().required("Property type is required"),
     partnerGender: Yup.string().required("Gender is required"),
-    rentPrice: Yup.number()
+    rent: Yup.number()
         .typeError("Rent price must be a number")
         .min(1, "Must be greater than 0")
         .required("Rent price is required"),

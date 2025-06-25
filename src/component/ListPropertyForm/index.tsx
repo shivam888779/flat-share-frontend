@@ -16,6 +16,7 @@ import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
 import { initialValues, propertyFormSchema, PropertyFormValues, Props, validationSchema } from "@/pages/list-property/data";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
+import { listPropertyApi } from "@/pages/list-property/apis";
 
 // ----------------------
 // Type Definitions
@@ -92,7 +93,7 @@ const PropertyListingForm = ({ type }: Props) => {
 
                 <Formik
                     initialValues={initialValues}
-                    // validationSchema={validationSchema}
+                    validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
                     {({ handleChange, values, touched, errors, setFieldValue }) => (
