@@ -4,7 +4,7 @@ import Tab from '@mui/material/Tab';
 import { useState,useEffect } from 'react';
 import { Autocomplete, Divider, Stack, TextField } from '@mui/material';
 import { LocationSearch } from '@/custom-component';
-import { searchPropertiesApi } from '@/pages/list-property/apis';
+import { searchPropertiesApi } from '@/pages/property/apis';
 
 export default function FilterNavbar({setLocation}:{setLocation:any}) {
   const [value, setValue] = React.useState('one');

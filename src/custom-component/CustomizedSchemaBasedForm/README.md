@@ -156,7 +156,7 @@ interface FormFieldSchema {
 
 ### Component Types
 
-1. **roundedSelect**: Custom rounded select component for highlights
+1. **roundedSelect**: Custom rounded select component for highLights
 2. **locationSearch**: Location autocomplete component
 3. **selectSingleOption**: Single option selector (tabs)
 4. **textField**: Standard text input field (Material-UI TextField)

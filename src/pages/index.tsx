@@ -4,13 +4,14 @@ import { KeyboardDoubleArrowDown } from "@mui/icons-material";
 import { useGlobalContext } from "@/global-context";
 import { useEffect, useState } from "react";
 import { SearchPropertyCard } from "@/types/property";
-import { searchPropertiesApi } from "./list-property/apis";
+import { searchPropertiesApi } from "./property/apis";
 import { useRouter } from 'next/router';
 
 export default function Home() {
   const a = Array(10).fill(0);
 
   const { state } = useGlobalContext();
+  console.log(state)
   const [location, setLocation] = useState<any>([]);
   const [propertyList, setPropetyList] = useState<Array<SearchPropertyCard>>([]);
   const [loading, setLoading] = useState(false);
@@ -48,7 +49,7 @@ export default function Home() {
         const payLoad = {
           lng: location?.longitude,
           lat: location?.latitude,
-          radiusKm: 500
+          radiusKm: 5000
         };
         const response = await searchPropertiesApi(payLoad);
         setPropetyList(response?.data?.data);

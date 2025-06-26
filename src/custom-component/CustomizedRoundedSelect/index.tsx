@@ -1,3 +1,4 @@
+import { useGlobalContext } from "@/global-context";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 import Image from "next/image";
 
@@ -8,9 +9,19 @@ interface Props {
 
 const CustomizedRoundedSelect = (props: Props) => {
 
+        const{state} = useGlobalContext()
         const { setFieldValue, selectedHighLights } = props;
+        const highLights = setFieldValue?state.highLights: state.highLights.filter((data)=>selectedHighLights.includes(data.id)) ;
+
+
+        console.log(props)
+        
 
         const handleSelectedHighLights = (id: number) => {
+                if(!setFieldValue)
+                {
+                        return;
+                }
                 if (selectedHighLights?.includes(id)) {
                         setFieldValue("highLights", selectedHighLights?.filter((item: Number) => item !== id))
                 } else {
@@ -18,16 +29,7 @@ const CustomizedRoundedSelect = (props: Props) => {
                 }
         }
 
-        const highLights = [
-                { id: 1, name: "Gym", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-                { id: 2, name: "park", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-                { id: 3, name: "Swimming pool", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-                { id: 4, name: "made", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-                { id: 5, name: "AC", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-                { id: 6, name: "fan", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-                { id: 7, name: "cooler", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-                { id: 8, name: "water", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-        ]
+       
         return <Stack my={3} direction={"row"} flexWrap={"wrap"} gap={4}>
                 {highLights?.map((item, index) => {
                         return <Box key={index} onClick={() => handleSelectedHighLights(item?.id)} className='cursor-pointer' >

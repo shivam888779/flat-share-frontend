@@ -16,7 +16,7 @@ import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
 import { initialValues, propertyFormSchema, PropertyFormValues, Props, validationSchema } from "@/pages/list-property/data";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
-import { listPropertyApi } from "@/pages/list-property/apis";
+import { listPropertyApi } from "@/pages/property/apis";
 
 // ----------------------
 // Type Definitions

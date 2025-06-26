@@ -2,59 +2,25 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from 'react-responsive-carousel';
 import Image from "next/image";
 
-const CustomizedCrousal = () =>{
+interface ICustomizedCrousalProps {
+    images: string[];
+}
 
+const CustomizedCrousal = (props:ICustomizedCrousalProps) =>{
+    const {images} = props;
+    console.log(images,"images")
     
     return <div className="px-6 mx-auto my-6"> <Carousel>
-    <div>
-         <img src="https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg"
+    {images.map((image,index)=>{
+        return <div key={index}>
+            <img src={image}
             width={125}
             height={125}
             alt="Picture of the author"
         />
         {/* <p className="legend">Legend 1</p> */}
     </div>
-    <div>
-         <img src="https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg"
-            width={125}
-            height={125}
-            alt="Picture of the author"
-        />
-        {/* <p className="legend">Legend 1</p> */}
-    </div>
-    <div>
-         <img src="https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg"
-            width={125}
-            height={125}
-            alt="Picture of the author"
-        />
-        {/* <p className="legend">Legend 1</p> */}
-    </div>
-    <div>
-         <img src="https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg"
-            width={125}
-            height={125}
-            alt="Picture of the author"
-        />
-        {/* <p className="legend">Legend 1</p> */}
-    </div>
-    <div>
-         <img src="https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg"
-            width={125}
-            height={125}
-            alt="Picture of the author"
-        />
-        {/* <p className="legend">Legend 1</p> */}
-    </div>
-    <div>
-         <img src="https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg"
-            width={125}
-            height={125}
-            alt="Picture of the author"
-        />
-        {/* <p className="legend">Legend 1</p> */}
-    </div>
-    
+    })}
 </Carousel>
 </div>
 }

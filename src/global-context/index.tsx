@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { IInitialState } from "./initial-state-type";
 import { initialStateData } from "./initial-state";
+import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPreferncesApi } from "@/pages/property/apis";
 
 type GlobalContextType = {
   state: IInitialState;
@@ -36,6 +37,29 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
   children,
 }) => {
   const [state, setState] = useReducer(simpleReducer, initialStateData);
+
+  // Fetch requirements if not already present
+  useEffect(() => {
+    const fetchRequirements = async () => {
+      try {
+        if (!state.highLights.length) {
+          const res = await getPropertyHighlightsApi();
+          setState({ highLights: res?.data?.data || [] });
+        }
+        if (!state.resources.length) {
+          const res = await getPropertyResourcesApi();
+          setState({ resources: res?.data?.data || [] });
+        }
+        if (!state.preferences.length) {
+          const res = await getPropertyPreferncesApi();
+          setState({ preferences: res?.data?.data || [] });
+        }
+      } catch (e) {
+        console.error("Failed to fetch requirements", e);
+      }
+    };
+    fetchRequirements();
+  }, [state.highLights.length, state.resources.length, state.preferences.length]);
 
   const providerValue = useMemo(() => ({ state, setState }), [state]);
 

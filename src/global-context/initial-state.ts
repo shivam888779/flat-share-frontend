@@ -14,6 +14,8 @@ export const initialStateData: IInitialState = {
         updatedAt: "",
         token: "",
         verified: false
-    }
-
+    },
+    highLights: [],
+    resources: [],
+    preferences: [],
 }

@@ -4,15 +4,14 @@ import Image from "next/image";
 interface Props {
         setFieldValue: any;
         selectedResources: Number[];
-        fieldKey: string;
-
+        fieldKey: string|undefined;
         schema: any
 }
 
 const CustomizedSelectChip = (props: Props) => {
 
         const { setFieldValue, selectedResources, fieldKey, schema } = props;
-        console.log("selectedResoucess", selectedResources)
+        console.log("selectedResoucess", props)
 
         const handleSelectedHighLights = (id: number) => {
                 if (selectedResources?.includes(id)) {
