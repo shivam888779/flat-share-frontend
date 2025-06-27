@@ -27,7 +27,7 @@ const PropertyDetailsCard = (props: {propertyDetails:SearchPropertyCard}) => {
           />
           <Box width={"100%"} m={2}>
               <Typography variant="h4" >{userName}</Typography>
-              <Typography variant="subtitle2" my={0.5}><PersonPinCircleOutlined sx={{ height: 18, width: 18, mb: 0.5 }} />&nbsp;{address}</Typography>
+              <Typography className="max-w-64 truncate" variant="subtitle2" my={0.5}><PersonPinCircleOutlined sx={{ height: 18, width: 18, mb: 0.5 }} />&nbsp;{address}</Typography>
 
               <Stack direction={"row"} justifyContent={"space-between"} mt={2}>
                   <Box>

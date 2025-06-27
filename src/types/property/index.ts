@@ -36,6 +36,7 @@ export interface IPropertyDetails {
   resources: number[];
   preferences: number[];
   images: string[] | null;
+  occupancy : string;
   userResponse: IPropertyUser;
 }
 

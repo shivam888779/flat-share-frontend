@@ -11,7 +11,7 @@ import {
 import { ILocation } from "@/types/property";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from './DynamicFormRenderer';
-import { propertyFormSchema, FormFieldSchema } from './formSchema';
+import {  FormFieldSchema } from './formSchema';
 import {
     FormConfig,
     defaultFormConfig,
@@ -25,6 +25,7 @@ import {
     defaultThemeConfig
 } from './formConfig';
 import { customValidationSchema } from './validationUtils';
+import { propertyFormSchema } from '@/pages/list-property/data';
 
 interface PropertyFormValues {
     typeId: number;

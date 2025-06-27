@@ -13,6 +13,13 @@ export const partnerGenderSchema = [
     { name: "Any", key: "any" }
 ];
 
+export const properyOccupancySchema = [
+    { name: "Single", key: "single" },
+    { name: "Double", key: "double" },
+    { name: "Tripple", key: "tripple" },
+    { name: "More than 3", key: "any" },
+];
+
 export const resources = [
     { id: 1, name: "Gym", imgSrc: "https://www.flatmate.in/dumbbell.png" },
     { id: 2, name: "Park", imgSrc: "https://www.flatmate.in/dumbbell.png" },
@@ -107,6 +114,18 @@ export const propertyFormSchema: FormFieldSchema[] = [
     },
     {
         componentType: "selectSingleOption",
+        name: "occupancy",
+        type: "tabSelect",
+        variant: undefined,
+        fullWidth: false,
+        fieldKey: "occupancy",
+        schema: properyOccupancySchema,
+        inputLabel: "Occupancy",
+        propsKey: ["setFieldValue"],
+        required: true
+    },
+    {
+        componentType: "selectSingleOption",
         name: "partnerGender",
         type: "tabSelect",
         variant: undefined,
@@ -191,6 +210,7 @@ export interface PropertyFormValues {
     availableFrom: string;
     description: string;
     partnerGender: string;
+    occupancy:string;
 }
 
 export interface Props {
@@ -209,7 +229,9 @@ export const initialValues: PropertyFormValues = {
     availableFrom: "",
     description: "",
     highLights: [],
-    partnerGender: "male"
+    partnerGender: "male",
+    occupancy :"sigle"
+
 };
 
 // ----------------------
@@ -230,4 +252,5 @@ export const validationSchema = Yup.object({
     description: Yup.string()
         .min(10, "Description should be at least 10 characters")
         .required("Description is required"),
+    occupancy: Yup.string().required("Gender is required"),
 });
