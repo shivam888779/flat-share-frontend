@@ -25,7 +25,7 @@ import {
     defaultThemeConfig
 } from './formConfig';
 import { customValidationSchema } from './validationUtils';
-import { propertyFormSchema } from '@/pages/list-property/data';
+import { propertyFormSchema } from '@/api/property/list-property-data';
 
 interface PropertyFormValues {
     typeId: number;

@@ -18,7 +18,7 @@ const OTPInput = ({ length = 4, onComplete,phoneNumber }: InputProps) => {
 
   useEffect(()=>{
     api.post("/otp/send-otp",{phoneNumber:phoneNumber})
-  },[])
+  },[phoneNumber])
 
   const inputRef = useRef<any>(Array(length).fill(null));
 

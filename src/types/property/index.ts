@@ -69,6 +69,7 @@ export interface SearchPropertyCard {
   distance: number;
   typeId: number;
   partnerGender: 'male' | 'female' | 'any'; // assuming these are the only values
+  userId:number;
 }
 
 export interface IRequirement {

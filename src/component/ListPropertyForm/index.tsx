@@ -14,9 +14,9 @@ import { useState } from "react";
 import { ILocation, IPropertyFormValues } from "@/types/property";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
-import { initialValues, propertyFormSchema, PropertyFormValues, Props, validationSchema } from "@/pages/list-property/data";
+import { initialValues, propertyFormSchema, PropertyFormValues, Props, validationSchema } from "@/api/property/list-property-data";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
-import { listPropertyApi } from "@/pages/property/apis";
+import { listPropertyApi } from "@/api/property";
 
 // ----------------------
 // Type Definitions

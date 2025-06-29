@@ -6,7 +6,7 @@ import { Button, TextField, Typography, Divider, Box, IconButton, Stack, InputLa
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import { useState } from "react";
-import { sendOtpApi, verifyOtpApi } from "@/pages/login/apis";
+import { sendOtpApi, verifyOtpApi } from "@/api/auth";
 import { ILoginFormValues, IMobileFormValues, IOtpFormValues } from "@/types/user";
 import { useGlobalContext } from "@/global-context";
 import { useRouter } from "next/router";

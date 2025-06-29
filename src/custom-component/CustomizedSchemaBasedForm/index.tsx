@@ -14,7 +14,7 @@ import { useState } from "react";
 import { ILocation } from "@/types/property";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from './DynamicFormRenderer';
-import { propertyFormSchema } from './formSchema';
+import { propertyFormSchema } from "@/api/property/list-property-data"; 
 import ExampleUsage from "./ExampleUsage";
 
 // ----------------------

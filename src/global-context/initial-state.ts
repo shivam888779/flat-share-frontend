@@ -18,4 +18,5 @@ export const initialStateData: IInitialState = {
     highLights: [],
     resources: [],
     preferences: [],
+    notifications:[]
 }

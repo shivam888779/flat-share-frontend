@@ -4,7 +4,7 @@ import { KeyboardDoubleArrowDown } from "@mui/icons-material";
 import { useGlobalContext } from "@/global-context";
 import { useEffect, useState } from "react";
 import { SearchPropertyCard } from "@/types/property";
-import { searchPropertiesApi } from "./property/apis";
+import { searchPropertiesApi } from "@/api/property";
 import { useRouter } from 'next/router';
 
 export default function Home() {

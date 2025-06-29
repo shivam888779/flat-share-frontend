@@ -1,3 +1,4 @@
+'use client'
 import React, {
   createContext,
   useContext,
@@ -6,19 +7,25 @@ import React, {
   ReactNode,
   Dispatch,
   useEffect,
+  useRef,
+  useState,
 } from "react";
+import { useRouter } from "next/router";
 import { IInitialState } from "./initial-state-type";
 import { initialStateData } from "./initial-state";
-import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPreferncesApi } from "@/pages/property/apis";
+import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPreferncesApi } from "@/api/property";
+import { getNotifications } from "@/api/notifications";
 
 type GlobalContextType = {
   state: IInitialState;
   setState: Dispatch<Partial<IInitialState>>;
+  fetchNotification: () => Promise<void>;
 };
 
 const GlobalContext = createContext<GlobalContextType>({
   state: initialStateData,
-  setState: () => {},
+  setState: () => { },
+  fetchNotification: async () => {},
 });
 
 const simpleReducer = (
@@ -37,11 +44,45 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
   children,
 }) => {
   const [state, setState] = useReducer(simpleReducer, initialStateData);
+  const [isStorageLoaded, setIsStorageLoaded] = useState(false);
+  const isInitialized = useRef(false);
+  const router = useRouter();
 
-  // Fetch requirements if not already present
+  const fetchNotification = async () => {
+    try {
+      const res = await getNotifications();
+      setState({ notifications: res?.data?.data || [] });
+    } catch (e) {
+      console.error("Failed to fetch notifications", e);
+    }
+  };
+
+
+
+  // Load from localStorage first
   useEffect(() => {
+    try {
+      const savedState = localStorage.getItem("state");
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+        setState(parsedState);
+      }
+      setIsStorageLoaded(true);
+    } catch (e) {
+      console.error("Could not load state from local storage", e);
+      setIsStorageLoaded(true);
+    }
+  }, []);
+
+  // Fetch requirements only after localStorage is loaded and state is updated
+  useEffect(() => {
+    if (!isStorageLoaded || isInitialized.current) {
+      return;
+    }
+
     const fetchRequirements = async () => {
       try {
+        // Only fetch if data is not already present
         if (!state.highLights.length) {
           const res = await getPropertyHighlightsApi();
           setState({ highLights: res?.data?.data || [] });
@@ -58,27 +99,45 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
         console.error("Failed to fetch requirements", e);
       }
     };
+
     fetchRequirements();
-  }, [state.highLights.length, state.resources.length, state.preferences.length]);
+    isInitialized.current = true;
+  }, [isStorageLoaded, state]);
 
-  const providerValue = useMemo(() => ({ state, setState }), [state]);
-
+  // Fetch notifications on initial load
   useEffect(() => {
-    if (state !== initialStateData) {
+    if (isStorageLoaded) {
+      fetchNotification();
+    }
+  }, [isStorageLoaded]);
+
+  // Fetch notifications and connections on route change
+  useEffect(() => {
+    const handleRouteChange = () => {
+      fetchNotification();
+    };
+
+    router.events.on('routeChangeComplete', handleRouteChange);
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange);
+      router.events.off('routeChangeStart', handleRouteChange);
+    };
+  }, [router.events]);
+
+  const providerValue = useMemo(() => ({ 
+    state, 
+    setState, 
+    fetchNotification,
+  }), [state, fetchNotification]);
+
+  // Save to localStorage when state changes (but not during initial load)
+  useEffect(() => {
+    if (isStorageLoaded && state !== initialStateData) {
       localStorage.setItem("state", JSON.stringify(state));
     }
-  }, [state]);
-
-  useEffect(() => {
-    try {
-      const savedState = localStorage.getItem("state");
-      if (savedState) {
-        setState(JSON.parse(savedState));
-      }
-    } catch (e) {
-      console.error("Could not load state from local storage", e);
-    }
-  }, []);
+  }, [state, isStorageLoaded]);
 
   return (
     <GlobalContext.Provider value={providerValue}>

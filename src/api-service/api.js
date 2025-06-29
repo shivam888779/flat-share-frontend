@@ -1,8 +1,6 @@
 import axios from 'axios';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-console.log(BASE_URL);
-
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -12,9 +10,6 @@ const api = axios.create({
 });
 
 
-
-
-// Request interceptor to add the Authorization header to authApiClient
 api.interceptors.request.use(
   (config) => {
        return config;

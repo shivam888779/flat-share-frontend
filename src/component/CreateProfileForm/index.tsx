@@ -4,13 +4,13 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { Button, Typography, Box, Stack } from "@mui/material";
 import { useState } from "react";
-import { createProfileApi } from "@/pages/create-profile/apis";
+import { createProfileApi } from "@/api/profiles";
 import { ICreateProfilePayLoad } from "@/types/user";
 import { useGlobalContext } from "@/global-context";
 import { useRouter } from "next/router";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
-import { createProfileFormSchema } from "@/pages/create-profile/data";
+import { createProfileFormSchema } from "@/api/profiles/create-profile-data";
 
 // Initial values
 const initialValues: ICreateProfilePayLoad = {

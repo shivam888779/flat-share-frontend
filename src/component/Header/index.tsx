@@ -169,7 +169,7 @@ export default function Header() {
         { text: 'Home', icon: <Home />, path: '/' },
         { text: 'Properties', icon: <Apartment />, path: '/properties' },
         { text: 'List Property', icon: <Add />, path: '/list-property', highlight: true },
-        { text: 'Favorites', icon: <Favorite />, path: '/favorites', badge: 2 },
+        { text: 'Favorites', icon: <Favorite />, path: '/connections', badge: 2 },
         { text: 'Messages', icon: <Message />, path: '/messages', badge: 3 },
         { text: 'Notifications', icon: <Notifications />, path: '/notifications', badge: 5 },
     ];
@@ -203,7 +203,7 @@ export default function Header() {
                 </ListItemIcon>
                 <ListItemText>My Profile</ListItemText>
             </MenuItem>
-            <MenuItem onClick={() => { handleNavigation('/favorites'); handleMenuClose(); }}>
+            <MenuItem onClick={() => { handleNavigation('/connections'); handleMenuClose(); }}>
                 <ListItemIcon>
                     <Favorite fontSize="small" />
                 </ListItemIcon>
@@ -424,7 +424,7 @@ export default function Header() {
                         <IconButton
                             size="large"
                             color="inherit"
-                            onClick={() => handleNavigation('/favorites')}
+                            onClick={() => handleNavigation('/connections')}
                         >
                             <Badge badgeContent={2} color="error">
                                 <Favorite />

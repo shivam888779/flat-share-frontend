@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import SubscriptionDetailCard from "../SubscriptionDetailCard";
 import { useGlobalContext } from "@/global-context";
-import { updateProfileApi } from "@/pages/my-profile/apis";
+import { updateProfileApi } from "@/api/profiles/my-profile";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
 
