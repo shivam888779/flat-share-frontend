@@ -15,9 +15,6 @@ const RequestContact: React.FC<RequestContactProps> = ({ open, onClose, userId }
     {
       const response = await requestConnectionApi({message:message,receiverId:userId})
 
-      console.log(response)
-
-      
     }
 
 

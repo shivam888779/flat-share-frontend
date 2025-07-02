@@ -8,7 +8,6 @@ interface ICustomizedCrousalProps {
 
 const CustomizedCrousal = (props: ICustomizedCrousalProps) => {
     const { images } = props;
-    console.log(images, "images");
 
     return (
         <div className="px-6 mx-auto my-6 max-h-96">

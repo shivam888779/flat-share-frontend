@@ -72,7 +72,6 @@ export const generateValidationSchema = (schema: FormFieldSchema[]): Yup.ObjectS
 
 // Custom validation for specific fields
 export const customValidationSchema = Yup.object({
-    typeId: Yup.number().required("Property type is required"),
     partnerGender: Yup.string().required("Gender is required"),
     rent: Yup.number()
         .typeError("Rent price must be a number")

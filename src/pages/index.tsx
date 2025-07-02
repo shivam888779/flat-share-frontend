@@ -11,7 +11,6 @@ export default function Home() {
   const a = Array(10).fill(0);
 
   const { state } = useGlobalContext();
-  console.log(state)
   const [location, setLocation] = useState<any>([]);
   const [propertyList, setPropetyList] = useState<Array<SearchPropertyCard>>([]);
   const [loading, setLoading] = useState(false);

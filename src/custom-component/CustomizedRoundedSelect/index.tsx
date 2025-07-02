@@ -13,10 +13,6 @@ const CustomizedRoundedSelect = (props: Props) => {
         const { setFieldValue, selectedHighLights } = props;
         const highLights = setFieldValue?state.highLights: state.highLights.filter((data)=>selectedHighLights.includes(data.id)) ;
 
-
-        console.log(props)
-        
-
         const handleSelectedHighLights = (id: number) => {
                 if(!setFieldValue)
                 {

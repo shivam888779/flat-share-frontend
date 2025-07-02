@@ -4,13 +4,11 @@ import { useState } from "react"
 const SelectSingleOption = (props:any) => {
     const {schema,fieldKey,selectedValue,setFieldValue} = props;
  
-console.log(props)
     const handleChange = (
         event: React.MouseEvent<HTMLElement>,
         newValue: string | null
     ) => {
         if (newValue !== null) {
-            console.log(newValue)
              setFieldValue(fieldKey,newValue)
         }
     };

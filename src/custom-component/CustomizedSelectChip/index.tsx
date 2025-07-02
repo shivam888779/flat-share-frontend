@@ -11,7 +11,6 @@ interface Props {
 const CustomizedSelectChip = (props: Props) => {
 
         const { setFieldValue, selectedResources, fieldKey, schema } = props;
-        console.log("selectedResoucess", props)
 
         const handleSelectedHighLights = (id: number) => {
                 if (selectedResources?.includes(id)) {
@@ -20,7 +19,6 @@ const CustomizedSelectChip = (props: Props) => {
                         setFieldValue(fieldKey, [...selectedResources, id])
                 }
         }
-        console.log("selectedHighLights", selectedResources)
 
 
         return <Stack my={3} direction={"row"} flexWrap={"wrap"} gap={2}>

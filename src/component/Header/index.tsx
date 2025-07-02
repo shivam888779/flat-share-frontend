@@ -21,7 +21,11 @@ import {
     ListItem,
     ListItemButton,
     Collapse,
-    Fab
+    Fab,
+    ClickAwayListener,
+    Grow,
+    Paper,
+    Popper
 } from '@mui/material';
 import {
     Search,
@@ -38,7 +42,10 @@ import {
     Message,
     Close,
     FilterList,
-    LocationOn
+    LocationOn,
+    KeyboardArrowDown,
+    Business,
+    Assignment
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import { useGlobalContext } from '@/global-context';
@@ -134,8 +141,10 @@ export default function Header() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
     const [searchOpen, setSearchOpen] = React.useState(false);
+    const [listMenuAnchorEl, setListMenuAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const isMenuOpen = Boolean(anchorEl);
+    const isListMenuOpen = Boolean(listMenuAnchorEl);
 
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -143,6 +152,14 @@ export default function Header() {
 
     const handleMenuClose = () => {
         setAnchorEl(null);
+    };
+
+    const handleListMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setListMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleListMenuClose = () => {
+        setListMenuAnchorEl(null);
     };
 
     const handleMobileDrawerToggle = () => {
@@ -163,12 +180,14 @@ export default function Header() {
         router.push(path);
         setMobileDrawerOpen(false);
         setSearchOpen(false);
+        handleListMenuClose();
     };
 
     const mobileMenuItems = [
         { text: 'Home', icon: <Home />, path: '/' },
         { text: 'Properties', icon: <Apartment />, path: '/properties' },
-        { text: 'List Property', icon: <Add />, path: '/list-property', highlight: true },
+        { text: 'List Property', icon: <Business />, path: '/list-property', highlight: true },
+        { text: 'List Requirement', icon: <Assignment />, path: '/list-requirement', highlight: true },
         { text: 'Favorites', icon: <Favorite />, path: '/connections', badge: 2 },
         { text: 'Messages', icon: <Message />, path: '/messages', badge: 3 },
         { text: 'Notifications', icon: <Notifications />, path: '/notifications', badge: 5 },
@@ -392,7 +411,8 @@ export default function Header() {
                         </NavButton>
                         <NavButton
                             startIcon={<Add />}
-                            onClick={() => handleNavigation('/list-property')}
+                            endIcon={<KeyboardArrowDown />}
+                            onClick={handleListMenuOpen}
                             sx={{
                                 backgroundColor: alpha('#fff', 0.1),
                                 '&:hover': {
@@ -400,7 +420,7 @@ export default function Header() {
                                 },
                             }}
                         >
-                            List Property
+                            List
                         </NavButton>
                     </Box>
 
@@ -511,6 +531,56 @@ export default function Header() {
                 </Collapse>
             </AppBar>
 
+            {/* List Options Dropdown Menu */}
+            <Popper
+                open={isListMenuOpen}
+                anchorEl={listMenuAnchorEl}
+                placement="bottom-start"
+                transition
+                disablePortal
+            >
+                {({ TransitionProps, placement }) => (
+                    <Grow
+                        {...TransitionProps}
+                        style={{
+                            transformOrigin:
+                                placement === 'bottom-start' ? 'left top' : 'left bottom',
+                        }}
+                    >
+                        <Paper sx={{ mt: 1, minWidth: 200 }}>
+                            <ClickAwayListener onClickAway={handleListMenuClose}>
+                                <Menu
+                                    anchorEl={listMenuAnchorEl}
+                                    open={isListMenuOpen}
+                                    onClose={handleListMenuClose}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'left',
+                                    }}
+                                >
+                                    <MenuItem onClick={() => handleNavigation('/list-property/list-property')}>
+                                        <ListItemIcon>
+                                            <Business fontSize="small" />
+                                        </ListItemIcon>
+                                        List Property
+                                    </MenuItem>
+                                    <MenuItem onClick={() => handleNavigation('/list-property/list-requirement')}>
+                                        <ListItemIcon>
+                                            <Assignment fontSize="small" />
+                                        </ListItemIcon>
+                                        List Requirement
+                                    </MenuItem>
+                                </Menu>
+                            </ClickAwayListener>
+                        </Paper>
+                    </Grow>
+                )}
+            </Popper>
+
             {/* Mobile Drawer */}
             {renderMobileDrawer}
 
@@ -521,8 +591,8 @@ export default function Header() {
             <Box sx={{ display: { xs: 'block', md: 'none' }, position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }}>
                 <Fab
                     color="primary"
-                    aria-label="list property"
-                    onClick={() => handleNavigation('/list-property')}
+                    aria-label="list options"
+                    onClick={handleListMenuOpen}
                     sx={{
                         backgroundColor: theme.palette.primary.main,
                         '&:hover': {
@@ -533,6 +603,56 @@ export default function Header() {
                     <Add />
                 </Fab>
             </Box>
+
+            {/* Mobile List Options Dropdown */}
+            <Popper
+                open={isListMenuOpen && isMobile}
+                anchorEl={listMenuAnchorEl}
+                placement="top-end"
+                transition
+                disablePortal
+            >
+                {({ TransitionProps, placement }) => (
+                    <Grow
+                        {...TransitionProps}
+                        style={{
+                            transformOrigin:
+                                placement === 'top-end' ? 'right bottom' : 'right top',
+                        }}
+                    >
+                        <Paper sx={{ mb: 1, minWidth: 200 }}>
+                            <ClickAwayListener onClickAway={handleListMenuClose}>
+                                <Menu
+                                    anchorEl={listMenuAnchorEl}
+                                    open={isListMenuOpen && isMobile}
+                                    onClose={handleListMenuClose}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right',
+                                    }}
+                                >
+                                    <MenuItem onClick={() => handleNavigation('/list-property')}>
+                                        <ListItemIcon>
+                                            <Business fontSize="small" />
+                                        </ListItemIcon>
+                                        List Property
+                                    </MenuItem>
+                                    <MenuItem onClick={() => handleNavigation('/list-requirement')}>
+                                        <ListItemIcon>
+                                            <Assignment fontSize="small" />
+                                        </ListItemIcon>
+                                        List Requirement
+                                    </MenuItem>
+                                </Menu>
+                            </ClickAwayListener>
+                        </Paper>
+                    </Grow>
+                )}
+            </Popper>
         </>
     );
 }

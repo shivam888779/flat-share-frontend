@@ -17,4 +17,8 @@ const getConnectionsApi = async () =>{
     return await authApi.get(`/connection/connections`)
 }
 
-export {requestConnectionApi,approveRequestApi,rejectRequestApi,getConnectionsApi}
+const cancelRequestApi = async (id:number) =>{
+    return await authApi.post(`/connection/cancel-request/${id}`)
+}
+
+export {requestConnectionApi,approveRequestApi,rejectRequestApi,getConnectionsApi,cancelRequestApi}

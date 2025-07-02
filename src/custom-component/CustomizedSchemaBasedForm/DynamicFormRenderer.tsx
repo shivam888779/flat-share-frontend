@@ -8,6 +8,7 @@ import {
     SelectSingleOption,
 } from "@/custom-component";
 import { ImageUpload } from '@/component';
+import { useGlobalContext } from '@/global-context';
 
 interface DynamicFormRendererProps {
     schema: FormFieldSchema[];
@@ -31,7 +32,19 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
     setSelectedFiles
 }) => {
     const renderField = (fieldSchema: FormFieldSchema) => {
-        const { componentType, name, inputLabel, ...props } = fieldSchema;
+        const { componentType, name, inputLabel, max, ...props  } = fieldSchema;
+
+        const {state} = useGlobalContext();
+        const getSchema = (key:string) =>{
+            switch(key){
+                case 'resources':
+                    return state.resources;
+                case 'preferences':
+                     return state.preferences;
+                default:
+                        null;     
+            }
+        }
 
         switch (componentType) {
             case 'roundedSelect':
@@ -60,7 +73,7 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                     <CustomizedSelectChip
                         setFieldValue={setFieldValue}
                         fieldKey={props.fieldKey || name}
-                        schema={props.schema}
+                        schema={getSchema(props.fieldKey??"")}
                         selectedResources={values[props.fieldKey || name]}
                     />
                 );
@@ -81,7 +94,6 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                         placeholder={props.placeholder}
                         inputProps={{
                             min: props.min,
-                            max: props.max,
                             // step: props.step,
                         }}
                         InputLabelProps={props.InputLabelProps}
@@ -109,7 +121,7 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                 );
 
             case 'imageUpload':
-                return <ImageUpload setSelectedFiles={setSelectedFiles} />;
+                return <ImageUpload setSelectedFiles={setSelectedFiles} maxImages={max} />;
 
             default:
                 return null;

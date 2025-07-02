@@ -9,7 +9,6 @@ interface Props {
 const CustomizedRoundedIcon = (props: Props) => {
 
         const { setFieldValue, selectedHighLights } = props;
-        console.log("selectedHighLights", selectedHighLights)
 
         const handleSelectedHighLights = (id: number) => {
                 if (selectedHighLights?.includes(id)) {
@@ -18,7 +17,6 @@ const CustomizedRoundedIcon = (props: Props) => {
                         setFieldValue("highLights", [...selectedHighLights, id])
                 }
         }
-        console.log("selectedHighLights", selectedHighLights)
 
         const highLights = [
                 { id: 1, name: "Gym", imgSrc: "https://www.flatmate.in/dumbbell.png" },

@@ -27,7 +27,6 @@ const PropertyInfo = () => {
         };
         if (id) fetchDetails();
     }, [id]);
-    console.log(propertyDetails)
 
     return (
         <Stack direction="row" my={8}>

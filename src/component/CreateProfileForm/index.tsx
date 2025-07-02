@@ -35,7 +35,6 @@ const CreateProfileForm = () => {
   const router = useRouter();
 
   const handleSubmit = async (values: ICreateProfilePayLoad) => {
-    console.log(values);
     const result = await generateSignedUrl({
       entity: "profile",
       file: selectedFiles[0],

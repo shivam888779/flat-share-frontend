@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import { getConnectionsApi, approveRequestApi, rejectRequestApi } from "@/api/connections";
+import { getConnectionsApi, approveRequestApi, rejectRequestApi, cancelRequestApi } from "@/api/connections";
 import { useGlobalContext } from "@/global-context";
 import { IConnection } from "@/types/connection";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
@@ -79,8 +79,8 @@ const ConnectionsPage: React.FC = () => {
     const handleCancelRequest = async (connectionId: number) => {
         try {
             // You might need to add a cancel API endpoint
-            // const response = await cancelRequestApi(connectionId);
-            snackbar.success("Request cancelled successfully!");
+            const response = await cancelRequestApi(connectionId);
+            snackbar.success(response.data.message ||"Request cancelled successfully!");
             getConnections(); // Refresh the list
         } catch (error) {
             snackbar.error("Failed to cancel request");
@@ -95,7 +95,6 @@ const ConnectionsPage: React.FC = () => {
         try {
             setLoading(true);
             const response = await getConnectionsApi();
-            console.log("API Response:", response);
             // Ensure we're setting an array
             const connectionsData = Array.isArray(response?.data?.data) ? response.data?.data : [];
             setConnections(connectionsData);

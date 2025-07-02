@@ -2,7 +2,7 @@ import { api, authApi } from "@/api-service";
 import { IPropertyFormValues, IPropertyListSearch } from "@/types/property";
 
 
-const listPropertyApi = (payload:IPropertyFormValues) =>{
+const listPropertyApi = (payload:IPropertyFormValues|any) =>{
     return authApi.post('property',payload)
 }
 
