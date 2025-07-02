@@ -98,7 +98,7 @@ export default function Listing() {
                 <Box className="building" sx={{ right: '5%', width: 75, height: 110, animationDelay: '4s' }} />
             </Box>
 
-            <Box mx="auto" maxWidth="1440px" px={3} pt={4} position="relative" zIndex={1}>
+            <Box mx="auto" maxWidth="1240px" px={3} pt={4} position="relative" zIndex={1}>
                 <FilterNavbar setLocation={setLocation} />
 
                 <Divider sx={{ my: 3, borderColor: 'rgba(108, 92, 231, 0.1)' }} />
@@ -141,17 +141,10 @@ export default function Listing() {
                     <>
                         {/* Property Grid */}
                         <Box
-                            sx={{
-                                display: 'grid',
-                                gridTemplateColumns: {
-                                    xs: '1fr',
-                                    sm: 'repeat(2, 1fr)',
-                                    md: 'repeat(3, 1fr)',
-                                    lg: 'repeat(4, 1fr)'
-                                },
-                                gap: 3,
-                                mb: 4
-                            }}
+                            display={"flex"}
+                            flexWrap={"wrap"}
+                            gap={2}
+                            justifyContent={"space-between"}
                         >
                             {propertyList.length > 0 ? (
                                 Array.from({ length: 8 }).map((_, index) => (
@@ -239,7 +232,6 @@ export default function Listing() {
                     </>
                 )}
 
-                <Footer />
             </Box>
         </Box>
     );
