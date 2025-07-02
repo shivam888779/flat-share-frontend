@@ -12,6 +12,7 @@ import SubscriptionDetailCard from "./SubscriptionDetailCard";
 import ListPropertyForm from "./ListPropertyForm";
 import RegisterForm from "./RegistrationForm";
 import ImageUpload from "./ImageUpload";
+import LandingPage from "./LandingPage";
 
 export {
     Header,
@@ -27,5 +28,6 @@ export {
     SubscriptionDetailCard,
     ListPropertyForm,
     RegisterForm,
-    ImageUpload
+    ImageUpload,
+    LandingPage
 }

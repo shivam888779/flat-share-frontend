@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import "@/styles/landing-page.css";
 import type { AppProps } from "next/app";
 import { GlobalContextProvider } from "../global-context"
 import { ThemeProvider } from "@mui/material";

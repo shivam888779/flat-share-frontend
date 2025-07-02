@@ -1,0 +1,310 @@
+/* Landing Page Animations and Styles */
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes floatRotate {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(10deg);
+    }
+}
+
+.animate-slideDown {
+    animation: slideDown 0.5s ease-out;
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.animation-delay-200 {
+    animation-delay: 0.2s;
+    animation-fill-mode: both;
+}
+
+.animation-delay-400 {
+    animation-delay: 0.4s;
+    animation-fill-mode: both;
+}
+
+.animation-delay-600 {
+    animation-delay: 0.6s;
+    animation-fill-mode: both;
+}
+
+/* Buildings */
+.building {
+    position: absolute;
+    bottom: 0;
+    transition: all 0.3s ease;
+}
+
+.building.night {
+    filter: brightness(0.8);
+}
+
+.house1 {
+    left: 5%;
+    width: 100px;
+    height: 120px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    animation: float 4s ease-in-out infinite;
+}
+
+.house1::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    border-bottom: 40px solid #d63447;
+}
+
+.house1::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    left: 35px;
+    width: 30px;
+    height: 40px;
+    background-color: #2d3436;
+    border-radius: 5px 5px 0 0;
+}
+
+.building2 {
+    left: 20%;
+    width: 120px;
+    height: 200px;
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    border-radius: 10px 10px 0 0;
+    animation: float 4s ease-in-out infinite 0.5s;
+}
+
+.building2::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 15px;
+    width: 20px;
+    height: 20px;
+    background-color: #ffeaa7;
+    box-shadow: 30px 0 #ffeaa7, 60px 0 #ffeaa7,
+        0 30px #ffeaa7, 30px 30px #ffeaa7, 60px 30px #ffeaa7,
+        0 60px #ffeaa7, 30px 60px #ffeaa7, 60px 60px #ffeaa7,
+        0 90px #ffeaa7, 30px 90px #ffeaa7, 60px 90px #ffeaa7,
+        0 120px #ffeaa7, 30px 120px #ffeaa7, 60px 120px #ffeaa7;
+}
+
+.building3 {
+    left: 45%;
+    width: 140px;
+    height: 250px;
+    background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+    border-radius: 5px 5px 0 0;
+    animation: float 4s ease-in-out infinite 1s;
+}
+
+.building3::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: repeating-linear-gradient(0deg,
+            transparent,
+            transparent 20px,
+            rgba(255, 255, 255, 0.1) 20px,
+            rgba(255, 255, 255, 0.1) 22px),
+        repeating-linear-gradient(90deg,
+            transparent,
+            transparent 20px,
+            rgba(255, 255, 255, 0.1) 20px,
+            rgba(255, 255, 255, 0.1) 22px);
+}
+
+.house4 {
+    right: 20%;
+    width: 110px;
+    height: 100px;
+    background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+    animation: float 4s ease-in-out infinite 1.5s;
+}
+
+.house4::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: -15px;
+    width: 140px;
+    height: 60px;
+    background: #00b894;
+    transform: skewY(-10deg);
+    border-radius: 10px 10px 0 0;
+}
+
+.house4::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    left: 40px;
+    width: 30px;
+    height: 35px;
+    background-color: #636e72;
+    border-radius: 5px 5px 0 0;
+}
+
+.building5 {
+    right: 5%;
+    width: 100px;
+    height: 160px;
+    background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+    animation: float 4s ease-in-out infinite 2s;
+}
+
+.building5::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    width: 25px;
+    height: 25px;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 35px 0 rgba(255, 255, 255, 0.8),
+        0 35px rgba(255, 255, 255, 0.8), 35px 35px rgba(255, 255, 255, 0.8),
+        0 70px rgba(255, 255, 255, 0.8), 35px 70px rgba(255, 255, 255, 0.8),
+        0 105px rgba(255, 255, 255, 0.8), 35px 105px rgba(255, 255, 255, 0.8);
+}
+
+/* Clouds */
+.cloud {
+    position: absolute;
+    background-color: white;
+    opacity: 0.8;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    animation: floatRotate 4s ease-in-out infinite;
+}
+
+.cloud1 {
+    top: 10%;
+    left: 10%;
+    width: 60px;
+    height: 40px;
+    border-radius: 100px;
+}
+
+.cloud1::before,
+.cloud1::after {
+    content: '';
+    position: absolute;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.cloud1::before {
+    top: -15px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+}
+
+.cloud1::after {
+    top: -10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+}
+
+.cloud2 {
+    top: 20%;
+    right: 15%;
+    width: 50px;
+    height: 35px;
+    border-radius: 100px;
+    animation-delay: 2s;
+}
+
+.cloud2::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 15px;
+    width: 25px;
+    height: 25px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+/* Hover Effects */
+.hover-brightness-120:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .building {
+        transform: scale(0.7);
+    }
+
+    .house1 {
+        left: 0%;
+    }
+
+    .building2 {
+        left: 15%;
+    }
+
+    .building3 {
+        left: 40%;
+        width: 100px;
+    }
+
+    .house4 {
+        right: 15%;
+    }
+
+    .building5 {
+        right: 0%;
+    }
+}
