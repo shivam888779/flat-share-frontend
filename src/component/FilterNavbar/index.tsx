@@ -11,7 +11,9 @@ import {
   IconButton,
   Badge,
   Tooltip,
-  Paper
+  Paper,
+  Typography,
+  Divider
 } from '@mui/material';
 import {
   FilterList,
@@ -19,9 +21,14 @@ import {
   MeetingRoom,
   People,
   AttachMoney,
-  LocationOn
+  LocationOn,
+  CheckCircle,
+  DirectionsSubway,
+  Filter
 } from '@mui/icons-material';
 import { LocationSearch } from '@/custom-component';
+import FilterSidebar, { FilterIconButton } from '../FilterSideBar';
+import { ST } from 'next/dist/shared/lib/utils';
 
 interface FilterNavbarProps {
   setLocation: (location: any) => void;
@@ -30,11 +37,24 @@ interface FilterNavbarProps {
 export default function FilterNavbar({ setLocation }: FilterNavbarProps) {
   const [value, setValue] = React.useState('find-roommate');
   const [activeFilters, setActiveFilters] = useState(0);
+  const [quickFilters, setQuickFilters] = useState({
+    nearMetro: true,
+    availableNow: true,
+    verifiedOnly: true
+  });
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
+  const toggleQuickFilter = (filterKey: keyof typeof quickFilters) => {
+    setQuickFilters(prev => ({
+      ...prev,
+      [filterKey]: !prev[filterKey]
+    }));
+  };
+
+  const [filterOpen, setFilterOpen] = useState(false);
   const genderOptions = [
     { label: 'Any Gender', value: 'any' },
     { label: 'Male Only', value: 'male' },
@@ -51,97 +71,48 @@ export default function FilterNavbar({ setLocation }: FilterNavbarProps) {
   ];
 
   return (
-    <Box>
-      {/* Hero Section with Search */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #f3f0ff 0%, #e8f4ff 100%)',
-          borderRadius: '20px',
-          p: 4,
-          mb: 3,
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-      >
-        {/* Decorative Elements */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: -50,
-            right: -50,
-            width: 150,
-            height: 150,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)',
-            opacity: 0.1
-          }}
-        />
-
-        <Stack spacing={3}>
-          <Box textAlign="center">
-            <Box
-              component="h2"
-              sx={{
-                fontSize: '2rem',
-                fontWeight: 700,
-                color: '#2d3436',
-                mb: 1
-              }}
-            >
-              Find Your Perfect Living Space
-            </Box>
-            <Box
-              component="p"
-              sx={{
-                fontSize: '1.1rem',
-                color: '#636e72'
-              }}
-            >
-              Search from thousands of verified properties
-            </Box>
-          </Box>
-
-          {/* Location Search */}
-          <Box maxWidth="600px" mx="auto" width="100%">
-            <LocationSearch setLocation={setLocation} />
-          </Box>
-        </Stack>
-      </Box>
-
-      {/* Filter Bar */}
-      <Paper
-        elevation={0}
-        sx={{
-          borderRadius: '15px',
-          p: 2,
-          backgroundColor: 'white',
-          border: '1px solid',
-          borderColor: 'rgba(0,0,0,0.08)'
-        }}
-      >
+    <Paper
+      elevation={0}
+      sx={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        backgroundColor: 'transparent',
+        borderBottom: '1px solid rgba(0,0,0,0.08)',
+        borderRadius: 0
+      }}
+    >
+      {/* Main Navigation Bar */}
+      <Box sx={{ py: 1.5 }}>
         <Stack
-          direction={{ xs: 'column', md: 'row' }}
+          direction={{ xs: 'column', lg: 'row' }}
+          spacing={{ xs: 2, lg: 3 }}
+          alignItems={{ xs: 'stretch', lg: 'center' }}
           justifyContent="space-between"
-          alignItems={{ xs: 'stretch', md: 'center' }}
-          spacing={2}
         >
-          {/* Tabs */}
+          {/* Title */}
+
+
+          {/* Location Search - Compact */}
+
+
+          {/* Tabs - Compact */}
           <Tabs
             value={value}
             onChange={handleChange}
-            aria-label="property search tabs"
             sx={{
+              minHeight: 'auto',
               '& .MuiTabs-indicator': {
                 backgroundColor: '#6c5ce7',
-                height: 3,
-                borderRadius: '3px'
+                height: 2
               },
               '& .MuiTab-root': {
                 textTransform: 'none',
                 fontWeight: 500,
-                fontSize: '1rem',
+                fontSize: '0.875rem',
                 color: '#636e72',
-                minHeight: 48,
+                minHeight: 36,
+                padding: '6px 12px',
                 '&.Mui-selected': {
                   color: '#6c5ce7'
                 }
@@ -151,120 +122,61 @@ export default function FilterNavbar({ setLocation }: FilterNavbarProps) {
             <Tab
               value="find-roommate"
               label={
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <People fontSize="small" />
-                  <span>Find Roommate</span>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <People sx={{ fontSize: 16 }} />
+                  <span>Roommate</span>
                 </Stack>
               }
             />
             <Tab
               value="find-room"
               label={
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <MeetingRoom fontSize="small" />
-                  <span>Find Room</span>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <MeetingRoom sx={{ fontSize: 16 }} />
+                  <span>Room</span>
                 </Stack>
               }
             />
             <Tab
               value="both"
               label={
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Home fontSize="small" />
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <Home sx={{ fontSize: 16 }} />
                   <span>Both</span>
                 </Stack>
               }
             />
           </Tabs>
+          <Stack direction="row" spacing={2}>
+            <Box sx={{ maxWidth: { xs: '100%', lg: '400px' } }}>
+              <LocationSearch setLocation={setLocation} />
 
-          {/* Filters */}
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Autocomplete
-              disablePortal
-              options={genderOptions}
-              defaultValue={genderOptions[0]}
-              sx={{
-                width: 160,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '12px',
-                  '&:hover fieldset': {
-                    borderColor: '#6c5ce7'
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#6c5ce7'
-                  }
-                }
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Gender Preference"
-                  size="small"
-                />
-              )}
-            />
-
-            <Autocomplete
-              disablePortal
-              options={priceRanges}
-              defaultValue={priceRanges[0]}
-              sx={{
-                width: 160,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '12px',
-                  '&:hover fieldset': {
-                    borderColor: '#6c5ce7'
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#6c5ce7'
-                  }
-                }
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Price Range"
-                  size="small"
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: <AttachMoney fontSize="small" sx={{ color: '#6c5ce7', mr: 0.5 }} />
-                  }}
-                />
-              )}
-            />
-
-            <Tooltip title="More Filters">
-              <IconButton
-                sx={{
-                  border: '2px solid',
-                  borderColor: activeFilters > 0 ? '#6c5ce7' : '#e0e0e0',
-                  backgroundColor: activeFilters > 0 ? '#f3f0ff' : 'transparent',
-                  '&:hover': {
-                    backgroundColor: '#f3f0ff',
-                    borderColor: '#6c5ce7'
-                  }
-                }}
-              >
-                <Badge badgeContent={activeFilters} color="secondary">
-                  <FilterList sx={{ color: activeFilters > 0 ? '#6c5ce7' : '#636e72' }} />
-                </Badge>
-              </IconButton>
-            </Tooltip>
+            </Box>
+            <IconButton onClick={() => setFilterOpen(true)}>
+              <Filter />
+            </IconButton>
           </Stack>
         </Stack>
+      </Box>
+      <FilterSidebar open={filterOpen} onClose={() => setFilterOpen(false)} onFiltersChange={() => { }} />
 
-        {/* Active Filters Display */}
-        {activeFilters > 0 && (
-          <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">
+      {/* Active Filters Display - Only show when filters are active */}
+      {activeFilters > 0 && (
+        <Box sx={{ px: 3, pb: 1.5 }}>
+          <Divider sx={{ mb: 1 }} />
+          <Stack direction="row" spacing={1} flexWrap="wrap">
             <Chip
               label="Pet Friendly"
               onDelete={() => setActiveFilters(activeFilters - 1)}
               size="small"
               sx={{
+                height: 24,
+                fontSize: '0.75rem',
                 backgroundColor: '#f3f0ff',
                 color: '#6c5ce7',
                 '& .MuiChip-deleteIcon': {
-                  color: '#6c5ce7'
+                  color: '#6c5ce7',
+                  fontSize: 16
                 }
               }}
             />
@@ -273,58 +185,19 @@ export default function FilterNavbar({ setLocation }: FilterNavbarProps) {
               onDelete={() => setActiveFilters(activeFilters - 1)}
               size="small"
               sx={{
+                height: 24,
+                fontSize: '0.75rem',
                 backgroundColor: '#e6fffa',
                 color: '#00b894',
                 '& .MuiChip-deleteIcon': {
-                  color: '#00b894'
+                  color: '#00b894',
+                  fontSize: 16
                 }
               }}
             />
           </Stack>
-        )}
-      </Paper>
-
-      {/* Quick Stats */}
-      <Stack
-        direction="row"
-        spacing={2}
-        mt={2}
-        sx={{ overflowX: 'auto', pb: 1 }}
-      >
-        <Chip
-          icon={<LocationOn />}
-          label="Near Metro"
-          clickable
-          sx={{
-            backgroundColor: 'white',
-            border: '1px solid #e0e0e0',
-            '&:hover': {
-              backgroundColor: '#f3f0ff',
-              borderColor: '#6c5ce7'
-            }
-          }}
-        />
-        <Chip
-          label="Available Now"
-          clickable
-          sx={{
-            backgroundColor: '#d4f4dd',
-            color: '#00b894'
-          }}
-        />
-        <Chip
-          label="Verified Only"
-          clickable
-          sx={{
-            backgroundColor: 'white',
-            border: '1px solid #e0e0e0',
-            '&:hover': {
-              backgroundColor: '#f3f0ff',
-              borderColor: '#6c5ce7'
-            }
-          }}
-        />
-      </Stack>
-    </Box>
+        </Box>
+      )}
+    </Paper>
   );
 }

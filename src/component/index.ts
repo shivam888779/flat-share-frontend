@@ -13,6 +13,7 @@ import ListPropertyForm from "./ListPropertyForm";
 import RegisterForm from "./RegistrationForm";
 import ImageUpload from "./ImageUpload";
 import LandingPage from "./LandingPage";
+import FilterSidebar from "./FilterSideBar";
 
 export {
     Header,
@@ -29,5 +30,6 @@ export {
     ListPropertyForm,
     RegisterForm,
     ImageUpload,
-    LandingPage
+    LandingPage,
+    FilterSidebar
 }

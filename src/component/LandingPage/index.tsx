@@ -27,53 +27,7 @@ const LandingPage: React.FC = () => {
   return (
     <div className={`min-h-screen overflow-x-hidden transition-colors duration-300 ${isNight ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
-      <header className="fixed top-0 w-full bg-white shadow-md z-50 animate-slideDown">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div
-              className="flex items-center gap-2 cursor-pointer transform hover:scale-105 transition-transform"
-              onClick={handleLogoClick}
-            >
-              <h1 className="text-3xl font-bold text-purple-600">
-                Learn<span className="text-green-500">Mate</span>
-              </h1>
-              <span className="text-sm">📚</span>
-            </div>
 
-            <div className="flex gap-3">
-              <Button
-                variant="text"
-                className="text-gray-600 hover:text-purple-600 normal-case"
-                sx={{
-                  borderRadius: '25px',
-                  px: 3,
-                  '&:hover': { transform: 'translateY(-2px)' }
-                }}
-              >
-                Login / Register
-              </Button>
-              <Button
-                variant="contained"
-                className="normal-case"
-                sx={{
-                  backgroundColor: '#ffeaa7',
-                  color: '#2d3436',
-                  borderRadius: '25px',
-                  px: 3,
-                  boxShadow: '0 4px 15px rgba(255, 234, 167, 0.4)',
-                  '&:hover': {
-                    backgroundColor: '#fdcb6e',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 6px 20px rgba(255, 234, 167, 0.6)'
-                  }
-                }}
-              >
-                Start Learning
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Main Content */}
       <main className="pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">

@@ -61,6 +61,7 @@ export default function Listing() {
     return (
         <Box
             width="100%"
+            mt={10}
             sx={{
                 backgroundColor: '#f8f9fa',
                 minHeight: '100vh',
@@ -101,7 +102,7 @@ export default function Listing() {
             <Box mx="auto" maxWidth="1240px" px={3} pt={4} position="relative" zIndex={1}>
                 <FilterNavbar setLocation={setLocation} />
 
-                <Divider sx={{ my: 3, borderColor: 'rgba(108, 92, 231, 0.1)' }} />
+                <Divider sx={{ mb: 3, borderColor: 'rgba(108, 92, 231, 0.1)' }} />
 
                 {/* Results Count */}
                 {propertyList.length > 0 && (

@@ -11,7 +11,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return <div className="main"><ThemeProvider theme={theme}>
     <SnackbarProvider>
       <GlobalContextProvider>
-        {/* <Header /> */}
+        <Header />
         <Component {...pageProps} />
         <Footer />
       </GlobalContextProvider>
