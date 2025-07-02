@@ -3,14 +3,14 @@ import { useLoadScript } from "@react-google-maps/api";
 import { ILocation } from "@/types/property";
 
 const libraries: ("places")[] = ["places"];
-const GOOGLE_MAPS_API_KEY = "AIzaSyBkEMXezDZpWUD6XuDFLf07bao3kJq4f_Q"; 
+const GOOGLE_MAPS_API_KEY = "AIzaSyBkEMXezDZpWUD6XuDFLf07bao3kJq4f_Q";
 
 interface Props {
-  setLocation : any
+  setLocation: any
 }
 
-export default function LocationSearch(props:Props) {
-  const {setLocation} = props;
+export default function LocationSearch(props: Props) {
+  const { setLocation } = props;
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
     libraries,
@@ -42,11 +42,11 @@ export default function LocationSearch(props:Props) {
 
           setSelectedPlace({ name, address, lat, lng });
           setLocation({
-            latitude:lat,
-            longitude :lng,
-            address : address
+            latitude: lat,
+            longitude: lng,
+            address: address
           })
-          setInput(address); 
+          setInput(address);
         }
       });
 
@@ -65,7 +65,7 @@ export default function LocationSearch(props:Props) {
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-    
+
     </div>
   ) : (
     <p>Loading...</p>

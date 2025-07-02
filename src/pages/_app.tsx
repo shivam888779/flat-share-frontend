@@ -1,10 +1,11 @@
 import "@/styles/globals.css";
+import "@/styles/landing-page.css";
 import type { AppProps } from "next/app";
 import { GlobalContextProvider } from "../global-context"
 import { ThemeProvider } from "@mui/material";
 import theme from "../styles/global-theme"
 import { SnackbarProvider } from "@/hooks/useSnackbar";
-import { Header } from "@/component";
+import { Footer, Header } from "@/component";
 
 export default function App({ Component, pageProps }: AppProps) {
   return <div className="main"><ThemeProvider theme={theme}>
@@ -12,6 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <GlobalContextProvider>
         <Header />
         <Component {...pageProps} />
+        <Footer />
       </GlobalContextProvider>
     </SnackbarProvider>
 

@@ -25,6 +25,7 @@ export interface IUserData {
     updatedAt: string; 
     token : string;
     verified:boolean;
+    isLoggedIn:boolean;
 }
 export interface ILoginFormValues {
   email: string;

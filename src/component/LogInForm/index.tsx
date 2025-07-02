@@ -50,7 +50,7 @@ const LogInForm = () => {
   const [isOtpSent, setIsOtpSent] = useState(false); // Track if OTP is sent
   const [mobileNumber, setMobileNumber] = useState(""); // Store mobile number for OTP verification
    const snackbar = useGlobalSnackbar();
-  const { state, setState } = useGlobalContext();
+  const { state, setState,fetchProfile } = useGlobalContext();
 
   const router = useRouter()
 
@@ -77,7 +77,8 @@ const LogInForm = () => {
     if (data?.status) {
       localStorage.setItem("authToken", data?.data?.token)
       console.log(data?.data)
-      setState({ userData: data?.data })
+      setState({ userData: {...data?.data, isLoggedIn: true} })
+      fetchProfile()
       if (data?.data?.verified) {
         router.push("/")
       }

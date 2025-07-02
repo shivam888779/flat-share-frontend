@@ -1,3 +1,4 @@
+'use client'
 import * as React from 'react';
 import { styled, alpha, useTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
@@ -49,58 +50,9 @@ import {
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import { useGlobalContext } from '@/global-context';
+import Link from 'next/link';
 
-const SearchWrapper = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    maxWidth: '400px',
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto',
-    },
-    [theme.breakpoints.down('md')]: {
-        maxWidth: '200px',
-    },
-    [theme.breakpoints.down('sm')]: {
-        maxWidth: '150px',
-    },
-}));
 
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-            width: '20ch',
-        },
-        [theme.breakpoints.down('md')]: {
-            width: '15ch',
-        },
-        [theme.breakpoints.down('sm')]: {
-            width: '12ch',
-        },
-    },
-}));
 
 const Logo = styled(Typography)(({ theme }) => ({
     fontWeight: 700,
@@ -115,26 +67,11 @@ const Logo = styled(Typography)(({ theme }) => ({
     },
 }));
 
-const NavButton = styled(Button)(({ theme }) => ({
-    color: theme.palette.common.white,
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.1),
-    },
-}));
-
-const MobileSearchButton = styled(IconButton)(({ theme }) => ({
-    color: theme.palette.common.white,
-    backgroundColor: alpha(theme.palette.common.white, 0.1),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.2),
-    },
-}));
 
 export default function Header() {
     const router = useRouter();
     const { state } = useGlobalContext();
+    const isLoggedIn = state?.userData?.isLoggedIn;
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -144,7 +81,6 @@ export default function Header() {
     const [listMenuAnchorEl, setListMenuAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const isMenuOpen = Boolean(anchorEl);
-    const isListMenuOpen = Boolean(listMenuAnchorEl);
 
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -368,291 +304,252 @@ export default function Header() {
         </Drawer>
     );
 
-    return (
-        <>
-            <AppBar
-                position="static"
-                sx={{
-                    backgroundColor: '#1976d2',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }}
-            >
-                <Toolbar>
-                    {/* Mobile Menu Button */}
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleMobileDrawerToggle}
-                        sx={{ mr: 2, display: { md: 'none' } }}
-                    >
-                        <More />
-                    </IconButton>
-
-                    {/* Logo */}
-                    <Logo onClick={() => handleNavigation('/')}>
-                        FlatShare
-                    </Logo>
-
-                    {/* Navigation Buttons - Desktop Only */}
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, ml: 4 }}>
-                        <NavButton
-                            startIcon={<Home />}
-                            onClick={() => handleNavigation('/')}
-                        >
-                            Home
-                        </NavButton>
-                        <NavButton
-                            startIcon={<Apartment />}
-                            onClick={() => handleNavigation('/properties')}
-                        >
-                            Properties
-                        </NavButton>
-                        <NavButton
-                            startIcon={<Add />}
-                            endIcon={<KeyboardArrowDown />}
-                            onClick={handleListMenuOpen}
-                            sx={{
-                                backgroundColor: alpha('#fff', 0.1),
-                                '&:hover': {
-                                    backgroundColor: alpha('#fff', 0.2),
-                                },
-                            }}
-                        >
-                            List
-                        </NavButton>
-                    </Box>
-
-                    {/* Search Bar - Desktop */}
-                    <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                        <SearchWrapper>
-                            <SearchIconWrapper>
-                                <Search />
-                            </SearchIconWrapper>
-                            <StyledInputBase
-                                placeholder="Search properties, locations..."
-                                inputProps={{ 'aria-label': 'search' }}
-                            />
-                        </SearchWrapper>
-                    </Box>
-
-                    <Box sx={{ flexGrow: 1 }} />
-
-                    {/* Right Side Icons - Desktop */}
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-                        <IconButton
-                            size="large"
-                            color="inherit"
-                            onClick={() => handleNavigation('/connections')}
-                        >
-                            <Badge badgeContent={2} color="error">
-                                <Favorite />
-                            </Badge>
-                        </IconButton>
-                        <IconButton
-                            size="large"
-                            color="inherit"
-                            onClick={() => handleNavigation('/messages')}
-                        >
-                            <Badge badgeContent={3} color="error">
-                                <Message />
-                            </Badge>
-                        </IconButton>
-                        <IconButton
-                            size="large"
-                            color="inherit"
-                            onClick={() => handleNavigation('/notifications')}
-                        >
-                            <Badge badgeContent={5} color="error">
-                                <Notifications />
-                            </Badge>
-                        </IconButton>
-                        <IconButton
-                            size="large"
-                            edge="end"
-                            aria-label="account of current user"
-                            aria-controls={menuId}
-                            aria-haspopup="true"
-                            onClick={handleProfileMenuOpen}
-                            color="inherit"
-                            sx={{ ml: 1 }}
-                        >
-                            {state?.userData?.profileImage ? (
-                                <Avatar
-                                    src={state.userData.profileImage}
-                                    sx={{ width: 32, height: 32 }}
-                                />
-                            ) : (
-                                <AccountCircle />
-                            )}
-                        </IconButton>
-                    </Box>
-
-                    {/* Mobile Right Side Icons */}
-                    <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1 }}>
-                        <MobileSearchButton
-                            size="large"
-                            onClick={handleSearchToggle}
-                        >
-                            <Search />
-                        </MobileSearchButton>
-                        <IconButton
-                            size="large"
-                            color="inherit"
-                            onClick={handleProfileMenuOpen}
-                        >
-                            {state?.userData?.profileImage ? (
-                                <Avatar
-                                    src={state.userData.profileImage}
-                                    sx={{ width: 28, height: 28 }}
-                                />
-                            ) : (
-                                <AccountCircle />
-                            )}
-                        </IconButton>
-                    </Box>
-                </Toolbar>
-
-                {/* Mobile Search Bar - Expandable */}
-                <Collapse in={searchOpen}>
-                    <Box sx={{ p: 2, backgroundColor: alpha('#1976d2', 0.95) }}>
-                        <SearchWrapper sx={{ maxWidth: '100%', margin: 0 }}>
-                            <SearchIconWrapper>
-                                <Search />
-                            </SearchIconWrapper>
-                            <StyledInputBase
-                                placeholder="Search properties, locations..."
-                                inputProps={{ 'aria-label': 'search' }}
-                                autoFocus
-                            />
-                        </SearchWrapper>
-                    </Box>
-                </Collapse>
-            </AppBar>
-
-            {/* List Options Dropdown Menu */}
-            <Popper
-                open={isListMenuOpen}
-                anchorEl={listMenuAnchorEl}
-                placement="bottom-start"
-                transition
-                disablePortal
-            >
-                {({ TransitionProps, placement }) => (
-                    <Grow
-                        {...TransitionProps}
-                        style={{
-                            transformOrigin:
-                                placement === 'bottom-start' ? 'left top' : 'left bottom',
-                        }}
-                    >
-                        <Paper sx={{ mt: 1, minWidth: 200 }}>
-                            <ClickAwayListener onClickAway={handleListMenuClose}>
-                                <Menu
-                                    anchorEl={listMenuAnchorEl}
-                                    open={isListMenuOpen}
-                                    onClose={handleListMenuClose}
-                                    anchorOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'left',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'left',
-                                    }}
-                                >
-                                    <MenuItem onClick={() => handleNavigation('/list-property/list-property')}>
-                                        <ListItemIcon>
-                                            <Business fontSize="small" />
-                                        </ListItemIcon>
-                                        List Property
-                                    </MenuItem>
-                                    <MenuItem onClick={() => handleNavigation('/list-property/list-requirement')}>
-                                        <ListItemIcon>
-                                            <Assignment fontSize="small" />
-                                        </ListItemIcon>
-                                        List Requirement
-                                    </MenuItem>
-                                </Menu>
-                            </ClickAwayListener>
-                        </Paper>
-                    </Grow>
-                )}
-            </Popper>
-
-            {/* Mobile Drawer */}
-            {renderMobileDrawer}
-
-            {/* Desktop Menu */}
-            {renderMenu}
-
-            {/* Mobile Floating Action Button for List Property */}
-            <Box sx={{ display: { xs: 'block', md: 'none' }, position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }}>
-                <Fab
-                    color="primary"
-                    aria-label="list options"
-                    onClick={handleListMenuOpen}
-                    sx={{
-                        backgroundColor: theme.palette.primary.main,
-                        '&:hover': {
-                            backgroundColor: theme.palette.primary.dark,
-                        },
-                    }}
+    return (<header className="fixed top-0 w-full bg-white shadow-md z-50 animate-slideDown">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-4">
+                <div
+                    className="flex items-center gap-2 cursor-pointer transform hover:scale-105 transition-transform"
+                    onClick={() => handleNavigation('/')}
                 >
-                    <Add />
-                </Fab>
-            </Box>
+                    <h1 className="text-3xl font-bold text-purple-600">
+                        Learn<span className="text-green-500">Mate</span>
+                    </h1>
+                    <span className="text-sm">📚</span>
+                </div>
 
-            {/* Mobile List Options Dropdown */}
-            <Popper
-                open={isListMenuOpen && isMobile}
-                anchorEl={listMenuAnchorEl}
-                placement="top-end"
-                transition
-                disablePortal
-            >
-                {({ TransitionProps, placement }) => (
-                    <Grow
-                        {...TransitionProps}
-                        style={{
-                            transformOrigin:
-                                placement === 'top-end' ? 'right bottom' : 'right top',
+                <div className="flex gap-3">
+                   {!isLoggedIn && <Link
+                        href="/login"
+                        className="text-gray-600 hover:text-purple-600 normal-case"
+                    >
+                        Login / Register
+                    </Link>}
+                    {/* <Button
+                        variant="contained"
+                        className="normal-case"
+                        sx={{
+                            backgroundColor: '#ffeaa7',
+                            color: '#2d3436',
+                            borderRadius: '25px',
+                            px: 3,
+                            boxShadow: '0 4px 15px rgba(255, 234, 167, 0.4)',
+                            '&:hover': {
+                                backgroundColor: '#fdcb6e',
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 6px 20px rgba(255, 234, 167, 0.6)'
+                            }
                         }}
                     >
-                        <Paper sx={{ mb: 1, minWidth: 200 }}>
-                            <ClickAwayListener onClickAway={handleListMenuClose}>
-                                <Menu
-                                    anchorEl={listMenuAnchorEl}
-                                    open={isListMenuOpen && isMobile}
-                                    onClose={handleListMenuClose}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'right',
-                                    }}
-                                >
-                                    <MenuItem onClick={() => handleNavigation('/list-property')}>
-                                        <ListItemIcon>
-                                            <Business fontSize="small" />
-                                        </ListItemIcon>
-                                        List Property
-                                    </MenuItem>
-                                    <MenuItem onClick={() => handleNavigation('/list-requirement')}>
-                                        <ListItemIcon>
-                                            <Assignment fontSize="small" />
-                                        </ListItemIcon>
-                                        List Requirement
-                                    </MenuItem>
-                                </Menu>
-                            </ClickAwayListener>
-                        </Paper>
-                    </Grow>
-                )}
-            </Popper>
-        </>
+                        Start Learning
+                    </Button> */}
+                        {isLoggedIn && <IconButton
+                    size="large"
+                    edge="end"
+                    aria-label="account of current user"
+                    aria-controls={menuId}
+                    aria-haspopup="true"
+                    onClick={handleProfileMenuOpen}
+                    color="inherit"
+                    sx={{ ml: 1 }}
+                >
+                    {state?.userData?.profileImage ? (
+                        <Avatar
+                            src={state.userData.profileImage}
+                            sx={{ width: 32, height: 32 }}
+                        />
+                    ) : (
+                        <AccountCircle />
+                    )}
+                </IconButton>}
+                {renderMenu}
+                </div>
+            </div>
+        </div>
+    </header>
+
     );
 }
+// <>
+//     <AppBar
+//         position="static"
+//         sx={{
+//             backgroundColor: '#1976d2',
+//             boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+//         }}
+//     >
+//         <Toolbar>
+//             {/* Mobile Menu Button */}
+//             <IconButton
+//                 size="large"
+//                 edge="start"
+//                 color="inherit"
+//                 aria-label="open drawer"
+//                 onClick={handleMobileDrawerToggle}
+//                 sx={{ mr: 2, display: { md: 'none' } }}
+//             >
+//                 <More />
+//             </IconButton>
+
+//             {/* Logo */}
+//             <Logo onClick={() => handleNavigation('/')}>
+//                 FlatShare
+//             </Logo>
+
+//             {/* Navigation Buttons - Desktop Only */}
+//             <Box sx={{ display: { xs: 'none', md: 'flex' }, ml: 4 }}>
+//                 <NavButton
+//                     startIcon={<Home />}
+//                     onClick={() => handleNavigation('/')}
+//                 >
+//                     Home
+//                 </NavButton>
+//                 <NavButton
+//                     startIcon={<Apartment />}
+//                     onClick={() => handleNavigation('/properties')}
+//                 >
+//                     Properties
+//                 </NavButton>
+//                 <NavButton
+//                     startIcon={<Add />}
+//                     onClick={() => handleNavigation('/list-property')}
+//                     sx={{
+//                         backgroundColor: alpha('#fff', 0.1),
+//                         '&:hover': {
+//                             backgroundColor: alpha('#fff', 0.2),
+//                         },
+//                     }}
+//                 >
+//                     List Property
+//                 </NavButton>
+//             </Box>
+
+//             {/* Search Bar - Desktop */}
+//             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+//                 <SearchWrapper>
+//                     <SearchIconWrapper>
+//                         <Search />
+//                     </SearchIconWrapper>
+//                     <StyledInputBase
+//                         placeholder="Search properties, locations..."
+//                         inputProps={{ 'aria-label': 'search' }}
+//                     />
+//                 </SearchWrapper>
+//             </Box>
+
+//             <Box sx={{ flexGrow: 1 }} />
+
+//             {/* Right Side Icons - Desktop */}
+//             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
+//                 <IconButton
+//                     size="large"
+//                     color="inherit"
+//                     onClick={() => handleNavigation('/connections')}
+//                 >
+//                     <Badge badgeContent={2} color="error">
+//                         <Favorite />
+//                     </Badge>
+//                 </IconButton>
+//                 <IconButton
+//                     size="large"
+//                     color="inherit"
+//                     onClick={() => handleNavigation('/messages')}
+//                 >
+//                     <Badge badgeContent={3} color="error">
+//                         <Message />
+//                     </Badge>
+//                 </IconButton>
+//                 <IconButton
+//                     size="large"
+//                     color="inherit"
+//                     onClick={() => handleNavigation('/notifications')}
+//                 >
+//                     <Badge badgeContent={5} color="error">
+//                         <Notifications />
+//                     </Badge>
+//                 </IconButton>
+                // <IconButton
+                //     size="large"
+                //     edge="end"
+                //     aria-label="account of current user"
+                //     aria-controls={menuId}
+                //     aria-haspopup="true"
+                //     onClick={handleProfileMenuOpen}
+                //     color="inherit"
+                //     sx={{ ml: 1 }}
+                // >
+                //     {state?.userData?.profileImage ? (
+                //         <Avatar
+                //             src={state.userData.profileImage}
+                //             sx={{ width: 32, height: 32 }}
+                //         />
+                //     ) : (
+                //         <AccountCircle />
+                //     )}
+                // </IconButton>
+//             </Box>
+
+//             {/* Mobile Right Side Icons */}
+//             <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1 }}>
+//                 <MobileSearchButton
+//                     size="large"
+//                     onClick={handleSearchToggle}
+//                 >
+//                     <Search />
+//                 </MobileSearchButton>
+//                 <IconButton
+//                     size="large"
+//                     color="inherit"
+//                     onClick={handleProfileMenuOpen}
+//                 >
+//                     {state?.userData?.profileImage ? (
+//                         <Avatar
+//                             src={state.userData.profileImage}
+//                             sx={{ width: 28, height: 28 }}
+//                         />
+//                     ) : (
+//                         <AccountCircle />
+//                     )}
+//                 </IconButton>
+//             </Box>
+//         </Toolbar>
+
+//         {/* Mobile Search Bar - Expandable */}
+//         <Collapse in={searchOpen}>
+//             <Box sx={{ p: 2, backgroundColor: alpha('#1976d2', 0.95) }}>
+//                 <SearchWrapper sx={{ maxWidth: '100%', margin: 0 }}>
+//                     <SearchIconWrapper>
+//                         <Search />
+//                     </SearchIconWrapper>
+//                     <StyledInputBase
+//                         placeholder="Search properties, locations..."
+//                         inputProps={{ 'aria-label': 'search' }}
+//                         autoFocus
+//                     />
+//                 </SearchWrapper>
+//             </Box>
+//         </Collapse>
+//     </AppBar>
+
+//     {/* Mobile Drawer */}
+//     {renderMobileDrawer}
+
+//     {/* Desktop Menu */}
+//     {renderMenu}
+
+//     {/* Mobile Floating Action Button for List Property */}
+//     <Box sx={{ display: { xs: 'block', md: 'none' }, position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }}>
+//         <Fab
+//             color="primary"
+//             aria-label="list property"
+//             onClick={() => handleNavigation('/list-property')}
+//             sx={{
+//                 backgroundColor: theme.palette.primary.main,
+//                 '&:hover': {
+//                     backgroundColor: theme.palette.primary.dark,
+//                 },
+//             }}
+//         >
+//             <Add />
+//         </Fab>
+//     </Box>
+// </>

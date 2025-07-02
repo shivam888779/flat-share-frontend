@@ -9,23 +9,27 @@ import React, {
   useEffect,
   useRef,
   useState,
+  useCallback,
 } from "react";
 import { useRouter } from "next/router";
 import { IInitialState } from "./initial-state-type";
 import { initialStateData } from "./initial-state";
 import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPreferncesApi } from "@/api/property";
 import { getNotifications } from "@/api/notifications";
+import { getProfileApi } from "@/api/profiles/my-profile";
 
 type GlobalContextType = {
   state: IInitialState;
   setState: Dispatch<Partial<IInitialState>>;
   fetchNotification: () => Promise<void>;
-};
+  fetchProfile: () => Promise<void>;
+  };
 
 const GlobalContext = createContext<GlobalContextType>({
   state: initialStateData,
   setState: () => { },
   fetchNotification: async () => {},
+  fetchProfile: async () => {},
 });
 
 const simpleReducer = (
@@ -103,7 +107,15 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     fetchRequirements();
     isInitialized.current = true;
   }, [isStorageLoaded, state]);
-
+  
+  const fetchProfile = useCallback(async () => {
+    try {
+      const res = await getProfileApi();
+      setState({ userData:{ ...res?.data?.data, isLoggedIn: true } });
+    } catch (e) {
+      console.error("Failed to fetch profile", e);
+    }
+  }, [setState,state]);
   // Fetch notifications on initial load
   useEffect(() => {
     if (isStorageLoaded) {
@@ -130,7 +142,8 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     state, 
     setState, 
     fetchNotification,
-  }), [state, fetchNotification]);
+    fetchProfile,
+  }), [state, fetchNotification, fetchProfile]);
 
   // Save to localStorage when state changes (but not during initial load)
   useEffect(() => {
