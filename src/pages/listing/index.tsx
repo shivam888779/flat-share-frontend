@@ -21,6 +21,7 @@ export default function Listing() {
             setLocation({
                 latitude: parseFloat(router.query.lat as string),
                 longitude: parseFloat(router.query.lng as string),
+                address: router.query.location as string
             });
         }
     }, [router.query.lat, router.query.lng]);
@@ -148,19 +149,19 @@ export default function Listing() {
                             justifyContent={"space-between"}
                         >
                             {propertyList.map((data, index) => (
-                                    <Grow
-                                        in={true}
-                                        key={index}
-                                        style={{ transformOrigin: '0 0 0' }}
-                                        timeout={300 + index * 100}
-                                    >
-                                        <Box>
-                                            <PropertyDetailsCard propertyDetails={data as SearchPropertyCard} />
-                                        </Box>
-                                    </Grow>
-                                ))
+                                <Grow
+                                    in={true}
+                                    key={index}
+                                    style={{ transformOrigin: '0 0 0' }}
+                                    timeout={300 + index * 100}
+                                >
+                                    <Box>
+                                        <PropertyDetailsCard propertyDetails={data as SearchPropertyCard} />
+                                    </Box>
+                                </Grow>
+                            ))
                             }
-                        
+
                         </Box>
 
                         {/* Load More Button */}

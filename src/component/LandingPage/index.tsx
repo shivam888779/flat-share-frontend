@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   Button,
   TextField,
@@ -8,9 +8,27 @@ import {
   InputAdornment
 } from '@mui/material'
 import { Search } from '@mui/icons-material'
+import { useLoadScript } from "@react-google-maps/api";
+import router from 'next/router';
+
+const libraries: ("places")[] = ["places"];
+const GOOGLE_MAPS_API_KEY = "AIzaSyBkEMXezDZpWUD6XuDFLf07bao3kJq4f_Q";
 
 const LandingPage: React.FC = () => {
   const [isNight, setIsNight] = useState(false)
+  const [searchInput, setSearchInput] = useState("")
+  const [selectedLocation, setSelectedLocation] = useState<{
+    name: string;
+    address: string;
+    lat?: number;
+    lng?: number;
+  } | null>(null);
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries,
+  });
 
   const popularTopics = [
     'Web Development',
@@ -23,6 +41,47 @@ const LandingPage: React.FC = () => {
   const handleLogoClick = () => {
     setIsNight(!isNight)
   }
+
+  // Initialize Google Places Autocomplete
+  useEffect(() => {
+    if (isLoaded && inputRef.current && !inputRef.current.dataset.autocompleteInitialized) {
+      const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
+        componentRestrictions: { country: "in" },
+        fields: ["place_id", "geometry", "name", "formatted_address"],
+      });
+
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (place && place.geometry) {
+          const lat = place.geometry.location?.lat();
+          const lng = place.geometry.location?.lng();
+          const name = place.name || "";
+          const address = place.formatted_address || "";
+
+          setSelectedLocation({ name, address, lat, lng });
+          setSearchInput(address);
+
+          // You can handle the location data here
+          console.log("Selected location: 123", { name, address, lat, lng });
+          router.push(`/listing?location=${address}&lat=${lat}&lng=${lng}`)
+        }
+      });
+
+      inputRef.current.dataset.autocompleteInitialized = "true";
+    }
+  }, [isLoaded]);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(event.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    // Handle search submission here
+    console.log("Search submitted:", searchInput);
+    if (selectedLocation) {
+      console.log("Location data:", selectedLocation);
+    }
+  };
 
   return (
     <div className={`overflow-x-hidden transition-colors duration-300 ${isNight ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -45,35 +104,62 @@ const LandingPage: React.FC = () => {
 
         {/* Search Box */}
         <div className="max-w-2xl mx-auto mb-8 animate-fadeInUp animation-delay-400">
-          <TextField
-            fullWidth
-            placeholder="Search Courses, Topics, or Skills..."
-            variant="outlined"
-            className="bg-white rounded-full"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search className="text-gray-400" />
-                </InputAdornment>
-              ),
-              sx: {
-                borderRadius: '50px',
-                '& fieldset': {
-                  border: 'none',
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
-                },
-                '&:hover fieldset': {
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.12)'
-                },
-                '&.Mui-focused': {
-                  transform: 'translateY(-2px)',
+          {isLoaded ? (
+            <TextField
+              fullWidth
+              placeholder="Search Courses, Topics, Skills, or Location..."
+              variant="outlined"
+              className="bg-white rounded-full"
+              value={searchInput}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearchSubmit();
+                }
+              }}
+              inputRef={inputRef}
+              InputProps={{
+                sx: {
+                  borderRadius: '50px',
                   '& fieldset': {
+                    border: 'none',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
+                  },
+                  '&:hover fieldset': {
                     boxShadow: '0 15px 50px rgba(0,0,0,0.12)'
+                  },
+                  '&.Mui-focused': {
+                    transform: 'translateY(-2px)',
+                    '& fieldset': {
+                      boxShadow: '0 15px 50px rgba(0,0,0,0.12)'
+                    }
                   }
                 }
-              }
-            }}
-          />
+              }}
+            />
+          ) : (
+            <TextField
+              fullWidth
+              placeholder="Loading search functionality..."
+              variant="outlined"
+              className="bg-white rounded-full"
+              disabled
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search className="text-gray-400" />
+                  </InputAdornment>
+                ),
+                sx: {
+                  borderRadius: '50px',
+                  '& fieldset': {
+                    border: 'none',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
+                  }
+                }
+              }}
+            />
+          )}
         </div>
 
         {/* Popular Topics */}

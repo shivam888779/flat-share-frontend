@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { ILocation } from "@/types/property";
+import { useRouter } from 'next/router';
 
 const libraries: ("places")[] = ["places"];
 const GOOGLE_MAPS_API_KEY = "AIzaSyBkEMXezDZpWUD6XuDFLf07bao3kJq4f_Q";
@@ -23,7 +24,8 @@ export default function LocationSearch(props: Props) {
     lat?: number;
     lng?: number;
   } | null>(null);
-  const [input, setInput] = useState("");
+  const router = useRouter();
+  const [input, setInput] = useState(router.query.location as string || "");
 
   useEffect(() => {
     if (isLoaded && inputRef.current && !inputRef.current.dataset.autocompleteInitialized) {

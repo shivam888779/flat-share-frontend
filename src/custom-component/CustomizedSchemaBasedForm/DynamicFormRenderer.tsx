@@ -31,18 +31,19 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
     setLocation,
     setSelectedFiles
 }) => {
+    const { state } = useGlobalContext();
     const renderField = (fieldSchema: FormFieldSchema) => {
-        const { componentType, name, inputLabel, max, ...props  } = fieldSchema;
+        const { componentType, name, inputLabel, max, ...props } = fieldSchema;
 
-        const {state} = useGlobalContext();
-        const getSchema = (key:string) =>{
-            switch(key){
+
+        const getSchema = (key: string) => {
+            switch (key) {
                 case 'resources':
                     return state.resources;
                 case 'preferences':
-                     return state.preferences;
+                    return state.preferences;
                 default:
-                        null;     
+                    null;
             }
         }
 
@@ -73,7 +74,7 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                     <CustomizedSelectChip
                         setFieldValue={setFieldValue}
                         fieldKey={props.fieldKey || name}
-                        schema={getSchema(props.fieldKey??"")}
+                        schema={getSchema(props.fieldKey ?? "")}
                         selectedResources={values[props.fieldKey || name]}
                     />
                 );

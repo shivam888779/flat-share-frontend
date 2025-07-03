@@ -14,9 +14,9 @@ import { useEffect, useState } from "react";
 import { ILocation, IPropertyFormValues } from "@/types/property";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
-import { 
-    getFormConfig, 
-    PropertyFormValues, 
+import {
+    getFormConfig,
+    PropertyFormValues,
     RequirementFormValues,
     validatePropertyForm,
     validateRequirementForm,
@@ -56,7 +56,7 @@ const PropertyListingForm = ({ type }: Props) => {
 
     // Get form configuration based on type and global state
     const formConfig = getFormConfig(
-        isRequirementForm() ? 'requirement' : 'property', 
+        isRequirementForm() ? 'requirement' : 'property',
         state
     );
 
@@ -73,7 +73,7 @@ const PropertyListingForm = ({ type }: Props) => {
 
     const handleSubmit = async (values: PropertyFormValues | RequirementFormValues) => {
         // Validate form based on type
-        const validation = isRequirementForm() 
+        const validation = isRequirementForm()
             ? await validateRequirementForm(values as RequirementFormValues)
             : await validatePropertyForm(values as PropertyFormValues);
 
@@ -175,7 +175,7 @@ const PropertyListingForm = ({ type }: Props) => {
                         enableReinitialize={true}
                     >
                         {({ handleChange, values, touched, errors, setFieldValue, isValid, dirty }) => (
-                         
+
                             <Form>
                                 <Stack spacing={3}>
                                     <DynamicFormRenderer
@@ -214,7 +214,7 @@ const PropertyListingForm = ({ type }: Props) => {
                                         <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', border: '1px solid #ccc', borderRadius: 1 }}>
                                             <Typography variant="subtitle2" sx={{ mb: 1 }}>Formik Debug Panel</Typography>
                                             <pre style={{ fontSize: 12, margin: 0 }}>
-{JSON.stringify({ errors, isValid, dirty }, null, 2)}
+                                                {JSON.stringify({ errors, isValid, dirty }, null, 2)}
                                             </pre>
                                         </Box>
                                     )}
@@ -222,30 +222,30 @@ const PropertyListingForm = ({ type }: Props) => {
                                     {submitted && (
                                         <Typography
                                             variant="body1"
-                                            sx={{ 
-                                                color: 'success.main', 
-                                                marginTop: 2, 
+                                            sx={{
+                                                color: 'success.main',
+                                                marginTop: 2,
                                                 textAlign: 'center',
                                                 fontWeight: 500
                                             }}
                                         >
-                                            {isRequirementForm() 
-                                                ? 'Requirement listed successfully!' 
+                                            {isRequirementForm()
+                                                ? 'Requirement listed successfully!'
                                                 : 'Property listed successfully!'
                                             }
                                         </Typography>
                                     )}
 
                                     {/* Form Type Indicator */}
-                                    <Box sx={{ 
-                                        mt: 2, 
-                                        p: 2, 
-                                        bgcolor: 'info.light', 
+                                    <Box sx={{
+                                        mt: 2,
+                                        p: 2,
+                                        bgcolor: 'info.light',
                                         borderRadius: 1,
                                         textAlign: 'center'
                                     }}>
                                         <Typography variant="body2" color="info.contrastText">
-                                            {isRequirementForm() 
+                                            {isRequirementForm()
                                                 ? '📋 You are listing a requirement for a property'
                                                 : '🏠 You are listing a property for rent'
                                             }
