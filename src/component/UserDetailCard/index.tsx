@@ -218,7 +218,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
         <Stack spacing={1} mb={2}>
           <Stack direction="row" alignItems="flex-start" spacing={0.5}>
             <LocationOn sx={{ fontSize: 18, color: '#636e72', mt: 0.5 }} />
-            <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
+            <Typography className='truncate w-8 ' variant="body2" color="text.secondary" sx={{ flex: 1 }}>
               {data?.address ?? ''}
             </Typography>
           </Stack>
@@ -253,7 +253,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
               fontWeight: 700
             }}
           >
-            ${data?.rent ?? 0}
+            {data?.rent ?? 0}
             <Typography
               component="span"
               variant="body1"
@@ -348,7 +348,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
             variant="contained"
             fullWidth
             startIcon={<Phone />}
-            href={`tel:${data?.phoneNo ?? ''  }`}
+            href={`tel:${data?.phoneNo ?? ''}`}
             sx={{
               borderRadius: '12px',
               backgroundColor: '#6c5ce7',

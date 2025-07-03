@@ -25,7 +25,7 @@ const LandingPage: React.FC = () => {
   }
 
   return (
-    <div className={`min-h-screen overflow-x-hidden transition-colors duration-300 ${isNight ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`overflow-x-hidden transition-colors duration-300 ${isNight ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
 
 

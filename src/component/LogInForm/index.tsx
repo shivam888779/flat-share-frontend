@@ -1,24 +1,28 @@
-// pages/login.tsx
-
-import { Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { Button, TextField, Typography, Divider, Box, IconButton, Stack, InputLabel } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Typography,
+  Box,
+  Stack,
+  InputAdornment,
+  Container,
+  Paper,
+  useTheme,
+  CircularProgress,
+  Fade,
+  Grow
+} from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
-import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState } from "react";
 import { sendOtpApi, verifyOtpApi } from "@/api/auth";
-import { ILoginFormValues, IMobileFormValues, IOtpFormValues } from "@/types/user";
+import { IMobileFormValues, IOtpFormValues } from "@/types/user";
 import { useGlobalContext } from "@/global-context";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
-
- 
-
-const emailInitialValues: ILoginFormValues = {
-  email: "",
-  password: "",
-};
 
 const mobileInitialValues: IMobileFormValues = {
   mobile: "",
@@ -28,14 +32,9 @@ const otpInitialValues: IOtpFormValues = {
   otp: "",
 };
 
-const emailValidationSchema = Yup.object({
-  email: Yup.string().email("Invalid email format").required("Email is required"),
-  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
-});
-
 const mobileValidationSchema = Yup.object({
   mobile: Yup.string()
-    .matches(/^[0-9]{10}$/, "Mobile number must be 10 digits")
+    .matches(/^[6-9][0-9]{9}$/, "Please enter a valid 10-digit Indian mobile number")
     .required("Mobile number is required"),
 });
 
@@ -46,197 +45,406 @@ const otpValidationSchema = Yup.object({
 });
 
 const LogInForm = () => {
-  const [isEmailLogin, setIsEmailLogin] = useState(true);
-  const [isOtpSent, setIsOtpSent] = useState(false); // Track if OTP is sent
-  const [mobileNumber, setMobileNumber] = useState(""); // Store mobile number for OTP verification
-   const snackbar = useGlobalSnackbar();
-  const { state, setState,fetchProfile } = useGlobalContext();
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
 
-  const router = useRouter()
+  const snackbar = useGlobalSnackbar();
+  const { setState, fetchProfile } = useGlobalContext();
+  const router = useRouter();
+  const theme = useTheme();
 
-
-  const handleEmailSubmit = (values: ILoginFormValues) => {
-    console.log("Email Login Data", values);
-  };
+  // Timer for resend OTP
+  useState(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  });
 
   const handleMobileSubmit = async (values: IMobileFormValues) => {
-    console.log("Mobile Login Data", values);
-    const { data } = await sendOtpApi({ phoneNo: values?.mobile })
-    if (data?.status) {
-      snackbar.success(data?.message+" "+data?.data?.otp)
-      setIsOtpSent(true);
+    setIsLoading(true);
+    try {
+      const { data } = await sendOtpApi({ phoneNo: values?.mobile });
+      if (data?.status) {
+        snackbar.success(data?.message);
+        setIsOtpSent(true);
+        setMobileNumber(values.mobile);
+        setResendTimer(30); // 30 seconds timer
+      }
+    } catch (error) {
+      snackbar.error("Failed to send OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setMobileNumber(values.mobile);
   };
 
   const handleOtpSubmit = async (values: IOtpFormValues) => {
-    console.log("OTP Verified for Mobile:", mobileNumber);
-    const { data } = await verifyOtpApi({ otp: values?.otp, phoneNo: mobileNumber })
+    setIsLoading(true);
+    try {
+      const { data } = await verifyOtpApi({ otp: values?.otp, phoneNo: mobileNumber });
 
-    if (data?.status) {
-      localStorage.setItem("authToken", data?.data?.token)
-      console.log(data?.data)
-      setState({ userData: {...data?.data, isLoggedIn: true} })
-      fetchProfile()
-      if (data?.data?.verified) {
-        router.push("/")
+      if (data?.status) {
+        localStorage.setItem("authToken", data?.data?.token);
+        setState({ userData: { ...data?.data, isLoggedIn: true } });
+        fetchProfile();
+
+        if (data?.data?.verified) {
+          router.push("/");
+        } else {
+          router.push('/create-profile');
+        }
       }
-      else {
-        router.push('/create-profile')
-      }
+    } catch (error) {
+      snackbar.error("Invalid OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-    // Handle OTP verification logic
+  };
+
+  const handleResendOtp = async () => {
+    if (resendTimer === 0) {
+      await handleMobileSubmit({ mobile: mobileNumber });
+    }
+  };
+
+  const handleChangeNumber = () => {
+    setIsOtpSent(false);
+    setMobileNumber("");
+    setResendTimer(0);
   };
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-      px={{ xs: 2, sm: 4, md: 8 }}
+      sx={{
+        minHeight: '100vh',
+        background: theme.palette.mode === 'light'
+          ? `linear-gradient(135deg, 
+              rgba(102, 126, 234, 0.05) 0%, 
+              rgba(118, 75, 162, 0.05) 100%)`
+          : theme.palette.background.default,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: '-50%',
+          right: '-50%',
+          width: '100%',
+          height: '100%',
+          borderRadius: '50%',
+          background: theme.palette.mode === 'light'
+            ? `radial-gradient(circle, 
+                rgba(102, 126, 234, 0.1) 0%, 
+                transparent 70%)`
+            : 'none',
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          bottom: '-50%',
+          left: '-50%',
+          width: '100%',
+          height: '100%',
+          borderRadius: '50%',
+          background: theme.palette.mode === 'light'
+            ? `radial-gradient(circle, 
+                rgba(118, 75, 162, 0.1) 0%, 
+                transparent 70%)`
+            : 'none',
+        }
+      }}
     >
-      <Box
-        width="100%"
-        maxWidth="sm"
-        p={{ xs: 2, sm: 4, md: 6 }}
-        boxShadow={{ xs: "none", sm: "xl" }}
-        borderRadius="lg"
-        bgcolor="background.paper"
-      >
-        <Typography variant="h3" component="h1" fontWeight="bold" textAlign="center" mb={2} color="text.primary">
-          Welcome Back!
-        </Typography>
-        <Typography variant="subtitle1" textAlign="center" color="text.secondary" mb={4}>
-          Sign in to continue
-        </Typography>
+      <Container maxWidth="sm">
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          py={4}
+          position="relative"
+          zIndex={1}
+        >
+          <Grow in timeout={800}>
+            <Paper
+              elevation={3}
+              sx={{
+                width: '100%',
+                p: { xs: 3, sm: 4, md: 5 },
+                borderRadius: 3,
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 4,
+                  background: theme.custom?.gradients?.primary ||
+                    `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                }
+              }}
+            >
+              {/* Logo/Icon */}
+              <Box display="flex" justifyContent="center" mb={3}>
+                <Box
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 2,
+                    background: theme.custom?.gradients?.primary ||
+                      `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: theme.shadows[3],
+                  }}
+                >
+                  <PhoneIcon sx={{ fontSize: 40, color: 'white' }} />
+                </Box>
+              </Box>
 
-        <Stack direction="row" spacing={2} justifyContent="center" mb={4}>
-          <Button
-            variant={isEmailLogin ? "contained" : "outlined"}
-            onClick={() => setIsEmailLogin(true)}
-            startIcon={<EmailIcon />}
-          >
-            Email
-          </Button>
-          <Button
-            variant={!isEmailLogin ? "contained" : "outlined"}
-            onClick={() => setIsEmailLogin(false)}
-            startIcon={<PhoneIcon />}
-          >
-            Phone
-          </Button>
-        </Stack>
-        {isEmailLogin ? (
-          <Formik
-            initialValues={emailInitialValues}
-            validationSchema={emailValidationSchema}
-            onSubmit={handleEmailSubmit}
-          >
-            {({ handleChange, values, touched, errors }) => (
-              <Form>
-                <InputLabel shrink htmlFor="bootstrap-input">
-                  Email
-                </InputLabel>
-                <TextField
-                  id="email"
-                  name="email"
-                  variant="outlined"
-                  fullWidth
-                  value={values.email}
-                  onChange={handleChange}
-                  error={touched.email && Boolean(errors.email)}
-                  helperText={touched.email && errors.email}
-                />
-                <InputLabel shrink htmlFor="bootstrap-input">
-                  Password
-                </InputLabel>
-                <TextField
-                  id="password"
-                  name="password"
-                  type="password"
-                  variant="outlined"
-                  fullWidth
-                  value={values.password}
-                  onChange={handleChange}
-                  error={touched.password && Boolean(errors.password)}
-                  helperText={touched.password && errors.password}
-                />
-                <Button type="submit" variant="contained" fullWidth color="primary" size="large">
-                  Login with Email
-                </Button>
-              </Form>
-            )}
-          </Formik>
-        ) : isOtpSent ? (
-          // OTP Form
-          <Formik
-            initialValues={otpInitialValues}
-            validationSchema={otpValidationSchema}
-            onSubmit={handleOtpSubmit}
-          >
-            {({ handleChange, values, touched, errors }) => (
-              <Form>
-                <Stack spacing={3}>
-                  <TextField
-                    id="otp"
-                    name="otp"
-                    label="Enter OTP"
-                    variant="outlined"
-                    fullWidth
-                    value={values.otp}
-                    onChange={handleChange}
-                    error={touched.otp && Boolean(errors.otp)}
-                    helperText={touched.otp && errors.otp}
-                  />
-                  <Button type="submit" variant="contained" fullWidth color="primary" size="large">
-                    Verify OTP
-                  </Button>
-                </Stack>
-              </Form>
-            )}
-          </Formik>
-        ) : (
-          // Mobile Login Form
-          <Formik
-            initialValues={mobileInitialValues}
-            validationSchema={mobileValidationSchema}
-            onSubmit={handleMobileSubmit}
-          >
-            {({ handleChange, values, touched, errors }) => (
-              <Form>
-                <Stack spacing={3}>
-                  <TextField
-                    id="mobile"
-                    name="mobile"
-                    label="Mobile Number"
-                    variant="outlined"
-                    fullWidth
-                    value={values.mobile}
-                    onChange={handleChange}
-                    error={touched.mobile && Boolean(errors.mobile)}
-                    helperText={touched.mobile && errors.mobile}
-                  />
-                  <Button type="submit" variant="contained" fullWidth color="primary" size="large">
-                    Send OTP
-                  </Button>
-                </Stack>
-              </Form>
-            )}
-          </Formik>
-        )}
-        <Typography variant="body2" textAlign="center" mt={4}>
-          Do not have an account?{" "}
-          <Link href="/register" passHref>
-            <Typography component="a" color="primary">
-              Sign up here
-            </Typography>
-          </Link>
-        </Typography>
-      </Box>
+              {/* Title */}
+              <Typography
+                variant="h4"
+                component="h1"
+                fontWeight="bold"
+                textAlign="center"
+                mb={1}
+                sx={{ letterSpacing: '-0.01562em' }}
+              >
+                Welcome Back
+              </Typography>
+
+              <Typography
+                variant="subtitle1"
+                textAlign="center"
+                color="text.secondary"
+                mb={4}
+              >
+                Sign in with your phone number
+              </Typography>
+
+              {!isOtpSent ? (
+                <Fade in timeout={500}>
+                  <Box>
+                    <Formik
+                      initialValues={mobileInitialValues}
+                      validationSchema={mobileValidationSchema}
+                      onSubmit={handleMobileSubmit}
+                    >
+                      {({ handleChange, values, touched, errors }) => (
+                        <Form>
+                          <Stack spacing={3}>
+                            <TextField
+                              id="mobile"
+                              name="mobile"
+                              label="Mobile Number"
+                              variant="outlined"
+                              fullWidth
+                              value={values.mobile}
+                              onChange={handleChange}
+                              error={touched.mobile && Boolean(errors.mobile)}
+                              helperText={touched.mobile && errors.mobile}
+                              placeholder="Enter 10-digit number"
+                              disabled={isLoading}
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <Typography color="text.secondary">+91</Typography>
+                                  </InputAdornment>
+                                ),
+                              }}
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  '&:hover fieldset': {
+                                    borderColor: theme.palette.primary.main,
+                                  },
+                                },
+                              }}
+                            />
+
+                            <Button
+                              type="submit"
+                              variant="contained"
+                              fullWidth
+                              size="large"
+                              disabled={isLoading}
+                              sx={{
+                                height: 48,
+                                background: theme.custom?.gradients?.primary,
+                                '&:hover': {
+                                  background: theme.custom?.gradients?.primary,
+                                  filter: 'brightness(0.9)',
+                                  transform: 'translateY(-1px)',
+                                  boxShadow: theme.shadows[4],
+                                },
+                                '&:active': {
+                                  transform: 'translateY(0)',
+                                }
+                              }}
+                            >
+                              {isLoading ? (
+                                <CircularProgress size={24} color="inherit" />
+                              ) : (
+                                'Send OTP'
+                              )}
+                            </Button>
+                          </Stack>
+                        </Form>
+                      )}
+                    </Formik>
+                  </Box>
+                </Fade>
+              ) : (
+                <Fade in timeout={500}>
+                  <Box>
+                    <Formik
+                      initialValues={otpInitialValues}
+                      validationSchema={otpValidationSchema}
+                      onSubmit={handleOtpSubmit}
+                    >
+                      {({ handleChange, values, touched, errors }) => (
+                        <Form>
+                          <Stack spacing={3}>
+                            {/* Show verified number */}
+                            <Box
+                              sx={{
+                                p: 2,
+                                borderRadius: 2,
+                                bgcolor: 'action.hover',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                              }}
+                            >
+                              <CheckCircleIcon color="success" fontSize="small" />
+                              <Typography variant="body2">
+                                OTP sent to <strong>+91 {mobileNumber}</strong>
+                              </Typography>
+                            </Box>
+
+                            <TextField
+                              id="otp"
+                              name="otp"
+                              label="Enter 6-digit OTP"
+                              variant="outlined"
+                              fullWidth
+                              value={values.otp}
+                              onChange={handleChange}
+                              error={touched.otp && Boolean(errors.otp)}
+                              helperText={touched.otp && errors.otp}
+                              disabled={isLoading}
+                              inputProps={{
+                                maxLength: 6,
+                                style: { textAlign: 'center', letterSpacing: '0.5em' }
+                              }}
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <LockIcon color="action" />
+                                  </InputAdornment>
+                                ),
+                              }}
+                            />
+
+                            <Button
+                              type="submit"
+                              variant="contained"
+                              fullWidth
+                              size="large"
+                              disabled={isLoading}
+                              sx={{
+                                height: 48,
+                                background: theme.custom?.gradients?.primary,
+                                '&:hover': {
+                                  background: theme.custom?.gradients?.primary,
+                                  filter: 'brightness(0.9)',
+                                  transform: 'translateY(-1px)',
+                                  boxShadow: theme.shadows[4],
+                                },
+                                '&:active': {
+                                  transform: 'translateY(0)',
+                                }
+                              }}
+                            >
+                              {isLoading ? (
+                                <CircularProgress size={24} color="inherit" />
+                              ) : (
+                                'Verify OTP'
+                              )}
+                            </Button>
+
+                            {/* Resend OTP and Change Number */}
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                              <Button
+                                size="small"
+                                onClick={handleResendOtp}
+                                disabled={resendTimer > 0 || isLoading}
+                                sx={{ textTransform: 'none' }}
+                              >
+                                {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
+                              </Button>
+
+                              <Button
+                                size="small"
+                                onClick={handleChangeNumber}
+                                disabled={isLoading}
+                                sx={{ textTransform: 'none' }}
+                              >
+                                Change Number
+                              </Button>
+                            </Stack>
+                          </Stack>
+                        </Form>
+                      )}
+                    </Formik>
+                  </Box>
+                </Fade>
+              )}
+
+              {/* Terms */}
+              <Typography
+                variant="caption"
+                display="block"
+                textAlign="center"
+                color="text.secondary"
+                mt={4}
+                sx={{ lineHeight: 1.6 }}
+              >
+                By continuing, you agree to our{' '}
+                <Typography
+                  component="a"
+                  href="/terms"
+                  color="primary"
+                  sx={{
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
+                >
+                  Terms of Service
+                </Typography>
+                {' and '}
+                <Typography
+                  component="a"
+                  href="/privacy"
+                  color="primary"
+                  sx={{
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
+                >
+                  Privacy Policy
+                </Typography>
+              </Typography>
+            </Paper>
+          </Grow>
+        </Box>
+      </Container>
     </Box>
   );
 };
-
 export default LogInForm;

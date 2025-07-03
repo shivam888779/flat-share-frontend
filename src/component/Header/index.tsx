@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react';
 import { styled, alpha, useTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, useMediaQuery } from '@mui/material';
 import {
     AppBar,
     Box,
@@ -46,12 +46,13 @@ import {
     LocationOn,
     KeyboardArrowDown,
     Business,
-    Assignment
+    Assignment,
+    School
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import { useGlobalContext } from '@/global-context';
 import Link from 'next/link';
-
+import SelectListingCard from '@/component/SelectListingCard';
 
 
 const Logo = styled(Typography)(({ theme }) => ({
@@ -304,69 +305,218 @@ export default function Header() {
         </Drawer>
     );
 
-    return (<header className="fixed top-0 w-full bg-white shadow-md z-50 animate-slideDown">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-4">
-                <div
-                    className="flex items-center gap-2 cursor-pointer transform hover:scale-105 transition-transform"
-                    onClick={() => handleNavigation('/')}
-                >
-                    <h1 className="text-3xl font-bold text-purple-600">
-                        Learn<span className="text-green-500">Mate</span>
-                    </h1>
-                    <span className="text-sm">📚</span>
-                </div>
+    const [isListingModalOpen, setIsListingModalOpen] = React.useState(false);
 
-                <div className="flex gap-3">
-                   {!isLoggedIn && <Link
-                        href="/login"
-                        className="text-gray-600 hover:text-purple-600 normal-case"
-                    >
-                        Login / Register
-                    </Link>}
-                    {/* <Button
-                        variant="contained"
-                        className="normal-case"
+    const RenderListingModal = () => {
+        const modalOptions = [
+            {
+                title: "Add Property",
+                description: "Add a new property or location for your listing",
+                icon: <Home sx={{ fontSize: 32 }} />,
+                route: "/list-property/list-property",
+                gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            },
+            {
+                title: "Add Requirement",
+                description: "Define requirements and prerequisites for your property",
+                icon: <Assignment sx={{ fontSize: 32 }} />,
+                route: "/list-property/list-requirement",
+                gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+            },
+
+        ];
+
+        return (
+            <Dialog
+                open={isListingModalOpen}
+                onClose={() => setIsListingModalOpen(false)}
+                maxWidth="md"
+                fullWidth
+                TransitionProps={{
+                    style: {
+                        transition: 'all 0.3s ease'
+                    }
+                }}
+                PaperProps={{
+                    elevation: 24,
+                    sx: {
+                        borderRadius: 3,
+                        overflow: 'visible'
+                    }
+                }}
+                sx={{
+                    '& .MuiBackdrop-root': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                        backdropFilter: 'blur(8px)'
+                    }
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        py: 3,
+                        px: 4
+                    }}
+                >
+                    <Typography variant="h4" component="h2" fontWeight={600}>
+                        Add New Listing
+                    </Typography>
+                    <IconButton
+                        aria-label="close"
+                        onClick={() => setIsListingModalOpen(false)}
                         sx={{
-                            backgroundColor: '#ffeaa7',
-                            color: '#2d3436',
-                            borderRadius: '25px',
-                            px: 3,
-                            boxShadow: '0 4px 15px rgba(255, 234, 167, 0.4)',
+                            color: 'text.secondary',
                             '&:hover': {
-                                backgroundColor: '#fdcb6e',
-                                transform: 'translateY(-2px)',
-                                boxShadow: '0 6px 20px rgba(255, 234, 167, 0.6)'
-                            }
+                                backgroundColor: 'action.hover',
+                                transform: 'rotate(90deg)',
+                            },
+                            transition: 'all 0.3s ease'
                         }}
                     >
-                        Start Learning
-                    </Button> */}
-                        {isLoggedIn && <IconButton
-                    size="large"
-                    edge="end"
-                    aria-label="account of current user"
-                    aria-controls={menuId}
-                    aria-haspopup="true"
-                    onClick={handleProfileMenuOpen}
-                    color="inherit"
-                    sx={{ ml: 1 }}
-                >
-                    {state?.userData?.profileImage ? (
-                        <Avatar
-                            src={state.userData.profileImage}
-                            sx={{ width: 32, height: 32 }}
-                        />
-                    ) : (
-                        <AccountCircle />
-                    )}
-                </IconButton>}
-                {renderMenu}
-                </div>
-            </div>
-        </div>
-    </header>
+                        <Close />
+                    </IconButton>
+                </DialogTitle>
 
+                <DialogContent sx={{ p: 4 }}>
+                    <Typography
+                        variant="h6"
+                        color="text.secondary"
+                        textAlign="center"
+                        mb={5}
+                        fontWeight={400}
+                    >
+                        Choose what you want to add to your listing
+                    </Typography>
+
+                    <Box
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: {
+                                xs: '1fr',
+                                sm: 'repeat(2, 1fr)',
+                                md: 'repeat(2, 1fr)'
+                            },
+                            gap: 3,
+                        }}
+                    >
+                        {modalOptions.map((option, index) => (
+                            <SelectListingCard
+                                key={index}
+                                handleDialogOpen={() => setIsListingModalOpen(!isListingModalOpen)}
+                                image="https://mui.com/static/images/cards/paella.jpg"
+                                {...option}
+                            />
+                        ))}
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            mt: 5,
+                            pt: 3,
+                            borderTop: '1px solid',
+                            borderColor: 'divider'
+                        }}
+                    >
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                        >
+                            Need help getting started?{' '}
+                            <Box
+                                component="a"
+                                href="#"
+                                sx={{
+                                    color: 'primary.main',
+                                    textDecoration: 'none',
+                                    fontWeight: 600,
+                                    '&:hover': {
+                                        textDecoration: 'underline'
+                                    }
+                                }}
+                            >
+                                View our guide
+                            </Box>
+                        </Typography>
+                    </Box>
+                </DialogContent>
+            </Dialog>
+        );
+    };
+
+
+    return (
+        <>
+            <header className="fixed top-0 w-full bg-white shadow-md z-50 animate-slideDown">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center py-4">
+                        <div
+                            className="flex items-center gap-2 cursor-pointer transform hover:scale-105 transition-transform"
+                            onClick={() => handleNavigation('/')}
+                        >
+                            <h1 className="text-3xl font-bold text-purple-600">
+                                Learn<span className="text-green-500">Mate</span>
+                            </h1>
+                            <span className="text-sm">📚</span>
+                        </div>
+
+                        <div className="flex gap-3">
+                            {!isLoggedIn && <Link
+                                href="/login"
+                                className="text-gray-600 hover:text-purple-600 normal-case"
+                            >
+                                Login / Register
+                            </Link>}
+                            <Button
+                                variant="contained"
+                                className="normal-case"
+                                sx={{
+                                    backgroundColor: '#ffeaa7',
+                                    color: '#2d3436',
+                                    borderRadius: '25px',
+                                    px: 3,
+                                    boxShadow: '0 4px 15px rgba(255, 234, 167, 0.4)',
+                                    '&:hover': {
+                                        backgroundColor: '#fdcb6e',
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: '0 6px 20px rgba(255, 234, 167, 0.6)'
+                                    }
+                                }}
+                                onClick={() => setIsListingModalOpen(true)}
+                            >
+                                Add Listing
+                            </Button>
+                            {isLoggedIn && <IconButton
+                                size="large"
+                                edge="end"
+                                aria-label="account of current user"
+                                aria-controls={menuId}
+                                aria-haspopup="true"
+                                onClick={handleProfileMenuOpen}
+                                color="inherit"
+                                sx={{ ml: 1 }}
+                            >
+                                {state?.userData?.profileImage ? (
+                                    <Avatar
+                                        src={state.userData.profileImage}
+                                        sx={{ width: 32, height: 32 }}
+                                    />
+                                ) : (
+                                    <AccountCircle />
+                                )}
+                            </IconButton>}
+                            {renderMenu}
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <RenderListingModal />
+        </>
     );
 }
 // <>
@@ -467,25 +617,25 @@ export default function Header() {
 //                         <Notifications />
 //                     </Badge>
 //                 </IconButton>
-                // <IconButton
-                //     size="large"
-                //     edge="end"
-                //     aria-label="account of current user"
-                //     aria-controls={menuId}
-                //     aria-haspopup="true"
-                //     onClick={handleProfileMenuOpen}
-                //     color="inherit"
-                //     sx={{ ml: 1 }}
-                // >
-                //     {state?.userData?.profileImage ? (
-                //         <Avatar
-                //             src={state.userData.profileImage}
-                //             sx={{ width: 32, height: 32 }}
-                //         />
-                //     ) : (
-                //         <AccountCircle />
-                //     )}
-                // </IconButton>
+// <IconButton
+//     size="large"
+//     edge="end"
+//     aria-label="account of current user"
+//     aria-controls={menuId}
+//     aria-haspopup="true"
+//     onClick={handleProfileMenuOpen}
+//     color="inherit"
+//     sx={{ ml: 1 }}
+// >
+//     {state?.userData?.profileImage ? (
+//         <Avatar
+//             src={state.userData.profileImage}
+//             sx={{ width: 32, height: 32 }}
+//         />
+//     ) : (
+//         <AccountCircle />
+//     )}
+// </IconButton>
 //             </Box>
 
 //             {/* Mobile Right Side Icons */}
