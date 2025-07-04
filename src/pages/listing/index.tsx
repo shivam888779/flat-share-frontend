@@ -62,7 +62,7 @@ export default function Listing() {
     return (
         <Box
             width="100%"
-            mt={10}
+
             sx={{
                 backgroundColor: '#f8f9fa',
                 minHeight: '100vh',

@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { ILocation } from "@/types/property";
 import { useRouter } from 'next/router';
+import { TextField, InputAdornment } from "@mui/material";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const libraries: ("places")[] = ["places"];
 const GOOGLE_MAPS_API_KEY = "AIzaSyBkEMXezDZpWUD6XuDFLf07bao3kJq4f_Q";
 
 interface Props {
-  setLocation: any
+  setLocation: any;
 }
 
 export default function LocationSearch(props: Props) {
@@ -47,29 +49,65 @@ export default function LocationSearch(props: Props) {
             latitude: lat,
             longitude: lng,
             address: address
-          })
+          });
           setInput(address);
         }
       });
 
       inputRef.current.dataset.autocompleteInitialized = "true";
     }
-  }, [isLoaded]);
-
+  }, [isLoaded, setLocation]);
 
   return isLoaded ? (
-    <div>
-      <input
-        ref={inputRef}
-        type="text"
-        className="search-input"
-        placeholder="Enter a location"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-
-    </div>
+    <TextField
+      inputRef={inputRef}
+      type="text"
+      placeholder="Enter a location"
+      value={input}
+      onChange={(e) => setInput(e.target.value)}
+      fullWidth
+      variant="outlined"
+      size="small"
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          backgroundColor: '#f9fafb',
+          borderRadius: '8px',
+          '& fieldset': {
+            borderColor: '#e5e7eb',
+          },
+          '&:hover fieldset': {
+            borderColor: '#9ca3af',
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: 'primary.main',
+            borderWidth: '1px',
+          },
+        },
+        '& .MuiInputBase-input': {
+          padding: '10px 14px',
+          fontSize: '0.875rem',
+        },
+      }}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <LocationOnIcon sx={{ color: '#6b7280', fontSize: '1.25rem' }} />
+          </InputAdornment>
+        ),
+      }}
+    />
   ) : (
-    <p>Loading...</p>
+    <TextField
+      disabled
+      fullWidth
+      variant="outlined"
+      size="small"
+      placeholder="Loading..."
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          backgroundColor: '#f9fafb',
+        },
+      }}
+    />
   );
 }

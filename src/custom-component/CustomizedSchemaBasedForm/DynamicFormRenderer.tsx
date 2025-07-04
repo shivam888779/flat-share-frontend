@@ -1,5 +1,5 @@
 import React from 'react';
-import { InputLabel, TextField, TextFieldVariants } from '@mui/material';
+import { InputLabel, TextField, TextFieldVariants, Box } from '@mui/material';
 import { FormFieldSchema } from './formSchema';
 import {
     LocationSearch,
@@ -32,9 +32,9 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
     setSelectedFiles
 }) => {
     const { state } = useGlobalContext();
+
     const renderField = (fieldSchema: FormFieldSchema) => {
         const { componentType, name, inputLabel, max, ...props } = fieldSchema;
-
 
         const getSchema = (key: string) => {
             switch (key) {
@@ -43,9 +43,9 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                 case 'preferences':
                     return state.preferences;
                 default:
-                    null;
+                    return null;
             }
-        }
+        };
 
         switch (componentType) {
             case 'roundedSelect':
@@ -74,7 +74,7 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                     <CustomizedSelectChip
                         setFieldValue={setFieldValue}
                         fieldKey={props.fieldKey || name}
-                        schema={getSchema(props.fieldKey ?? "")}
+                        schema={getSchema(props.fieldKey ?? "") || props.schema}
                         selectedResources={values[props.fieldKey || name]}
                     />
                 );
@@ -84,7 +84,7 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                     <TextField
                         name={name}
                         type={props.type}
-                        variant={props.variant as TextFieldVariants}
+                        variant="outlined"
                         fullWidth={props.fullWidth}
                         value={values[name]}
                         onChange={handleChange}
@@ -93,32 +93,81 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                         multiline={props.multiline}
                         rows={props.rows}
                         placeholder={props.placeholder}
+                        size="small"
                         inputProps={{
                             min: props.min,
-                            // step: props.step,
+                            // max: props.max,
+                            step: props.step,
                         }}
                         InputLabelProps={props.InputLabelProps}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                backgroundColor: '#f9fafb',
+                                borderRadius: '8px',
+                                '& fieldset': {
+                                    borderColor: '#e5e7eb',
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: '#9ca3af',
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: 'primary.main',
+                                    borderWidth: '1px',
+                                },
+                            },
+                            '& .MuiInputBase-input': {
+                                padding: '10px 14px',
+                                fontSize: '0.875rem',
+                            },
+                            '& .MuiFormHelperText-root': {
+                                marginLeft: 0,
+                                fontSize: '0.75rem',
+                            },
+                        }}
                     />
                 );
 
             case 'textArea':
                 return (
-                    <div>
-                        <textarea
+                    <Box>
+                        <TextField
                             name={name}
                             value={values[name] || ""}
                             onChange={handleChange}
-                            placeholder={props.placeholder || "Enter text..."}
+                            placeholder={props.placeholder || "Describe your property in detail..."}
+                            multiline
                             rows={props.rows || 4}
-                            className={`w-full border rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 ${touched[name] && errors[name]
-                                ? 'border-red-500 focus:ring-red-500'
-                                : 'border-gray-300 focus:ring-blue-500'
-                                }`}
+                            fullWidth
+                            variant="outlined"
+                            error={touched[name] && Boolean(errors[name])}
+                            helperText={touched[name] && errors[name]}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: '#f9fafb',
+                                    borderRadius: '8px',
+                                    '& fieldset': {
+                                        borderColor: '#e5e7eb',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#9ca3af',
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: 'primary.main',
+                                        borderWidth: '1px',
+                                    },
+                                },
+                                '& .MuiInputBase-input': {
+                                    padding: '10px 14px',
+                                    fontSize: '0.875rem',
+                                    lineHeight: 1.6,
+                                },
+                                '& .MuiFormHelperText-root': {
+                                    marginLeft: 0,
+                                    fontSize: '0.75rem',
+                                },
+                            }}
                         />
-                        {touched[name] && errors[name] && (
-                            <div className="text-red-500 text-sm mt-1">{errors[name]}</div>
-                        )}
-                    </div>
+                    </Box>
                 );
 
             case 'imageUpload':
@@ -132,13 +181,23 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
     return (
         <>
             {schema.map((fieldSchema, index) => (
-                <div key={`${fieldSchema.name}-${index}`}>
-                    <InputLabel shrink>{fieldSchema.inputLabel}</InputLabel>
+                <Box key={`${fieldSchema.name}-${index}`} sx={{ mb: 2 }}>
+                    <InputLabel
+                        shrink
+                        sx={{
+                            color: '#6b7280',
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            mb: 0.5,
+                        }}
+                    >
+                        {fieldSchema.inputLabel}
+                    </InputLabel>
                     {renderField(fieldSchema)}
-                </div>
+                </Box>
             ))}
         </>
     );
 };
 
-export default DynamicFormRenderer; 
+export default DynamicFormRenderer;

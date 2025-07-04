@@ -1,53 +1,44 @@
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
-import { useState } from "react"
+import { Box, Stack } from "@mui/material";
+import { useState } from "react";
 
-const SelectSingleOption = (props:any) => {
-    const {schema,fieldKey,selectedValue,setFieldValue} = props;
- 
-    const handleChange = (
-        event: React.MouseEvent<HTMLElement>,
-        newValue: string | null
-    ) => {
-        if (newValue !== null) {
-             setFieldValue(fieldKey,newValue)
-        }
+const SelectSingleOption = (props: any) => {
+    const { schema, fieldKey, selectedValue, setFieldValue } = props;
+
+    const handleChange = (newValue: string) => {
+        setFieldValue(fieldKey, newValue);
     };
 
-   
-
     return (
-        <div>
-            <ToggleButtonGroup
-                value={selectedValue}
-                exclusive
-                color="primary"
-                onChange={handleChange}
-                aria-label="looking for"
-                className="rounded-lg border border-gray-300 overflow-hidden"
-            >
-                {schema?.map((value: any, index: number) => {
-                    return <ToggleButton
+        <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+            {schema?.map((value: any, index: number) => {
+                const isSelected = selectedValue === value?.key;
+                return (
+                    <Box
                         key={index}
-                        value={value?.key}
+                        onClick={() => handleChange(value?.key)}
                         sx={{
-                            textTransform: "none",
-                            px: 4,
+                            px: 2,
                             py: 1,
-                            border: "none",
-                            bgcolor: selectedValue === value?.key ? "#34d399" : "#f9fafb",
-                            color: selectedValue ===  value?.key ? "white" : "#4b5563",
+                            borderRadius: '8px',
+                            backgroundColor: isSelected ? 'primary.main' : '#f3f4f6',
+                            color: isSelected ? 'white' : '#6b7280',
+                            fontSize: '0.875rem',
                             fontWeight: 500,
-                            "&:hover": {
-                                bgcolor: selectedValue ===  value?.key  ? "#10b981" : "#e5e7eb",
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            border: '1px solid',
+                            borderColor: isSelected ? 'primary.main' : '#e5e7eb',
+                            '&:hover': {
+                                backgroundColor: isSelected ? 'primary.dark' : '#e5e7eb',
+                                color: isSelected ? 'white' : '#374151',
                             },
                         }}
                     >
                         {value?.name}
-                    </ToggleButton>
-                })}
-
-            </ToggleButtonGroup>
-        </div>
+                    </Box>
+                );
+            })}
+        </Stack>
     );
 };
 

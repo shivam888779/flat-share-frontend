@@ -1,23 +1,24 @@
 import React, { useState, ChangeEvent } from "react";
+import { Box, Button, Stack, IconButton, Typography } from "@mui/material";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface ImageUploadProps {
   setSelectedFiles: (files: File[]) => void;
-  maxImages?: number; // Optional, defaults to 1
+  maxImages?: number;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages = 1 }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages = 3 }) => {
   const [previews, setPreviews] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       let filesArray = Array.from(event.target.files);
-      // Combine with existing files, but do not exceed maxImages
       let newFiles = [...files, ...filesArray].slice(0, maxImages);
       setFiles(newFiles);
       setSelectedFiles(newFiles);
 
-      // Generate previews
       const previewPromises = newFiles.map(
         file =>
           new Promise<string>((resolve) => {
@@ -27,7 +28,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
           })
       );
       Promise.all(previewPromises).then(setPreviews);
-      // Reset the input value so the same file can be selected again if removed
       event.target.value = '';
     }
   };
@@ -36,59 +36,124 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
     const newFiles = files.filter((_, i) => i !== idx);
     setFiles(newFiles);
     setSelectedFiles(newFiles);
-    // Remove the corresponding preview
     setPreviews(previews.filter((_, i) => i !== idx));
   };
 
   return (
-    <div>
-      <input
-        type="file"
-        accept="image/*"
-        multiple={maxImages > 1}
-        onChange={handleFileChange}
-        style={{ marginBottom: '8px' }}
-        disabled={files.length >= maxImages}
-      />
-      {maxImages > 1 && (
-        <p style={{ fontSize: '0.8rem', color: '#666', margin: 0 }}>
-          Hold Ctrl (or Cmd on Mac) to select up to {maxImages} images.
-        </p>
-      )}
-      <div style={{ display: "flex", flexWrap: 'wrap', gap: "10px", marginTop: "10px" }}>
-        {previews.map((src, idx) => (
-          <div key={idx} style={{ position: 'relative', display: 'inline-block' }}>
-            <img
-              src={src}
-              alt={`Preview ${idx + 1}`}
-              style={{ maxWidth: "100px", maxHeight: "100px", borderRadius: 4, border: '1px solid #ccc' }}
-            />
-            <button
-              type="button"
-              onClick={() => handleRemove(idx)}
-              style={{
-                position: 'absolute',
-                top: 2,
-                right: 2,
-                background: '#fff',
-                border: '1px solid #ccc',
-                borderRadius: '50%',
-                width: 22,
-                height: 22,
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                color: '#d00',
-                lineHeight: '18px',
-                padding: 0
+    <Box>
+      <Box
+        sx={{
+          border: '2px dashed #e5e7eb',
+          borderRadius: '8px',
+          p: 2,
+          backgroundColor: '#f9fafb',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            borderColor: 'primary.main',
+            backgroundColor: '#f3f4f6',
+          },
+        }}
+        onClick={() => document.getElementById('file-upload-input')?.click()}
+      >
+        <input
+          id="file-upload-input"
+          type="file"
+          accept="image/*"
+          multiple={maxImages > 1}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          disabled={files.length >= maxImages}
+        />
+
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Button
+            variant="outlined"
+            size="small"
+            disabled={files.length >= maxImages}
+            sx={{
+              borderColor: '#e5e7eb',
+              backgroundColor: 'white',
+              color: '#374151',
+              fontWeight: 500,
+              fontSize: '0.875rem',
+              textTransform: 'none',
+              px: 2,
+              py: 0.75,
+              '&:hover': {
+                borderColor: '#9ca3af',
+                backgroundColor: '#f9fafb',
+              },
+              '&.Mui-disabled': {
+                backgroundColor: '#f3f4f6',
+                borderColor: '#e5e7eb',
+              },
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              document.getElementById('file-upload-input')?.click();
+            }}
+          >
+            Choose files | {files.length === 0 ? 'No file chosen' : `${files.length} file(s) chosen`}
+          </Button>
+
+          <Typography
+            variant="caption"
+            sx={{
+              color: '#9ca3af',
+              fontSize: '0.75rem',
+            }}
+          >
+            Hold Ctrl (or Cmd on Mac) to select up to {maxImages} images
+          </Typography>
+        </Stack>
+      </Box>
+
+      {previews.length > 0 && (
+        <Stack direction="row" spacing={1} sx={{ mt: 2 }} flexWrap="wrap">
+          {previews.map((src, idx) => (
+            <Box
+              key={idx}
+              sx={{
+                position: 'relative',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                width: 100,
+                height: 100,
+                mb: 1,
               }}
-              aria-label={`Remove image ${idx + 1}`}
             >
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
+              <img
+                src={src}
+                alt={`Preview ${idx + 1}`}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+              />
+              <IconButton
+                size="small"
+                onClick={() => handleRemove(idx)}
+                sx={{
+                  position: 'absolute',
+                  top: 4,
+                  right: 4,
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  width: 24,
+                  height: 24,
+                  '&:hover': {
+                    backgroundColor: 'white',
+                  },
+                }}
+              >
+                <CloseIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Box>
+          ))}
+        </Stack>
+      )}
+    </Box>
   );
 };
 

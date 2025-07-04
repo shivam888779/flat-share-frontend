@@ -1,12 +1,21 @@
-import React from "react";
-import { 
-    Box, 
-    FormControl, 
-    InputLabel, 
-    Select, 
-    MenuItem, 
-    SelectChangeEvent 
+import React, { useState } from "react";
+import {
+    Box,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    SelectChangeEvent,
+    IconButton,
+    Popover,
+    Stack,
+    Typography,
+    Chip,
+    Button,
+    Divider,
 } from "@mui/material";
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ClearIcon from '@mui/icons-material/Clear';
 
 export interface ConnectionFilters {
     status: "all" | "PENDING" | "APPROVED" | "REJECTED";
@@ -21,6 +30,18 @@ const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
     filters,
     onFiltersChange,
 }) => {
+    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+
     const handleStatusChange = (event: SelectChangeEvent) => {
         onFiltersChange({
             ...filters,
@@ -28,25 +49,171 @@ const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
         });
     };
 
+    const handleClearFilters = () => {
+        onFiltersChange({
+            status: "all",
+        });
+        handleClose();
+    };
+
+    const activeFiltersCount = filters.status !== "all" ? 1 : 0;
+
+    const statusOptions = [
+        { value: "all", label: "All Connections", color: null },
+        { value: "PENDING", label: "Pending Requests", color: "warning" },
+        { value: "APPROVED", label: "Approved Connections", color: "success" },
+        { value: "REJECTED", label: "Rejected Requests", color: "error" },
+    ];
+
     return (
-        <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-            <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel id="status-filter-label">Filter by Status</InputLabel>
-                <Select
-                    labelId="status-filter-label"
-                    id="status-filter"
-                    value={filters.status}
-                    label="Filter by Status"
-                    onChange={handleStatusChange}
+        <>
+            <Box sx={{ position: 'relative' }}>
+                <Button
+                    variant="outlined"
+                    startIcon={<FilterListIcon />}
+                    onClick={handleClick}
+                    sx={{
+                        borderRadius: '8px',
+                        borderColor: '#e5e7eb',
+                        color: activeFiltersCount > 0 ? 'primary.main' : 'text.secondary',
+                        backgroundColor: activeFiltersCount > 0 ? 'primary.50' : 'transparent',
+                        fontWeight: 500,
+                        textTransform: 'none',
+                        '&:hover': {
+                            borderColor: 'primary.main',
+                            backgroundColor: activeFiltersCount > 0 ? 'primary.100' : 'transparent',
+                        },
+                    }}
+                    endIcon={
+                        activeFiltersCount > 0 && (
+                            <Chip
+                                label={activeFiltersCount}
+                                size="small"
+                                sx={{
+                                    height: 20,
+                                    backgroundColor: 'primary.main',
+                                    color: 'white',
+                                    fontSize: '0.75rem',
+                                }}
+                            />
+                        )
+                    }
                 >
-                    <MenuItem value="all">All Connections</MenuItem>
-                    <MenuItem value="PENDING">Pending Requests</MenuItem>
-                    <MenuItem value="APPROVED">Approved Connections</MenuItem>
-                    <MenuItem value="REJECTED">Rejected Requests</MenuItem>
-                </Select>
-            </FormControl>
-        </Box>
+                    Filter
+                </Button>
+            </Box>
+
+            <Popover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                PaperProps={{
+                    elevation: 3,
+                    sx: {
+                        borderRadius: '12px',
+                        mt: 1,
+                        minWidth: 300,
+                    },
+                }}
+            >
+                <Box sx={{ p: 2 }}>
+                    <Stack spacing={2}>
+                        <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                        >
+                            <Typography variant="subtitle1" fontWeight={600}>
+                                Filters
+                            </Typography>
+                            {activeFiltersCount > 0 && (
+                                <IconButton
+                                    size="small"
+                                    onClick={handleClearFilters}
+                                    sx={{ color: 'text.secondary' }}
+                                >
+                                    <ClearIcon fontSize="small" />
+                                </IconButton>
+                            )}
+                        </Stack>
+
+                        <Divider />
+
+                        <FormControl fullWidth size="small">
+                            <InputLabel id="status-filter-label">Status</InputLabel>
+                            <Select
+                                labelId="status-filter-label"
+                                id="status-filter"
+                                value={filters.status}
+                                label="Status"
+                                onChange={handleStatusChange}
+                                sx={{
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#e5e7eb',
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#9ca3af',
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'primary.main',
+                                        borderWidth: '1px',
+                                    },
+                                }}
+                            >
+                                {statusOptions.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Typography>{option.label}</Typography>
+                                            {option.color && (
+                                                <Box
+                                                    sx={{
+                                                        width: 8,
+                                                        height: 8,
+                                                        borderRadius: '50%',
+                                                        backgroundColor: `${option.color}.main`,
+                                                    }}
+                                                />
+                                            )}
+                                        </Stack>
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        {activeFiltersCount > 0 && (
+                            <>
+                                <Divider />
+                                <Stack direction="row" spacing={1}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Active filters:
+                                    </Typography>
+                                    {filters.status !== "all" && (
+                                        <Chip
+                                            label={statusOptions.find(opt => opt.value === filters.status)?.label}
+                                            size="small"
+                                            onDelete={() => handleStatusChange({ target: { value: "all" } } as SelectChangeEvent)}
+                                            sx={{
+                                                height: 24,
+                                                fontSize: '0.75rem',
+                                            }}
+                                        />
+                                    )}
+                                </Stack>
+                            </>
+                        )}
+                    </Stack>
+                </Box>
+            </Popover>
+        </>
     );
 };
 
-export default ConnectionFilters; 
+export default ConnectionFilters;

@@ -165,11 +165,11 @@ export default function Header() {
                 </ListItemIcon>
                 <ListItemText>Favorites</ListItemText>
             </MenuItem>
-            <MenuItem onClick={() => { handleNavigation('/messages'); handleMenuClose(); }}>
+            <MenuItem onClick={() => { handleNavigation('/connections'); handleMenuClose(); }}>
                 <ListItemIcon>
                     <Message fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>Messages</ListItemText>
+                <ListItemText>Connections</ListItemText>
             </MenuItem>
             <Divider />
             <MenuItem onClick={() => { handleNavigation('/settings'); handleMenuClose(); }}>

@@ -14,6 +14,7 @@ import RegisterForm from "./RegistrationForm";
 import ImageUpload from "./ImageUpload";
 import LandingPage from "./LandingPage";
 import FilterSidebar from "./FilterSideBar";
+import MyProfileHeader from "./MyProfileHeader";
 
 export {
     Header,
@@ -31,5 +32,6 @@ export {
     RegisterForm,
     ImageUpload,
     LandingPage,
-    FilterSidebar
+    FilterSidebar,
+    MyProfileHeader
 }

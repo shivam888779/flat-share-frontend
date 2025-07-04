@@ -1,14 +1,12 @@
 // pages/PropertyForm.tsx
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
+import { Formik, Form } from "formik";
 import {
     Button,
-    TextField,
     Typography,
-    MenuItem,
     Box,
-    InputLabel,
-    Stack
+    Stack,
+    Paper,
+    Divider
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ILocation, IPropertyFormValues } from "@/types/property";
@@ -27,10 +25,8 @@ import { useGlobalSnackbar } from "@/hooks/useSnackbar";
 import { listPropertyApi } from "@/api/property";
 import { useRouter } from "next/router";
 import { useGlobalContext } from "@/global-context";
-
-// ----------------------
-// Type Definitions
-// ----------------------
+import HomeIcon from '@mui/icons-material/Home';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 interface Props {
     type: string;
@@ -54,12 +50,10 @@ const PropertyListingForm = ({ type }: Props) => {
         return propType === "list-requirement";
     };
 
-    // Get form configuration based on type and global state
     const formConfig = getFormConfig(
         isRequirementForm() ? 'requirement' : 'property',
         state
     );
-
 
     useEffect(() => {
         if (router.isReady) {
@@ -72,7 +66,6 @@ const PropertyListingForm = ({ type }: Props) => {
     }, [router, type]);
 
     const handleSubmit = async (values: PropertyFormValues | RequirementFormValues) => {
-        // Validate form based on type
         const validation = isRequirementForm()
             ? await validateRequirementForm(values as RequirementFormValues)
             : await validatePropertyForm(values as PropertyFormValues);
@@ -83,24 +76,16 @@ const PropertyListingForm = ({ type }: Props) => {
             return;
         }
 
-        // Check for images only for property form
         if (!isRequirementForm() && selectedFiles.length === 0) {
             snackbar.error("Please select at least one image.");
             return;
         }
-
-        console.log("values", {
-            ...values,
-            location,
-            images: isRequirementForm() ? [] : ["https://www.flatmate.in/dumbbell.png"],
-        });
 
         setIsSubmitting(true);
 
         try {
             let imageUrls: string[] = [];
 
-            // Handle image uploads only for property form
             if (!isRequirementForm() && selectedFiles.length > 0) {
                 const uploadPromises = selectedFiles.map(file =>
                     generateSignedUrl({
@@ -110,8 +95,6 @@ const PropertyListingForm = ({ type }: Props) => {
                 );
 
                 const uploadResults = await Promise.all(uploadPromises);
-
-                // Filter out any failed uploads and get the public URLs
                 imageUrls = uploadResults
                     .filter(result => result && result.publicUrl)
                     .map(result => result.publicUrl);
@@ -122,7 +105,6 @@ const PropertyListingForm = ({ type }: Props) => {
                 }
             }
 
-            // Process form data based on type
             const processedData = isRequirementForm()
                 ? processRequirementFormData(values as RequirementFormValues)
                 : processPropertyFormData(values as PropertyFormValues);
@@ -138,7 +120,6 @@ const PropertyListingForm = ({ type }: Props) => {
             snackbar.success(data?.message || 'Successfully submitted!');
             setSubmitted(true);
 
-            // Redirect after successful submission
             setTimeout(() => {
                 router.push('/');
             }, 2000);
@@ -162,99 +143,180 @@ const PropertyListingForm = ({ type }: Props) => {
 
     return (
         propType && (
-            <Box maxWidth="md" mt={8} mx="auto">
-                <Box className="p-8 shadow-xl rounded-lg bg-white">
-                    <Typography variant="h4" className="text-center mb-6 font-semibold text-gray-700">
+            <Box
+                sx={{
+                    minHeight: '100vh',
+                    backgroundColor: '#f3f4f6',
+                }}
+            >
+                <Box maxWidth="900px" mx="auto" px={2}>
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            textAlign: 'center',
+                            mb: 4,
+                            fontWeight: 700,
+                            color: 'text.primary',
+                        }}
+                    >
                         {getFormTitle()}
                     </Typography>
 
-                    <Formik
-                        initialValues={formConfig.initialValues}
-                        validationSchema={formConfig.validationSchema}
-                        onSubmit={handleSubmit}
-                        enableReinitialize={true}
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            borderRadius: '16px',
+                            backgroundColor: 'white',
+                            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                            overflow: 'hidden',
+                        }}
                     >
-                        {({ handleChange, values, touched, errors, setFieldValue, isValid, dirty }) => (
+                        <Box sx={{ p: { xs: 3, sm: 4 } }}>
+                            <Formik
+                                initialValues={formConfig.initialValues}
+                                validationSchema={formConfig.validationSchema}
+                                onSubmit={handleSubmit}
+                                enableReinitialize={true}
+                            >
+                                {({ handleChange, values, touched, errors, setFieldValue, isValid, dirty }) => (
+                                    <Form>
+                                        <Stack spacing={0}>
+                                            {/* Form Fields */}
+                                            <DynamicFormRenderer
+                                                schema={formConfig.schema}
+                                                values={values}
+                                                touched={touched}
+                                                errors={errors}
+                                                handleChange={handleChange}
+                                                setFieldValue={setFieldValue}
+                                                setLocation={setLocation}
+                                                setSelectedFiles={setSelectedFiles}
+                                            />
 
-                            <Form>
-                                <Stack spacing={3}>
-                                    <DynamicFormRenderer
-                                        schema={formConfig.schema}
-                                        values={values}
-                                        touched={touched}
-                                        errors={errors}
-                                        handleChange={handleChange}
-                                        setFieldValue={setFieldValue}
-                                        setLocation={setLocation}
-                                        setSelectedFiles={setSelectedFiles}
-                                    />
+                                            {/* Submit Button */}
+                                            <Button
+                                                variant="contained"
+                                                type="submit"
+                                                disabled={isSubmitting || !isValid || !dirty}
+                                                fullWidth
+                                                size="large"
+                                                sx={{
+                                                    mt: 3,
+                                                    py: 1.5,
+                                                    fontSize: '1rem',
+                                                    fontWeight: 600,
+                                                    textTransform: 'none',
+                                                    borderRadius: '8px',
+                                                    backgroundColor: 'primary.main',
+                                                    boxShadow: 'none',
+                                                    '&:hover': {
+                                                        backgroundColor: 'primary.dark',
+                                                        boxShadow: 'none',
+                                                    },
+                                                    '&:disabled': {
+                                                        backgroundColor: '#e5e7eb',
+                                                        color: '#9ca3af',
+                                                    },
+                                                }}
+                                            >
+                                                {getSubmitButtonText()}
+                                            </Button>
 
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        type="submit"
-                                        disabled={isSubmitting || !isValid || !dirty}
-                                        fullWidth
-                                        size="large"
-                                        sx={{
-                                            mt: 2,
-                                            py: 1.5,
-                                            fontSize: '1.1rem',
-                                            fontWeight: 600,
-                                            '&:disabled': {
-                                                opacity: 0.6,
-                                            }
-                                        }}
-                                    >
-                                        {getSubmitButtonText()}
-                                    </Button>
+                                            {/* Debug Panel */}
+                                            {process.env.NODE_ENV === 'development' && (
+                                                <Box
+                                                    sx={{
+                                                        mt: 2,
+                                                        p: 2,
+                                                        bgcolor: '#f3e8ff',
+                                                        border: '1px solid #e9d5ff',
+                                                        borderRadius: '8px',
+                                                    }}
+                                                >
+                                                    <Typography
+                                                        variant="subtitle2"
+                                                        sx={{
+                                                            mb: 1,
+                                                            fontWeight: 600,
+                                                            color: '#6b21a8',
+                                                            fontFamily: 'monospace',
+                                                        }}
+                                                    >
+                                                        FormIt Debug Panel
+                                                    </Typography>
+                                                    <pre style={{
+                                                        fontSize: '0.75rem',
+                                                        margin: 0,
+                                                        color: '#6b21a8',
+                                                        fontFamily: 'monospace',
+                                                    }}>
+                                                        {`{
+  "errors": ${JSON.stringify(errors, null, 2).split('\n').slice(1).join('\n  ')},
+  "isValid": ${isValid},
+  "dirty": ${dirty}
+}`}
+                                                    </pre>
+                                                </Box>
+                                            )}
 
-                                    {/* Debug Panel: Only show in development mode */}
-                                    {process.env.NODE_ENV === 'development' && (
-                                        <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', border: '1px solid #ccc', borderRadius: 1 }}>
-                                            <Typography variant="subtitle2" sx={{ mb: 1 }}>Formik Debug Panel</Typography>
-                                            <pre style={{ fontSize: 12, margin: 0 }}>
-                                                {JSON.stringify({ errors, isValid, dirty }, null, 2)}
-                                            </pre>
-                                        </Box>
-                                    )}
+                                            {submitted && (
+                                                <Typography
+                                                    variant="body1"
+                                                    sx={{
+                                                        color: 'success.main',
+                                                        marginTop: 2,
+                                                        textAlign: 'center',
+                                                        fontWeight: 500
+                                                    }}
+                                                >
+                                                    {isRequirementForm()
+                                                        ? 'Requirement listed successfully!'
+                                                        : 'Property listed successfully!'
+                                                    }
+                                                </Typography>
+                                            )}
+                                        </Stack>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </Box>
 
-                                    {submitted && (
-                                        <Typography
-                                            variant="body1"
-                                            sx={{
-                                                color: 'success.main',
-                                                marginTop: 2,
-                                                textAlign: 'center',
-                                                fontWeight: 500
-                                            }}
-                                        >
-                                            {isRequirementForm()
-                                                ? 'Requirement listed successfully!'
-                                                : 'Property listed successfully!'
-                                            }
-                                        </Typography>
-                                    )}
-
-                                    {/* Form Type Indicator */}
-                                    <Box sx={{
-                                        mt: 2,
-                                        p: 2,
-                                        bgcolor: 'info.light',
-                                        borderRadius: 1,
-                                        textAlign: 'center'
-                                    }}>
-                                        <Typography variant="body2" color="info.contrastText">
-                                            {isRequirementForm()
-                                                ? '📋 You are listing a requirement for a property'
-                                                : '🏠 You are listing a property for rent'
-                                            }
-                                        </Typography>
-                                    </Box>
-                                </Stack>
-                            </Form>
-                        )}
-                    </Formik>
+                        {/* Form Type Indicator */}
+                        <Box
+                            sx={{
+                                p: 2,
+                                bgcolor: '#e0e7ff',
+                                textAlign: 'center',
+                                borderTop: '1px solid #e5e7eb',
+                            }}
+                        >
+                            <Stack
+                                direction="row"
+                                alignItems="center"
+                                justifyContent="center"
+                                spacing={1}
+                            >
+                                {isRequirementForm() ? (
+                                    <AssignmentIcon sx={{ color: 'primary.main', fontSize: '1.25rem' }} />
+                                ) : (
+                                    <HomeIcon sx={{ color: 'primary.main', fontSize: '1.25rem' }} />
+                                )}
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: 'primary.main',
+                                        fontWeight: 500,
+                                        fontSize: '0.875rem',
+                                    }}
+                                >
+                                    {isRequirementForm()
+                                        ? 'You are listing a requirement for a property'
+                                        : 'You are listing a property for rent'
+                                    }
+                                </Typography>
+                            </Stack>
+                        </Box>
+                    </Paper>
                 </Box>
             </Box>
         )
