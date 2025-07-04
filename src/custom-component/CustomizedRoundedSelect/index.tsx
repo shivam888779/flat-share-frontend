@@ -1,7 +1,6 @@
 import { useGlobalContext } from "@/global-context";
 import { Box, Paper, Stack, Typography, useTheme, alpha } from "@mui/material";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 interface Props {
         setFieldValue: any;
@@ -33,11 +32,8 @@ const CustomizedRoundedSelect = (props: Props) => {
                                 const isSelected = selectedHighLights.includes(item?.id);
 
                                 return (
-                                        <motion.div
+                                        <div
                                                 key={index}
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                transition={{ type: "spring", stiffness: 300, damping: 25 }}
                                         >
                                                 <Box
                                                         onClick={() => handleSelectedHighLights(item?.id)}
@@ -97,7 +93,7 @@ const CustomizedRoundedSelect = (props: Props) => {
                                                                 {item?.name}
                                                         </Typography>
                                                 </Box>
-                                        </motion.div>
+                                        </div>
                                 );
                         })}
                 </Stack>
