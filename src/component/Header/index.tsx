@@ -73,6 +73,7 @@ export default function Header() {
     const router = useRouter();
     const { state } = useGlobalContext();
     const isLoggedIn = state?.userData?.isLoggedIn;
+    const userData = state?.userData;
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -472,7 +473,7 @@ export default function Header() {
                             >
                                 Login / Register
                             </Link>}
-                            <Button
+                            {!userData?.requirementListed && userData?.firstName && <Button
                                 variant="contained"
                                 className="normal-case"
                                 sx={{
@@ -490,7 +491,7 @@ export default function Header() {
                                 onClick={() => setIsListingModalOpen(true)}
                             >
                                 Add Listing
-                            </Button>
+                            </Button>}
                             {isLoggedIn && <IconButton
                                 size="large"
                                 edge="end"

@@ -3,6 +3,10 @@ export interface IRequestConnection {
     receiverId: number
 }
 
+export interface IConnectionFilters {
+    status: "all" | "PENDING" | "APPROVED" | "REJECTED";
+}
+
 export interface IConnection {
     id: number;
     requesterId: number;

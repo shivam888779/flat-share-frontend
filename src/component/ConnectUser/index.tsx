@@ -12,18 +12,7 @@ import {
     Tooltip,
 } from "@mui/material";
 import { IPropertyUser } from "@/types/property";
-import CallIcon from '@mui/icons-material/Call';
-import ChatIcon from '@mui/icons-material/Chat';
-import PersonIcon from '@mui/icons-material/Person';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import StarIcon from '@mui/icons-material/Star';
-import EmailIcon from '@mui/icons-material/Email';
-import PhoneIcon from '@mui/icons-material/Phone';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import ShareIcon from '@mui/icons-material/Share';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { Call, Chat, Person, Email, Phone, WhatsApp, Share, Favorite, FavoriteBorder } from '@mui/icons-material';
 import { useState } from "react";
 
 interface IConnectUserProps {
@@ -32,7 +21,7 @@ interface IConnectUserProps {
 
 const ConnectUser = (props: IConnectUserProps) => {
     const { propertyUser } = props;
-    const { firstName, lastName, gender, profileImage, email, phoneNo, verified, rating, location } = propertyUser;
+    const { firstName, lastName, gender, profileImage, email, phoneNo } = propertyUser;
     const [isFavorite, setIsFavorite] = useState(false);
 
     return (
@@ -77,7 +66,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                                 },
                             }}
                         >
-                            {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                            {isFavorite ? <Favorite /> : <FavoriteBorder />}
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Share profile">
@@ -92,7 +81,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                                 },
                             }}
                         >
-                            <ShareIcon />
+                            <Share />
                         </IconButton>
                     </Tooltip>
                 </Stack>
@@ -121,15 +110,15 @@ const ConnectUser = (props: IConnectUserProps) => {
                     <Typography variant="h6" fontWeight={700}>
                         {firstName} {lastName}
                     </Typography>
-                    {verified && (
+                    {/* {verified && (
                         <Tooltip title="Verified User">
                             <VerifiedIcon sx={{ color: 'primary.main', fontSize: 20 }} />
                         </Tooltip>
-                    )}
+                    )} */}
                 </Stack>
 
                 {/* Rating */}
-                {rating && (
+                {/* {rating && (
                     <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5} mb={2}>
                         <StarIcon sx={{ color: 'warning.main', fontSize: 18 }} />
                         <Typography variant="body2" fontWeight={600}>
@@ -139,11 +128,11 @@ const ConnectUser = (props: IConnectUserProps) => {
                             (24 reviews)
                         </Typography>
                     </Stack>
-                )}
+                )} */}
 
                 {/* Gender Chip */}
                 <Chip
-                    icon={<PersonIcon />}
+                    icon={<Person />}
                     label={gender}
                     size="small"
                     sx={{
@@ -155,14 +144,14 @@ const ConnectUser = (props: IConnectUserProps) => {
                 />
 
                 {/* Location */}
-                {location && (
+                {/* {location && (
                     <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5} mb={2}>
                         <LocationOnIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                         <Typography variant="body2" color="text.secondary">
                             {location}
                         </Typography>
                     </Stack>
-                )}
+                )} */}
 
                 <Divider sx={{ my: 2 }} />
 
@@ -170,7 +159,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                 <Stack spacing={1} mb={3}>
                     {email && (
                         <Stack direction="row" alignItems="center" spacing={1}>
-                            <EmailIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                            <Email sx={{ fontSize: 18, color: 'text.secondary' }} />
                             <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
                                 {email}
                             </Typography>
@@ -178,7 +167,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                     )}
                     {phoneNo && (
                         <Stack direction="row" alignItems="center" spacing={1}>
-                            <PhoneIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                            <Phone sx={{ fontSize: 18, color: 'text.secondary' }} />
                             <Typography variant="body2" color="text.secondary">
                                 {phoneNo}
                             </Typography>
@@ -195,7 +184,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                     <Button
                         fullWidth
                         variant="contained"
-                        startIcon={<CallIcon />}
+                        startIcon={<Call />}
                         sx={{
                             borderRadius: '8px',
                             textTransform: 'none',
@@ -214,7 +203,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                         <Button
                             fullWidth
                             variant="outlined"
-                            startIcon={<ChatIcon />}
+                            startIcon={<Chat />}
                             sx={{
                                 borderRadius: '8px',
                                 textTransform: 'none',
@@ -234,7 +223,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                         <Button
                             fullWidth
                             variant="outlined"
-                            startIcon={<WhatsAppIcon />}
+                            startIcon={<WhatsApp />}
                             sx={{
                                 borderRadius: '8px',
                                 textTransform: 'none',

@@ -16,14 +16,11 @@ import {
 } from "@mui/material";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
-
-export interface ConnectionFilters {
-    status: "all" | "PENDING" | "APPROVED" | "REJECTED";
-}
+import { IConnectionFilters } from "@/types/connection";
 
 interface ConnectionFiltersProps {
-    filters: ConnectionFilters;
-    onFiltersChange: (filters: ConnectionFilters) => void;
+    filters: IConnectionFilters;
+    onFiltersChange: (filters: IConnectionFilters) => void;
 }
 
 const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
@@ -45,7 +42,7 @@ const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
     const handleStatusChange = (event: SelectChangeEvent) => {
         onFiltersChange({
             ...filters,
-            status: event.target.value as ConnectionFilters["status"],
+            status: event.target.value as IConnectionFilters["status"],
         });
     };
 

@@ -20,22 +20,13 @@ import {
 } from "@mui/material";
 import { getConnectionsApi, approveRequestApi, rejectRequestApi, cancelRequestApi } from "@/api/connections";
 import { useGlobalContext } from "@/global-context";
-import { IConnection } from "@/types/connection";
+import { IConnection, IConnectionFilters } from "@/types/connection";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
 import {
     ConnectionList,
     ConnectionFilters,
-    ConnectionFiltersType
 } from "@/component/contact-access-components";
-import PeopleIcon from '@mui/icons-material/People';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import SendIcon from '@mui/icons-material/Send';
-import FiberNewIcon from '@mui/icons-material/FiberNew';
-import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import { People, Schedule, Send, FiberNew, Search, Refresh, PersonAdd } from '@mui/icons-material';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -69,7 +60,7 @@ const ConnectionsPage: React.FC = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [tabValue, setTabValue] = useState(0);
-    const [filters, setFilters] = useState<ConnectionFiltersType>({
+    const [filters, setFilters] = useState<IConnectionFilters>({
         status: "all",
     });
     const snackbar = useGlobalSnackbar();
@@ -185,7 +176,7 @@ const ConnectionsPage: React.FC = () => {
         }
     };
 
-    const handleFiltersChange = (newFilters: ConnectionFiltersType) => {
+    const handleFiltersChange = (newFilters: IConnectionFilters) => {
         setFilters(newFilters);
     };
 
@@ -267,7 +258,7 @@ const ConnectionsPage: React.FC = () => {
                                                 },
                                             }}
                                         >
-                                            <PersonAddIcon />
+                                            <PersonAdd />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Refresh">
@@ -280,7 +271,7 @@ const ConnectionsPage: React.FC = () => {
                                                 borderColor: 'divider',
                                             }}
                                         >
-                                            <RefreshIcon
+                                            <Refresh
                                                 sx={{
                                                     animation: refreshing ? 'spin 1s linear infinite' : 'none',
                                                     '@keyframes spin': {
@@ -325,7 +316,7 @@ const ConnectionsPage: React.FC = () => {
                                                     justifyContent: 'center',
                                                 }}
                                             >
-                                                <PeopleIcon sx={{ color: 'primary.main' }} />
+                                                <People sx={{ color: 'primary.main' }} />
                                             </Box>
                                             <Typography variant="h4" fontWeight={700}>
                                                 {stats.total}
@@ -363,7 +354,7 @@ const ConnectionsPage: React.FC = () => {
                                                     justifyContent: 'center',
                                                 }}
                                             >
-                                                <ScheduleIcon sx={{ color: 'warning.main' }} />
+                                                <Schedule sx={{ color: 'warning.main' }} />
                                             </Box>
                                             <Typography variant="h4" fontWeight={700}>
                                                 {stats.pending}
@@ -401,7 +392,7 @@ const ConnectionsPage: React.FC = () => {
                                                     justifyContent: 'center',
                                                 }}
                                             >
-                                                <SendIcon sx={{ color: 'secondary.main' }} />
+                                                <Send sx={{ color: 'secondary.main' }} />
                                             </Box>
                                             <Typography variant="h4" fontWeight={700}>
                                                 {stats.sent}
@@ -439,7 +430,7 @@ const ConnectionsPage: React.FC = () => {
                                                     justifyContent: 'center',
                                                 }}
                                             >
-                                                <FiberNewIcon sx={{ color: 'success.main' }} />
+                                                <FiberNew sx={{ color: 'success.main' }} />
                                             </Box>
                                             <Typography variant="h4" fontWeight={700}>
                                                 {stats.new}
@@ -497,7 +488,7 @@ const ConnectionsPage: React.FC = () => {
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <SearchIcon sx={{ color: 'text.secondary' }} />
+                                                    <Search sx={{ color: 'text.secondary' }} />
                                                 </InputAdornment>
                                             ),
                                         }}

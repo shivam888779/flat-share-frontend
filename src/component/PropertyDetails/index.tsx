@@ -1,36 +1,10 @@
-import {
-    Box,
-    Stack,
-    Typography,
-    Paper,
-    Chip,
-    Grid,
-    Divider,
-    IconButton,
-    Tooltip,
-    Button,
-    Card,
-    CardContent,
-} from "@mui/material";
+import { Box, Stack, Typography, Paper, Chip, Grid, IconButton, Tooltip, Card } from "@mui/material";
 import CustomizedCrousal from "../CustomizedCrousal";
 import { IPropertyDetails } from "@/types/property";
 import { CustomizedRoundedSelect, CustomizedSelectChip } from "@/custom-component";
 import { useGlobalContext } from "@/global-context";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import HomeIcon from '@mui/icons-material/Home';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import PaymentIcon from '@mui/icons-material/Payment';
-import GroupIcon from '@mui/icons-material/Group';
-import WcIcon from '@mui/icons-material/Wc';
-import ShieldIcon from '@mui/icons-material/Shield';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
-import InfoIcon from '@mui/icons-material/Info';
-import StarIcon from '@mui/icons-material/Star';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import PersonIcon from '@mui/icons-material/Person';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import ShareIcon from '@mui/icons-material/Share';
+import { Share, LocationOn, ReportProblem, Home, CalendarToday, Payment, Group, Wc, Shield, Favorite, PhotoLibrary, Info, Star, Inventory, Person } from '@mui/icons-material';
+
 import { useState } from "react";
 
 interface IPropertyDetailsProps {
@@ -57,16 +31,14 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
         resources,
         preferences,
         images,
-        occupancy,
-        propertyType,
-        createdAt
+        occupancy
     } = propertyDetails;
 
     const resourcesSchema = state.resources?.filter((data) => resources?.includes(data.id));
     const preferencesSchema = state.preferences?.filter((data) => preferences?.includes(data.id));
 
     // Calculate days since posted
-    const daysSincePosted = Math.floor((new Date().getTime() - new Date(createdAt || availableFrom).getTime()) / (1000 * 3600 * 24));
+    const daysSincePosted = Math.floor((new Date().getTime() - new Date(availableFrom).getTime()) / (1000 * 3600 * 24));
 
     return (
         <Stack spacing={3}>
@@ -93,7 +65,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                         <Box>
                             <Stack direction="row" alignItems="center" spacing={1} mb={1}>
                                 <Chip
-                                    label={propertyType || "Property"}
+                                    label={"Property"}
                                     size="small"
                                     sx={{
                                         backgroundColor: 'primary.main',
@@ -118,7 +90,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                 ₹{rent?.toLocaleString()}/month
                             </Typography>
                             <Stack direction="row" alignItems="center" spacing={0.5}>
-                                <LocationOnIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                <LocationOn sx={{ color: 'text.secondary', fontSize: 20 }} />
                                 <Typography variant="body1" color="text.secondary">
                                     {location?.address}
                                 </Typography>
@@ -127,7 +99,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                         <Stack direction="row" spacing={1}>
                             <Tooltip title="Share property">
                                 <IconButton>
-                                    <ShareIcon />
+                                    <Share />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title={isReported ? "Reported" : "Report listing"}>
@@ -135,7 +107,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                     onClick={() => setIsReported(!isReported)}
                                     sx={{ color: isReported ? 'error.main' : 'inherit' }}
                                 >
-                                    <ReportProblemIcon />
+                                    <ReportProblem />
                                 </IconButton>
                             </Tooltip>
                         </Stack>
@@ -156,7 +128,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                     borderColor: 'divider',
                                 }}
                             >
-                                <WcIcon sx={{ color: 'primary.main', mb: 1 }} />
+                                <Wc sx={{ color: 'primary.main', mb: 1 }} />
                                 <Typography variant="caption" color="text.secondary" display="block">
                                     Gender Preference
                                 </Typography>
@@ -177,7 +149,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                     borderColor: 'divider',
                                 }}
                             >
-                                <GroupIcon sx={{ color: 'success.main', mb: 1 }} />
+                                <Group sx={{ color: 'success.main', mb: 1 }} />
                                 <Typography variant="caption" color="text.secondary" display="block">
                                     Occupancy
                                 </Typography>
@@ -198,7 +170,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                     borderColor: 'divider',
                                 }}
                             >
-                                <PaymentIcon sx={{ color: 'warning.main', mb: 1 }} />
+                                <Payment sx={{ color: 'warning.main', mb: 1 }} />
                                 <Typography variant="caption" color="text.secondary" display="block">
                                     Security Deposit
                                 </Typography>
@@ -219,7 +191,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                     borderColor: 'divider',
                                 }}
                             >
-                                <CalendarTodayIcon sx={{ color: 'info.main', mb: 1 }} />
+                                <CalendarToday sx={{ color: 'info.main', mb: 1 }} />
                                 <Typography variant="caption" color="text.secondary" display="block">
                                     Available From
                                 </Typography>
@@ -249,7 +221,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                     }}
                 >
                     <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                        <PhotoLibraryIcon sx={{ color: 'primary.main' }} />
+                        <PhotoLibrary sx={{ color: 'primary.main' }} />
                         <Typography variant="h6" fontWeight={600}>
                             Property Gallery
                         </Typography>
@@ -271,7 +243,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                     }}
                 >
                     <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                        <StarIcon sx={{ color: 'warning.main' }} />
+                        <Star sx={{ color: 'warning.main' }} />
                         <Typography variant="h6" fontWeight={600}>
                             Property Highlights
                         </Typography>
@@ -299,7 +271,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                             }}
                         >
                             <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                                <InventoryIcon sx={{ color: 'secondary.main' }} />
+                                <Inventory sx={{ color: 'secondary.main' }} />
                                 <Typography variant="h6" fontWeight={600}>
                                     Available Resources
                                 </Typography>
@@ -328,7 +300,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                             }}
                         >
                             <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                                <PersonIcon sx={{ color: 'info.main' }} />
+                                <Person sx={{ color: 'info.main' }} />
                                 <Typography variant="h6" fontWeight={600}>
                                     Roommate Preferences
                                 </Typography>
@@ -356,7 +328,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                     }}
                 >
                     <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                        <InfoIcon sx={{ color: 'primary.main' }} />
+                        <Info sx={{ color: 'primary.main' }} />
                         <Typography variant="h6" fontWeight={600}>
                             About This Property
                         </Typography>
@@ -387,7 +359,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                     }}
                 >
                     <Stack direction="row" alignItems="center" spacing={1}>
-                        <ShieldIcon sx={{ color: 'success.main' }} />
+                        <Shield sx={{ color: 'success.main' }} />
                         <Typography variant="subtitle1" fontWeight={600} color="success.dark">
                             Security Features
                         </Typography>

@@ -1,4 +1,6 @@
-export { default as ConnectionList } from './ConnectionList';
-export { default as ConnectionCard } from './ConnectionCard';
-export { default as ConnectionFilters } from './ConnectionFilters';
-export type { ConnectionFilters as ConnectionFiltersType } from './ConnectionFilters'; 
+import RequestContact from "./RequestContact";
+import ConnectionCard from "./ConnectionCard";
+import ConnectionFilters from "./ConnectionFilters";
+import ConnectionList from "./ConnectionList";
+
+export { RequestContact, ConnectionCard, ConnectionFilters, ConnectionList };

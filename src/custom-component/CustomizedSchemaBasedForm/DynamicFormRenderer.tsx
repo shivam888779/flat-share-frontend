@@ -94,11 +94,11 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                         rows={props.rows}
                         placeholder={props.placeholder}
                         size="small"
-                        inputProps={{
-                            min: props.min,
-                            // max: props.max,
-                            step: props.step,
-                        }}
+                        // inputProps={{
+                        //     min: props.min,
+                        //     // max: props.max,
+                        //     step: props.step,
+                        // }}
                         InputLabelProps={props.InputLabelProps}
                         sx={{
                             '& .MuiOutlinedInput-root': {
