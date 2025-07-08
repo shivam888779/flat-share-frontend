@@ -35,3 +35,5 @@ export {
     FilterSidebar,
     MyProfileHeader
 }
+
+export * from './Chat';

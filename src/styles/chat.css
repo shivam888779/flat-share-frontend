@@ -1,0 +1,145 @@
+/* Chat Animations */
+@keyframes typing {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+
+    30% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Message bubble animations */
+.message-bubble {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.message-bubble:hover .message-actions {
+    opacity: 1 !important;
+}
+
+/* Typing indicator animation */
+.typing-indicator {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Online status pulse */
+.online-status {
+    animation: pulse 2s infinite;
+}
+
+/* Chat room hover effects */
+.chat-room-item:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    transition: background-color 0.2s ease;
+}
+
+/* Message input focus effects */
+.message-input:focus-within {
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    transition: box-shadow 0.2s ease;
+}
+
+/* Send button hover effects */
+.send-button:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Avatar hover effects */
+.avatar-hover:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .skeleton {
+        background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+        background-size: 200px 100%;
+    }
+
+    .chat-room-item:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+}
+
+/* Mobile responsive animations */
+@media (max-width: 768px) {
+    .message-bubble {
+        animation: slideIn 0.2s ease-out;
+    }
+
+    .typing-indicator {
+        animation: fadeIn 0.2s ease-out;
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

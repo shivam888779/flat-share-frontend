@@ -52,3 +52,6 @@ body {
   width: 100%;
   min-width: 400px;
 }
+
+/* Import chat styles */
+@import './chat.css';
