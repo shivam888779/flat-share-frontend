@@ -56,37 +56,59 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     const [showNewChatDialog, setShowNewChatDialog] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const { state } = useGlobalContext();
-    
+
     // Safely filter connections
     const filteredConnections = useMemo(() => {
         if (!Array.isArray(state?.connections)) return [];
-        
+
         return state.connections
             .filter((connection: IConnection) => connection.status === 'APPROVED')
-            .map((connection: IConnection) => connection.requester)
+            .map((connection: IConnection) => {
+                // Return the user who is not the current user
+                return connection.requesterId === userData.id ? connection.requester : connection.requester;
+            })
             .filter((user: IUserData) => {
                 if (!searchQuery) return true;
                 const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-                return fullName.includes(searchQuery.toLowerCase()) || 
-                       user.phoneNo?.toLowerCase().includes(searchQuery.toLowerCase());
+                return fullName.includes(searchQuery.toLowerCase()) ||
+                    user.phoneNo?.toLowerCase().includes(searchQuery.toLowerCase());
+            })
+            .filter((user: IUserData) => {
+                // Don't show users we already have chat rooms with
+                return !chatRooms.some(room => {
+                    const otherUserId = room.user1Id === userData.id ? room.user2Id : room.user1Id;
+                    return otherUserId === user?.id;
+                });
             });
-    }, [state?.connections, searchQuery]);
+    }, [state?.connections, searchQuery, userData.id, chatRooms]);
 
     const getOtherUser = (chatRoom: IChatRoom) => {
         // Check if chatRoom has user1 and user2 properties
         if (chatRoom.user1 && chatRoom.user2) {
             return chatRoom.user1Id === userData.id ? chatRoom.user2 : chatRoom.user1;
         }
-        
+
         // Fallback to otherUser property if it exists
         if (chatRoom.otherUser) {
             return chatRoom.otherUser;
         }
-        
+
         // Final fallback
-        return chatRoom.user1Id === userData.id 
-            ? { id: chatRoom.user2Id, firstName: 'Unknown', lastName: 'User', profileImage: '' }
-            : { id: chatRoom.user1Id, firstName: 'Unknown', lastName: 'User', profileImage: '' };
+        return {
+            id: chatRoom.user1Id === userData.id ? chatRoom.user2Id : chatRoom.user1Id,
+            firstName: 'Unknown',
+            lastName: 'User',
+            profileImage: '',
+            email: null,
+            phoneNo: '',
+            gender: 'Male' as const,
+            description: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            verified: false,
+            isLoggedIn: false,
+            requirementListed: false
+        };
     };
 
     const formatLastMessageTime = (timestamp: string) => {
@@ -102,6 +124,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     };
 
     const handleStartNewChat = (connectionId: number) => {
+        // Create a temporary chat room ID or trigger chat room creation
         onChatRoomSelect(connectionId.toString());
         setShowNewChatDialog(false);
         setSearchQuery('');
@@ -231,6 +254,9 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                             px: 2,
                                             '&:hover': {
                                                 bgcolor: 'action.hover'
+                                            },
+                                            '&:hover .delete-button': {
+                                                opacity: 1
                                             }
                                         }}
                                     >
@@ -312,6 +338,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                         />
 
                                         <IconButton
+                                            className="delete-button"
                                             size="small"
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -362,15 +389,15 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                     <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
                         {filteredConnections.length === 0 ? (
                             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-                                {searchQuery ? 'No connections found' : 'No approved connections available'}
+                                {searchQuery ? 'No connections found' : 'No new connections available to chat with'}
                             </Typography>
                         ) : (
                             <List>
                                 {filteredConnections.map((connection) => (
                                     <ListItem
-                                        key={connection.id}
+                                        key={connection?.id}
                                         button
-                                        onClick={() => handleStartNewChat(connection.id)}
+                                        onClick={() => handleStartNewChat(connection?.id)}
                                         sx={{
                                             py: 1,
                                             '&:hover': {
@@ -380,15 +407,15 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                     >
                                         <ListItemAvatar>
                                             <Avatar
-                                                src={connection.profileImage}
-                                                alt={`${connection.firstName} ${connection.lastName}`}
+                                                src={connection?.profileImage}
+                                                alt={`${connection?.firstName} ${connection?.lastName}`}
                                             >
-                                                {connection.firstName?.charAt(0) || '?'}{connection.lastName?.charAt(0) || '?'}
+                                                {connection?.firstName?.charAt(0) || '?'}{connection?.lastName?.charAt(0) || '?'}
                                             </Avatar>
                                         </ListItemAvatar>
                                         <ListItemText
-                                            primary={`${connection.firstName} ${connection.lastName}`}
-                                            secondary={connection.phoneNo}
+                                            primary={`${connection?.firstName} ${connection?.lastName}`}
+                                            secondary={connection?.phoneNo}
                                         />
                                     </ListItem>
                                 ))}

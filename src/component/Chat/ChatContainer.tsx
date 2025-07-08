@@ -27,6 +27,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
     const [chatRooms, setChatRooms] = useState<any[]>(rooms);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
+    const [sending, setSending] = useState(false);
 
     // WebSocket hook
     const { connected, events, sendMessage } = useChatWebSocket({ userId, token });
@@ -51,51 +52,51 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
     useEffect(() => {
         if (!events.length) return;
         const lastEvent = events[events.length - 1];
-        
+
         switch (lastEvent.type) {
             case 'message':
-                // Only add message if it's for the current chat room
-                if (selectedChatRoom && lastEvent.data.chatRoomId === selectedChatRoom) {
-                    setMessages((prev) => [...prev, lastEvent.data]);
-                }
-                
                 // Update chat rooms to reflect new message
-                setChatRooms((prev) => 
-                    prev.map(room => 
-                        room.id.toString() === lastEvent.data.chatRoomId 
-                            ? { 
-                                ...room, 
-                                lastMessage: lastEvent.data,
-                                unreadCount: selectedChatRoom === lastEvent.data.chatRoomId 
-                                    ? room.unreadCount 
+                setChatRooms((prev) =>
+                    prev.map(room => {
+                        const eventChatRoomId = lastEvent.data.chatRoomId?.toString() || lastEvent.data.roomId?.toString();
+
+                        if (room.id.toString() === eventChatRoomId) {
+                            return {
+                                ...room,
+                                lastMessage: {
+                                    id: lastEvent.data.id,
+                                    message: lastEvent.data.message || lastEvent.data.content,
+                                    createdAt: lastEvent.data.timestamp || lastEvent.data.createdAt,
+                                    senderId: lastEvent.data.senderId || lastEvent.data.sender?.id,
+                                    messageType: lastEvent.data.messageType || 'TEXT'
+                                },
+                                unreadCount: selectedChatRoom === eventChatRoomId
+                                    ? room.unreadCount
                                     : (room.unreadCount || 0) + 1
-                            }
-                            : room
-                    )
+                            };
+                        }
+                        return room;
+                    })
                 );
                 break;
-                
+
             case 'typing':
                 setTypingUsers((prev) => {
                     const newSet = new Set(prev);
+                    const senderId = lastEvent.data.senderId?.toString();
+
                     if (lastEvent.data.type === 'TYPING') {
-                        newSet.add(lastEvent.data.senderId);
+                        newSet.add(senderId);
                     } else {
-                        newSet.delete(lastEvent.data.senderId);
+                        newSet.delete(senderId);
                     }
                     return newSet;
                 });
                 break;
-                
+
             case 'read-receipt':
-                // Update message read status
-                setMessages((prev) =>
-                    prev.map(msg =>
-                        msg.id === lastEvent.data.messageId
-                            ? { ...msg, isRead: true }
-                            : msg
-                    )
-                );
+                // Handle read receipts if needed
+                console.log('Read receipt received:', lastEvent.data);
                 break;
         }
     }, [events, selectedChatRoom]);
@@ -103,13 +104,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
     // Chat room selection logic
     const handleChatRoomSelect = useCallback((roomId: string) => {
         setSelectedChatRoom(roomId);
-        
-        // Clear messages when switching rooms
-        setMessages([]);
-        
-        // Load messages for the selected room (you might want to fetch from API)
-        // For now, we'll just clear the messages array
-        
+
         // Mark room as read
         setChatRooms((prev) =>
             prev.map(room =>
@@ -118,7 +113,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
                     : room
             )
         );
-        
+
         if (isMobile) setShowSidebar(false);
     }, [isMobile]);
 
@@ -128,20 +123,48 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
     };
 
     // Send message handler
-    const handleSendMessage = (content: string) => {
-        if (!selectedChatRoom) return;
-        
-        const messageData = {
-            chatRoomId: selectedChatRoom,
-            senderId: Number(userId),
-            receiverId: getReceiverId(currentChatRoom),
-            message: content,
-            messageType: 'TEXT',
-            timestamp: new Date().toISOString(),
-        };
+    const handleSendMessage = useCallback(async (content: string) => {
+        if (!selectedChatRoom || !userData) return;
 
-        sendMessage(`/app/chat.send`, messageData);
-    };
+        try {
+            setSending(true);
+
+            const messageData = {
+                chatRoomId: selectedChatRoom,
+                senderId: Number(userId),
+                receiverId: getReceiverId(currentChatRoom),
+                message: content,
+                messageType: 'TEXT',
+                timestamp: new Date().toISOString(),
+            };
+
+            // Send via WebSocket
+            sendMessage(`/app/chat.send`, messageData);
+
+            // Update the chat room's last message optimistically
+            setChatRooms((prev) =>
+                prev.map(room =>
+                    room.id.toString() === selectedChatRoom
+                        ? {
+                            ...room,
+                            lastMessage: {
+                                id: Date.now(),
+                                message: content,
+                                createdAt: new Date().toISOString(),
+                                senderId: userData.id,
+                                messageType: 'TEXT'
+                            }
+                        }
+                        : room
+                )
+            );
+
+        } catch (error) {
+            console.error('Failed to send message:', error);
+        } finally {
+            setSending(false);
+        }
+    }, [selectedChatRoom, userId, currentChatRoom, userData, sendMessage]);
 
     // Helper function to get receiver ID from chat room
     const getReceiverId = (chatRoom: any): number => {
@@ -150,7 +173,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
     };
 
     // Typing handlers
-    const handleTypingStart = () => {
+    const handleTypingStart = useCallback(() => {
         if (!selectedChatRoom) return;
         sendMessage('/app/chat.typing', {
             chatRoomId: selectedChatRoom,
@@ -158,9 +181,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
             type: 'TYPING',
             timestamp: new Date().toISOString(),
         });
-    };
+    }, [selectedChatRoom, userId, sendMessage]);
 
-    const handleTypingStop = () => {
+    const handleTypingStop = useCallback(() => {
         if (!selectedChatRoom) return;
         sendMessage('/app/chat.typing', {
             chatRoomId: selectedChatRoom,
@@ -168,10 +191,10 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
             type: 'STOP_TYPING',
             timestamp: new Date().toISOString(),
         });
-    };
+    }, [selectedChatRoom, userId, sendMessage]);
 
     // Mark as read handler
-    const handleMarkAsRead = () => {
+    const handleMarkAsRead = useCallback(() => {
         if (!selectedChatRoom) return;
         sendMessage('/app/chat.read', {
             chatRoomId: selectedChatRoom,
@@ -179,12 +202,12 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
             type: 'READ_RECEIPT',
             timestamp: new Date().toISOString(),
         });
-    };
+    }, [selectedChatRoom, userId, sendMessage]);
 
     // Delete chat room handler
     const handleDeleteChatRoom = (chatRoomId: number) => {
         setChatRooms((prev) => prev.filter(room => room.id !== chatRoomId));
-        
+
         // If the deleted room was selected, clear selection
         if (selectedChatRoom === chatRoomId.toString()) {
             setSelectedChatRoom(null);
@@ -281,16 +304,16 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
                                 onDeleteChatRoom={() => handleDeleteChatRoom(currentChatRoom.id)}
                             />
                             <ChatWindow
-                                messages={messages}
+                                events={events}
                                 currentChatRoom={currentChatRoom}
                                 loading={false}
-                                sending={false}
+                                sending={sending}
                                 error={null}
                                 onSendMessage={handleSendMessage}
                                 onTypingStart={handleTypingStart}
                                 onTypingStop={handleTypingStop}
                                 onMarkAsRead={handleMarkAsRead}
-                                onDeleteMessage={() => {}}
+                                onDeleteMessage={() => { }}
                                 userData={userData}
                                 typingUsers={Array.from(typingUsers)}
                             />

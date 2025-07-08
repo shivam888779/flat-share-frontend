@@ -15,7 +15,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <Box sx={{ pt: 10, backgroundColor: '#f3f4f6' }}>
           <Component {...pageProps} />
         </Box>
-        <Footer />
+        {/* <Footer /> */}
       </GlobalContextProvider>
     </SnackbarProvider>
 

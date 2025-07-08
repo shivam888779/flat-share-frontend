@@ -22,6 +22,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { chatApi } from '@/api/chat';
 
 interface ChatWindowProps {
+    events: any[];
     messages: IChatMessage[];
     currentChatRoom: IChatRoom;
     loading: boolean;
@@ -36,6 +37,7 @@ interface ChatWindowProps {
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
+    events,
     currentChatRoom,
     loading,
     sending,
@@ -52,31 +54,101 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     const [messages, setMessages] = useState<any[]>([]);
     const [isTyping, setIsTyping] = useState(false);
     const [chatLoading, setChatLoading] = useState(false);
+    const [typingUsers, setTypingUsers] = useState<Set<number>>(new Set());
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Load chat history when chat room changes
     useEffect(() => {
         const getChatHistory = async () => {
             if (!currentChatRoom?.id) return;
-            
+
             try {
                 setChatLoading(true);
                 const res = await chatApi.getChatHistory(currentChatRoom.id);
                 console.log('Chat history response:', res?.data);
-                
-                // Set the messages from the API response
+
                 if (res?.data && Array.isArray(res.data)) {
                     setMessages(res.data);
+                } else {
+                    setMessages([]);
                 }
             } catch (error) {
                 console.error('Error fetching chat history:', error);
+                setMessages([]);
             } finally {
                 setChatLoading(false);
             }
         };
 
+        // Clear messages when switching rooms
+        setMessages([]);
+        setTypingUsers(new Set());
         getChatHistory();
     }, [currentChatRoom?.id]);
+
+    // Handle incoming WebSocket events
+    useEffect(() => {
+        if (!events || !Array.isArray(events) || !currentChatRoom?.id) return;
+
+        // Filter events for current chat room
+        const relevantEvents = events.filter(event =>
+            event.data?.chatRoomId === currentChatRoom.id
+        );
+
+        // Process events
+        relevantEvents.forEach(event => {
+            if (event.type === 'message') {
+                const newMessage = {
+                    id: event.data.id,
+                    chatRoomId: event.data.chatRoomId,
+                    senderId: event.data.senderId,
+                    receiverId: event.data.receiverId,
+                    message: event.data.message,
+                    messageType: event.data.messageType || 'TEXT',
+                    isRead: event.data.isRead || false,
+                    createdAt: event.data.createdAt || new Date().toISOString(),
+                    updatedAt: event.data.updatedAt || event.data.createdAt || new Date().toISOString(),
+                    sender: event.data.sender,
+                    receiver: event.data.receiver
+                };
+
+                // Add message if it doesn't already exist
+                setMessages(prevMessages => {
+                    const exists = prevMessages.some(msg =>
+                        msg.id === newMessage.id ||
+                        (msg.senderId === newMessage.senderId &&
+                            msg.message === newMessage.message &&
+                            Math.abs(new Date(msg.createdAt).getTime() - new Date(newMessage.createdAt).getTime()) < 2000)
+                    );
+
+                    if (!exists) {
+                        return [...prevMessages, newMessage].sort((a, b) =>
+                            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                        );
+                    }
+                    return prevMessages;
+                });
+            } else if (event.type === 'typing') {
+                const senderId = Number(event.data.senderId);
+
+                if (senderId !== userData.id) { // Don't show own typing
+                    setTypingUsers(prev => {
+                        const newSet = new Set(prev);
+                        if (event.data.type === 'TYPING') {
+                            newSet.add(senderId);
+                        } else if (event.data.type === 'STOP_TYPING') {
+                            newSet.delete(senderId);
+                        }
+                        return newSet;
+                    });
+                }
+            }
+        });
+    }, [events, currentChatRoom?.id, userData.id]);
+
+    console.log(messages, 'messages');
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
@@ -92,12 +164,42 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
     const handleSendMessage = () => {
         if (message.trim() && !sending) {
+            // Create optimistic message
+            const optimisticMessage = {
+                id: `temp-${Date.now()}`, // Temporary ID
+                chatRoomId: currentChatRoom.id,
+                senderId: userData.id,
+                receiverId: getReceiverId(),
+                message: message.trim(),
+                messageType: 'TEXT' as const,
+                isRead: false,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                sender: userData,
+                receiver: currentChatRoom?.otherUser,
+                sending: true // Flag for optimistic message
+            };
+
+            // Add optimistic message immediately
+            setMessages(prev => [...prev, optimisticMessage]);
+
+            // Send message through parent component
             onSendMessage(message.trim());
-            
+
             setMessage('');
             setIsTyping(false);
             onTypingStop();
         }
+    };
+
+    const getReceiverId = () => {
+        if (currentChatRoom?.otherUser?.id) {
+            return currentChatRoom.otherUser.id;
+        }
+        if (currentChatRoom?.user1Id && currentChatRoom?.user2Id) {
+            return currentChatRoom.user1Id === userData.id ? currentChatRoom.user2Id : currentChatRoom.user1Id;
+        }
+        return 0;
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -114,14 +216,28 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             setIsTyping(true);
             onTypingStart();
         }
+
+        // Clear existing timeout
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
+        // Set new timeout to stop typing after 3 seconds of inactivity
+        typingTimeoutRef.current = setTimeout(() => {
+            setIsTyping(false);
+            onTypingStop();
+        }, 3000);
     };
 
     const handleInputBlur = () => {
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
         setIsTyping(false);
         onTypingStop();
     };
 
-    // Transform API response to match your component's expected format
+    // Transform API response to match component's expected format
     const transformMessage = (apiMessage: any): IChatMessage => {
         return {
             id: apiMessage.id,
@@ -129,10 +245,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             senderId: apiMessage.senderId,
             receiverId: apiMessage.receiverId,
             message: apiMessage.message,
+            content: apiMessage.message, // For compatibility
             messageType: apiMessage.messageType,
             isRead: apiMessage.isRead,
             createdAt: apiMessage.createdAt,
-            // Add any other fields your IChatMessage interface expects
+            updatedAt: apiMessage.updatedAt || apiMessage.createdAt,
             sender: apiMessage.sender,
             receiver: apiMessage.receiver
         };
@@ -155,10 +272,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         }));
     };
 
-    const messageGroups = groupMessagesByDate(messages);
+    // Get other user info for typing indicator
+    const getOtherUser = () => {
+        if (currentChatRoom?.otherUser) {
+            return currentChatRoom.otherUser;
+        }
+        if (currentChatRoom?.user1 && currentChatRoom?.user2) {
+            return currentChatRoom.user1Id === userData.id ? currentChatRoom.user2 : currentChatRoom.user1;
+        }
+        return null;
+    };
 
-    // Use chatLoading for the loading state of messages
+    const messageGroups = groupMessagesByDate(messages);
     const isLoading = loading || chatLoading;
+    const otherUser = getOtherUser();
+    const isOtherUserTyping = typingUsers.size > 0;
 
     return (
         <Box
@@ -244,13 +372,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                                         isOwnMessage={msg.senderId === userData.id}
                                         onDelete={() => onDeleteMessage(msg.id)}
                                         showAvatar={index === 0 || groupMessages[index - 1]?.senderId !== msg.senderId}
+                                        isSending={false} // Pass sending state for optimistic messages
                                     />
                                 ))}
                             </Box>
                         ))}
 
                         {/* Typing Indicator */}
-                        <TypingIndicator />
+                        {isOtherUserTyping && otherUser && (
+                            <TypingIndicator
+                                isTyping={true}
+                                typingUser={`${otherUser.firstName} ${otherUser.lastName}`}
+                            />
+                        )}
 
                         {/* Scroll anchor */}
                         <div ref={messagesEndRef} />

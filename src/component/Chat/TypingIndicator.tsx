@@ -1,10 +1,22 @@
 import React from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme, keyframes } from '@mui/material';
 
 interface TypingIndicatorProps {
     isTyping?: boolean;
     typingUser?: string;
 }
+
+// Keyframes for the typing animation
+const typingAnimation = keyframes`
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    30% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+`;
 
 const TypingIndicator: React.FC<TypingIndicatorProps> = ({
     isTyping = false,
@@ -24,25 +36,28 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({
                 gap: 1,
                 p: 1.5,
                 maxWidth: '70%',
-                alignSelf: 'flex-start'
+                alignSelf: 'flex-start',
+                mb: 1
             }}
         >
             <Box
                 sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 0.5,
+                    gap: 1,
                     p: 1.5,
                     bgcolor: 'background.paper',
                     borderRadius: 2,
-                    boxShadow: 1
+                    boxShadow: 1,
+                    border: `1px solid ${theme.palette.divider}`
                 }}
             >
                 <Typography
                     variant="body2"
                     sx={{
                         color: 'text.secondary',
-                        fontSize: '0.875rem'
+                        fontSize: '0.875rem',
+                        fontStyle: 'italic'
                     }}
                 >
                     {typingUser} is typing
@@ -53,19 +68,21 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({
                     sx={{
                         display: 'flex',
                         gap: 0.25,
-                        ml: 1
+                        ml: 1,
+                        alignItems: 'center'
                     }}
                 >
                     {[0, 1, 2].map((index) => (
                         <Box
                             key={index}
                             sx={{
-                                width: 4,
-                                height: 4,
+                                width: 6,
+                                height: 6,
                                 borderRadius: '50%',
-                                bgcolor: 'text.secondary',
-                                animation: 'typing 1.4s infinite ease-in-out',
-                                animationDelay: `${index * 0.2}s`
+                                bgcolor: theme.palette.primary.main,
+                                animation: `${typingAnimation} 1.4s infinite ease-in-out`,
+                                animationDelay: `${index * 0.2}s`,
+                                opacity: 0.4
                             }}
                         />
                     ))}
@@ -75,4 +92,4 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({
     );
 };
 
-export default TypingIndicator; 
+export default TypingIndicator;

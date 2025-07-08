@@ -7,7 +7,8 @@ import {
     Menu,
     MenuItem,
     Paper,
-    useTheme
+    useTheme,
+    CircularProgress
 } from '@mui/material';
 import {
     MoreVert as MoreVertIcon,
@@ -23,16 +24,17 @@ interface MessageBubbleProps {
     isOwnMessage: boolean;
     onDelete: () => void;
     showAvatar: boolean;
+    isSending?: boolean; // New prop for optimistic messages
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({
     message,
     isOwnMessage,
     onDelete,
-    showAvatar
+    showAvatar,
+    isSending = false
 }) => {
     const theme = useTheme();
-    console.log(message)
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -57,6 +59,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     };
 
     const renderMessageContent = () => {
+        const content = message.message || message.content || '';
+
         switch (message.messageType) {
             case 'TEXT':
                 return (
@@ -67,7 +71,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                             wordBreak: 'break-word'
                         }}
                     >
-                        {message.message}
+                        {content}
                     </Typography>
                 );
 
@@ -75,7 +79,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 return (
                     <Box
                         component="img"
-                        src={message.content}
+                        src={content}
                         alt="Image"
                         sx={{
                             maxWidth: 200,
@@ -99,7 +103,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                         }}
                     >
                         <Typography variant="body2" sx={{ color: isOwnMessage ? 'white' : 'text.primary' }}>
-                            📎 {message.content}
+                            📎 {content}
                         </Typography>
                     </Box>
                 );
@@ -125,7 +129,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             default:
                 return (
                     <Typography variant="body2" sx={{ color: isOwnMessage ? 'white' : 'text.primary' }}>
-                        {message.content}
+                        {content}
                     </Typography>
                 );
         }
@@ -137,7 +141,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 display: 'flex',
                 justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
                 mb: 1,
-                gap: 1
+                gap: 1,
+                opacity: isSending ? 0.7 : 1, // Dim optimistic messages
+                transition: 'opacity 0.3s ease'
             }}
         >
             {/* Avatar (for received messages) */}
@@ -169,39 +175,53 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                         color: isOwnMessage ? 'white' : 'text.primary',
                         borderRadius: 2,
                         position: 'relative',
+                        border: isSending ? `1px dashed ${theme.palette.primary.main}` : 'none',
                         '&:hover .message-actions': {
                             opacity: 1
                         }
                     }}
                 >
                     {/* Message Content */}
-                    {renderMessageContent()}
-
-                    {/* Message Actions */}
-                    <Box
-                        className="message-actions"
-                        sx={{
-                            position: 'absolute',
-                            top: -8,
-                            right: isOwnMessage ? -8 : 'auto',
-                            left: isOwnMessage ? 'auto' : -8,
-                            opacity: 0,
-                            transition: 'opacity 0.2s',
-                            bgcolor: 'background.paper',
-                            borderRadius: 1,
-                            boxShadow: 2,
-                            display: 'flex',
-                            alignItems: 'center'
-                        }}
-                    >
-                        <IconButton
-                            size="small"
-                            onClick={handleMenuOpen}
-                            sx={{ p: 0.5 }}
-                        >
-                            <MoreVertIcon fontSize="small" />
-                        </IconButton>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {renderMessageContent()}
+                        {isSending && (
+                            <CircularProgress
+                                size={12}
+                                sx={{
+                                    color: isOwnMessage ? 'white' : 'primary.main',
+                                    ml: 1
+                                }}
+                            />
+                        )}
                     </Box>
+
+                    {/* Message Actions - Hide for sending messages */}
+                    {!isSending && (
+                        <Box
+                            className="message-actions"
+                            sx={{
+                                position: 'absolute',
+                                top: -8,
+                                right: isOwnMessage ? -8 : 'auto',
+                                left: isOwnMessage ? 'auto' : -8,
+                                opacity: 0,
+                                transition: 'opacity 0.2s',
+                                bgcolor: 'background.paper',
+                                borderRadius: 1,
+                                boxShadow: 2,
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <IconButton
+                                size="small"
+                                onClick={handleMenuOpen}
+                                sx={{ p: 0.5 }}
+                            >
+                                <MoreVertIcon fontSize="small" />
+                            </IconButton>
+                        </Box>
+                    )}
                 </Paper>
 
                 {/* Message Info */}
@@ -221,10 +241,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                             fontSize: '0.75rem'
                         }}
                     >
-                        {formatTime(message.createdAt)}
+                        {isSending ? 'Sending...' : formatTime(message.createdAt)}
                     </Typography>
 
-                    {isOwnMessage && (
+                    {isOwnMessage && !isSending && (
                         <Typography
                             variant="caption"
                             sx={{
@@ -249,37 +269,39 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 </Avatar>
             )}
 
-            {/* Message Menu */}
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                }}
-                transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right'
-                }}
-            >
-                <MenuItem onClick={handleMenuClose}>
-                    <ReplyIcon fontSize="small" sx={{ mr: 1 }} />
-                    Reply
-                </MenuItem>
-                <MenuItem onClick={handleMenuClose}>
-                    <ForwardIcon fontSize="small" sx={{ mr: 1 }} />
-                    Forward
-                </MenuItem>
-                {isOwnMessage && (
-                    <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-                        <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
-                        Delete
+            {/* Message Menu - Don't show for sending messages */}
+            {!isSending && (
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                    }}
+                    transformOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right'
+                    }}
+                >
+                    <MenuItem onClick={handleMenuClose}>
+                        <ReplyIcon fontSize="small" sx={{ mr: 1 }} />
+                        Reply
                     </MenuItem>
-                )}
-            </Menu>
+                    <MenuItem onClick={handleMenuClose}>
+                        <ForwardIcon fontSize="small" sx={{ mr: 1 }} />
+                        Forward
+                    </MenuItem>
+                    {isOwnMessage && (
+                        <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+                            <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
+                            Delete
+                        </MenuItem>
+                    )}
+                </Menu>
+            )}
         </Box>
     );
 };
 
-export default MessageBubble; 
+export default MessageBubble;
