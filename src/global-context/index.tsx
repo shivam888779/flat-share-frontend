@@ -17,6 +17,9 @@ import { initialStateData } from "./initial-state";
 import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPreferncesApi } from "@/api/property";
 import { getNotifications } from "@/api/notifications";
 import { getProfileApi } from "@/api/profiles/my-profile";
+import { getConnectionsApi } from "@/api/connections";
+import { IConnection } from "@/types/connection";
+import { chatApi } from "@/api/chat";
 
 type GlobalContextType = {
   state: IInitialState;
@@ -116,7 +119,29 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
       console.error("Failed to fetch profile", e);
     }
   }, [setState,state]);
-  // Fetch notifications on initial load
+
+  const fetchConnections = useCallback(async () => {
+    try {
+      const res = await getConnectionsApi();
+      console.log(res);
+      const connections = res?.data?.data?.map((connection: IConnection) => connection.requester);
+        setState({ connections: res?.data?.data || [] });
+    } catch (e) {
+      console.error("Failed to fetch profile", e);
+    }
+  }, [setState,state]);
+
+  const fetchChatRooms = useCallback(async () => {
+    try {
+      const res = await chatApi.getChatRooms();
+      console.log(res);
+      setState({ chatRooms: res?.data || [] });
+    } catch (e) {
+      console.error("Failed to fetch chat rooms", e);
+    }
+  }, [setState,state]);
+
+
   useEffect(() => {
     if (isStorageLoaded) {
       fetchNotification();
@@ -143,7 +168,9 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     setState, 
     fetchNotification,
     fetchProfile,
-  }), [state, fetchNotification, fetchProfile]);
+    fetchConnections,
+    fetchChatRooms
+  }), [state, fetchNotification, fetchProfile,fetchConnections,fetchChatRooms]);
 
   // Save to localStorage when state changes (but not during initial load)
   useEffect(() => {

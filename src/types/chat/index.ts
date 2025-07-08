@@ -6,6 +6,7 @@ export interface IChatMessage {
     content: string;
     messageType: 'TEXT' | 'IMAGE' | 'FILE' | 'LOCATION';
     isRead: boolean;
+    message:string;
     createdAt: string;
     updatedAt: string;
     sender?: IUserData;

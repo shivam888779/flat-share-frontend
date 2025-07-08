@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     Box,
     List,
@@ -29,13 +29,15 @@ import {
 } from '@mui/icons-material';
 import { IChatRoom, IUserData } from '../../types/chat';
 import { formatDistanceToNow } from 'date-fns';
+import { useGlobalContext } from '@/global-context';
+import { IConnection } from '@/types/connection';
 
 interface ChatSidebarProps {
     chatRooms: IChatRoom[];
     unreadCount: number;
     isConnected: boolean;
     loading: boolean;
-    onChatRoomSelect: (otherUserId: number) => void;
+    onChatRoomSelect: (chatRoomId: string) => void;
     onDeleteChatRoom: (chatRoomId: number) => void;
     userData: IUserData;
     approvedConnections?: IUserData[];
@@ -49,17 +51,42 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     onChatRoomSelect,
     onDeleteChatRoom,
     userData,
-    approvedConnections = []
 }) => {
     const theme = useTheme();
     const [showNewChatDialog, setShowNewChatDialog] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const { state } = useGlobalContext();
+    
+    // Safely filter connections
+    const filteredConnections = useMemo(() => {
+        if (!Array.isArray(state?.connections)) return [];
+        
+        return state.connections
+            .filter((connection: IConnection) => connection.status === 'APPROVED')
+            .map((connection: IConnection) => connection.requester)
+            .filter((user: IUserData) => {
+                if (!searchQuery) return true;
+                const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+                return fullName.includes(searchQuery.toLowerCase()) || 
+                       user.phoneNo?.toLowerCase().includes(searchQuery.toLowerCase());
+            });
+    }, [state?.connections, searchQuery]);
 
     const getOtherUser = (chatRoom: IChatRoom) => {
-        return chatRoom.otherUser ||
-            (chatRoom.user1Id === userData.id ?
-                { id: chatRoom.user2Id, firstName: 'Unknown', lastName: 'User', profileImage: '' } :
-                { id: chatRoom.user1Id, firstName: 'Unknown', lastName: 'User', profileImage: '' });
+        // Check if chatRoom has user1 and user2 properties
+        if (chatRoom.user1 && chatRoom.user2) {
+            return chatRoom.user1Id === userData.id ? chatRoom.user2 : chatRoom.user1;
+        }
+        
+        // Fallback to otherUser property if it exists
+        if (chatRoom.otherUser) {
+            return chatRoom.otherUser;
+        }
+        
+        // Final fallback
+        return chatRoom.user1Id === userData.id 
+            ? { id: chatRoom.user2Id, firstName: 'Unknown', lastName: 'User', profileImage: '' }
+            : { id: chatRoom.user1Id, firstName: 'Unknown', lastName: 'User', profileImage: '' };
     };
 
     const formatLastMessageTime = (timestamp: string) => {
@@ -75,16 +102,15 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     };
 
     const handleStartNewChat = (connectionId: number) => {
-        onChatRoomSelect(connectionId);
+        onChatRoomSelect(connectionId.toString());
         setShowNewChatDialog(false);
         setSearchQuery('');
     };
 
-    const filteredConnections = approvedConnections.filter(connection =>
-        `${connection.firstName} ${connection.lastName}`
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())
-    );
+    // Calculate total unread count from all chat rooms
+    const totalUnreadCount = useMemo(() => {
+        return chatRooms?.reduce((total, room) => total + (room.unreadCount || 0), 0) || 0;
+    }, [chatRooms]);
 
     if (loading) {
         return (
@@ -137,9 +163,9 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                         color={isConnected ? 'success' : 'error'}
                         variant="outlined"
                     />
-                    {unreadCount > 0 && (
+                    {totalUnreadCount > 0 && (
                         <Badge
-                            badgeContent={unreadCount}
+                            badgeContent={totalUnreadCount}
                             color="primary"
                             sx={{
                                 '& .MuiBadge-badge': {
@@ -199,7 +225,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                 <React.Fragment key={chatRoom.id}>
                                     <ListItem
                                         button
-                                        onClick={() => onChatRoomSelect(otherUser.id)}
+                                        onClick={() => onChatRoomSelect(chatRoom.id.toString())}
                                         sx={{
                                             py: 1.5,
                                             px: 2,
@@ -226,7 +252,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                                     alt={`${otherUser.firstName} ${otherUser.lastName}`}
                                                     sx={{ width: 48, height: 48 }}
                                                 >
-                                                    {otherUser.firstName.charAt(0)}{otherUser.lastName.charAt(0)}
+                                                    {otherUser.firstName?.charAt(0) || '?'}{otherUser.lastName?.charAt(0) || '?'}
                                                 </Avatar>
                                             </Badge>
                                         </ListItemAvatar>
@@ -266,7 +292,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                                             whiteSpace: 'nowrap'
                                                         }}
                                                     >
-                                                        {chatRoom.lastMessage ? truncateMessage(chatRoom.lastMessage.content) : 'No messages yet'}
+                                                        {chatRoom?.lastMessage ? truncateMessage(chatRoom.lastMessage.message) : 'No messages yet'}
                                                     </Typography>
                                                     {chatRoom.unreadCount > 0 && (
                                                         <Badge
@@ -357,7 +383,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                                 src={connection.profileImage}
                                                 alt={`${connection.firstName} ${connection.lastName}`}
                                             >
-                                                {connection.firstName.charAt(0)}{connection.lastName.charAt(0)}
+                                                {connection.firstName?.charAt(0) || '?'}{connection.lastName?.charAt(0) || '?'}
                                             </Avatar>
                                         </ListItemAvatar>
                                         <ListItemText
@@ -380,4 +406,4 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     );
 };
 
-export default ChatSidebar; 
+export default ChatSidebar;

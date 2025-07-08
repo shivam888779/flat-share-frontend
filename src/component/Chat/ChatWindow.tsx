@@ -19,6 +19,7 @@ import { IChatMessage, IChatRoom, IUserData } from '../../types/chat';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import { formatDistanceToNow } from 'date-fns';
+import { chatApi } from '@/api/chat';
 
 interface ChatWindowProps {
     messages: IChatMessage[];
@@ -35,7 +36,6 @@ interface ChatWindowProps {
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
-    messages,
     currentChatRoom,
     loading,
     sending,
@@ -49,9 +49,34 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 }) => {
     const theme = useTheme();
     const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState<any[]>([]);
     const [isTyping, setIsTyping] = useState(false);
+    const [chatLoading, setChatLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const getChatHistory = async () => {
+            if (!currentChatRoom?.id) return;
+            
+            try {
+                setChatLoading(true);
+                const res = await chatApi.getChatHistory(currentChatRoom.id);
+                console.log('Chat history response:', res?.data);
+                
+                // Set the messages from the API response
+                if (res?.data && Array.isArray(res.data)) {
+                    setMessages(res.data);
+                }
+            } catch (error) {
+                console.error('Error fetching chat history:', error);
+            } finally {
+                setChatLoading(false);
+            }
+        };
+
+        getChatHistory();
+    }, [currentChatRoom?.id]);
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
@@ -68,6 +93,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     const handleSendMessage = () => {
         if (message.trim() && !sending) {
             onSendMessage(message.trim());
+            
             setMessage('');
             setIsTyping(false);
             onTypingStop();
@@ -95,8 +121,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         onTypingStop();
     };
 
-    const groupMessagesByDate = (messages: IChatMessage[]) => {
-        const groups: { [key: string]: IChatMessage[] } = {};
+    // Transform API response to match your component's expected format
+    const transformMessage = (apiMessage: any): IChatMessage => {
+        return {
+            id: apiMessage.id,
+            chatRoomId: apiMessage.chatRoomId,
+            senderId: apiMessage.senderId,
+            receiverId: apiMessage.receiverId,
+            message: apiMessage.message,
+            messageType: apiMessage.messageType,
+            isRead: apiMessage.isRead,
+            createdAt: apiMessage.createdAt,
+            // Add any other fields your IChatMessage interface expects
+            sender: apiMessage.sender,
+            receiver: apiMessage.receiver
+        };
+    };
+
+    const groupMessagesByDate = (messages: any[]) => {
+        const groups: { [key: string]: any[] } = {};
 
         messages.forEach(msg => {
             const date = new Date(msg.createdAt).toDateString();
@@ -113,6 +156,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     };
 
     const messageGroups = groupMessagesByDate(messages);
+
+    // Use chatLoading for the loading state of messages
+    const isLoading = loading || chatLoading;
 
     return (
         <Box
@@ -134,7 +180,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     gap: 1
                 }}
             >
-                {loading ? (
+                {isLoading ? (
                     <Box
                         sx={{
                             display: 'flex',
@@ -194,7 +240,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                                 {groupMessages.map((msg, index) => (
                                     <MessageBubble
                                         key={msg.id}
-                                        message={msg}
+                                        message={transformMessage(msg)}
                                         isOwnMessage={msg.senderId === userData.id}
                                         onDelete={() => onDeleteMessage(msg.id)}
                                         showAvatar={index === 0 || groupMessages[index - 1]?.senderId !== msg.senderId}
@@ -289,4 +335,4 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     );
 };
 
-export default ChatWindow; 
+export default ChatWindow;

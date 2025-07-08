@@ -13,10 +13,14 @@ export const initialStateData: IInitialState = {
         createdAt: "",
         updatedAt: "",
         token: "",
-        verified: false
+        verified: false,
+        isLoggedIn: false,
+        requirementListed: false
     },
     highLights: [],
     resources: [],
     preferences: [],
-    notifications:[]
+    notifications:[],
+    connections:[],
+    chatRooms:[]
 }

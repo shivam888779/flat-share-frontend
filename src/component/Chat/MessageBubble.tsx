@@ -32,6 +32,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     showAvatar
 }) => {
     const theme = useTheme();
+    console.log(message)
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -66,7 +67,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                             wordBreak: 'break-word'
                         }}
                     >
-                        {message.content}
+                        {message.message}
                     </Typography>
                 );
 
