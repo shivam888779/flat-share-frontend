@@ -66,11 +66,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
             try {
                 setChatLoading(true);
-                const res = await chatApi.getChatHistory(currentChatRoom.id);
-                console.log('Chat history response:', res?.data);
+                const { data } = await chatApi.getChatHistory(currentChatRoom.id);
+                console.log('Chat history response:', data);
 
-                if (res?.data && Array.isArray(res.data)) {
-                    setMessages(res.data);
+                if (data && Array.isArray(data)) {
+                    setMessages(data);
                 } else {
                     setMessages([]);
                 }

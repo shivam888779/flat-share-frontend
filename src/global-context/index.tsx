@@ -26,13 +26,13 @@ type GlobalContextType = {
   setState: Dispatch<Partial<IInitialState>>;
   fetchNotification: () => Promise<void>;
   fetchProfile: () => Promise<void>;
-  };
+};
 
 const GlobalContext = createContext<GlobalContextType>({
   state: initialStateData,
   setState: () => { },
-  fetchNotification: async () => {},
-  fetchProfile: async () => {},
+  fetchNotification: async () => { },
+  fetchProfile: async () => { },
 });
 
 const simpleReducer = (
@@ -55,14 +55,14 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
   const isInitialized = useRef(false);
   const router = useRouter();
 
-  const fetchNotification = async () => {
+  const fetchNotification = useCallback(async () => {
     try {
       const res = await getNotifications();
       setState({ notifications: res?.data?.data || [] });
     } catch (e) {
       console.error("Failed to fetch notifications", e);
     }
-  };
+  }, [setState]);
 
 
 
@@ -110,26 +110,26 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     fetchRequirements();
     isInitialized.current = true;
   }, [isStorageLoaded, state]);
-  
+
   const fetchProfile = useCallback(async () => {
     try {
       const res = await getProfileApi();
-      setState({ userData:{ ...res?.data?.data, isLoggedIn: true } });
+      setState({ userData: { ...res?.data?.data, isLoggedIn: true } });
     } catch (e) {
       console.error("Failed to fetch profile", e);
     }
-  }, [setState,state]);
+  }, [setState, state]);
 
   const fetchConnections = useCallback(async () => {
     try {
       const res = await getConnectionsApi();
       console.log(res);
       const connections = res?.data?.data?.map((connection: IConnection) => connection.requester);
-        setState({ connections: res?.data?.data || [] });
+      setState({ connections: res?.data?.data || [] });
     } catch (e) {
       console.error("Failed to fetch profile", e);
     }
-  }, [setState,state]);
+  }, [setState, state]);
 
   const fetchChatRooms = useCallback(async () => {
     try {
@@ -139,7 +139,7 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     } catch (e) {
       console.error("Failed to fetch chat rooms", e);
     }
-  }, [setState,state]);
+  }, [setState, state]);
 
 
   useEffect(() => {
@@ -163,14 +163,14 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     };
   }, [router.events]);
 
-  const providerValue = useMemo(() => ({ 
-    state, 
-    setState, 
+  const providerValue = useMemo(() => ({
+    state,
+    setState,
     fetchNotification,
     fetchProfile,
     fetchConnections,
     fetchChatRooms
-  }), [state, fetchNotification, fetchProfile,fetchConnections,fetchChatRooms]);
+  }), [state, fetchNotification, fetchProfile, fetchConnections, fetchChatRooms]);
 
   // Save to localStorage when state changes (but not during initial load)
   useEffect(() => {

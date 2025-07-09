@@ -61,6 +61,7 @@ export interface ISendMessageResponse {
 }
 
 export interface IChatHistoryResponse {
+    data(arg0: string, data: any): unknown;
     messages: IChatMessage[];
     totalPages: number;
     currentPage: number;
@@ -68,6 +69,7 @@ export interface IChatHistoryResponse {
 }
 
 export interface IChatRoomsResponse {
+    data: never[];
     chatRooms: IChatRoom[];
     totalUnreadCount: number;
 }
