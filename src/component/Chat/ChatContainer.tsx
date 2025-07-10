@@ -86,9 +86,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
                     const senderId = lastEvent.data.senderId?.toString();
 
                     if (lastEvent.data.type === 'TYPING') {
-                        newSet.add(senderId);
+                        newSet.add(senderId || '');
                     } else {
-                        newSet.delete(senderId);
+                        newSet.delete(senderId || '');
                     }
                     return newSet;
                 });

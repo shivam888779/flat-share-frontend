@@ -15,6 +15,7 @@ import {
     FiberManualRecord as FiberManualRecordIcon
 } from '@mui/icons-material';
 import { IChatRoom } from '../../types/chat';
+import { useGlobalContext } from '@/global-context';
 
 interface ChatHeaderProps {
     chatRoom: IChatRoom;
@@ -31,13 +32,11 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 }) => {
     const theme = useTheme();
 
-    const getOtherUser = () => {
-        return chatRoom.otherUser || { firstName: 'Unknown', lastName: 'User', profileImage: '' };
-    };
-
-    const otherUser = getOtherUser();
+    const {state} = useGlobalContext();
+    const {connections} = state;
+    const otherUser = connections.find(c => c.otherUser?.id === chatRoom.otherUser?.id)?.otherUser || { firstName: 'Unknown', lastName: 'User', profileImage: '' };
     const isOnline = false; // TODO: Implement online status
-
+    console.log(otherUser,chatRoom);
     return (
         <Box
             sx={{

@@ -262,14 +262,14 @@ export const createAppTheme = (mode: PaletteMode = 'light') => {
         },
       },
 
-      MuiBackdrop: {
-        styleOverrides: {
-          root: {
-            backgroundColor: alpha('#000', 0.5),
-            backdropFilter: 'blur(8px)',
-          },
-        },
-      },
+      // MuiBackdrop: {
+      //   styleOverrides: {
+      //     root: {
+      //       backgroundColor: alpha('#000', 0.5),
+      //       backdropFilter: 'blur(8px)',
+      //     },
+      //   },
+      // },
 
       // Enhanced Button styles
       MuiButton: {

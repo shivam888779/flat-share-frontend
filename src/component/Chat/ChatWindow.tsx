@@ -250,8 +250,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             isRead: apiMessage.isRead,
             createdAt: apiMessage.createdAt,
             updatedAt: apiMessage.updatedAt || apiMessage.createdAt,
-            sender: apiMessage.sender,
-            receiver: apiMessage.receiver
         };
     };
 
@@ -417,18 +415,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     }}
                 >
                     {/* Attachment Buttons */}
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <IconButton size="small" disabled={sending}>
-                            <ImageIcon />
-                        </IconButton>
-                        <IconButton size="small" disabled={sending}>
-                            <AttachFileIcon />
-                        </IconButton>
-                        <IconButton size="small" disabled={sending}>
-                            <LocationIcon />
-                        </IconButton>
-                    </Box>
-
+                    {/* 
+                    
                     {/* Message Input */}
                     <TextField
                         ref={inputRef}

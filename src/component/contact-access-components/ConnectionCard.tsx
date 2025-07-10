@@ -59,7 +59,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
     };
 
     // Get the other user's information
-    const otherUser = isIncoming ? connection.requester : connection.receiver;
+    const otherUser = connection.otherUser;
     const isOnline = Math.random() > 0.5; // Mock online status
 
     // Format date

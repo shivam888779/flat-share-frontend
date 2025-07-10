@@ -120,10 +120,11 @@ const LandingPage: React.FC = () => {
               inputRef={inputRef}
               InputProps={{
                 sx: {
-                  borderRadius: '50px',
+                 
                   '& fieldset': {
                     border: 'none',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                    borderRadius: '9999px',
                   },
                   '&:hover fieldset': {
                     boxShadow: '0 15px 50px rgba(0,0,0,0.12)'
@@ -151,10 +152,11 @@ const LandingPage: React.FC = () => {
                   </InputAdornment>
                 ),
                 sx: {
-                  borderRadius: '50px',
+                
                   '& fieldset': {
                     border: 'none',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                   
                   }
                 }
               }}

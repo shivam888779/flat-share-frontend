@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import { IChatMessage } from '../../types/chat';
 import { formatDistanceToNow } from 'date-fns';
+import { useGlobalContext } from '@/global-context';
 
 interface MessageBubbleProps {
     message: IChatMessage;
@@ -35,6 +36,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     isSending = false
 }) => {
     const theme = useTheme();
+    const {state} = useGlobalContext();
+    const {userData,connections} = state;
+    const sender = connections.find(c => c.otherUser?.id === message.senderId)?.otherUser;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -149,11 +153,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             {/* Avatar (for received messages) */}
             {!isOwnMessage && showAvatar && (
                 <Avatar
-                    src={message.sender?.profileImage}
-                    alt={`${message.sender?.firstName} ${message.sender?.lastName}`}
+                    src={sender?.profileImage}
+                    alt={`${sender?.firstName} ${sender?.lastName}`}
                     sx={{ width: 32, height: 32, mt: 'auto' }}
                 >
-                    {message.sender?.firstName?.charAt(0)}{message.sender?.lastName?.charAt(0)}
+                    {sender?.firstName?.charAt(0)}{sender?.lastName?.charAt(0)}
                 </Avatar>
             )}
 
@@ -261,11 +265,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             {/* Avatar (for sent messages) */}
             {isOwnMessage && showAvatar && (
                 <Avatar
-                    src={message.sender?.profileImage}
-                    alt={`${message.sender?.firstName} ${message.sender?.lastName}`}
+                    src={userData?.profileImage}
+                    alt={`${userData?.firstName} ${userData?.lastName}`}
                     sx={{ width: 32, height: 32, mt: 'auto' }}
                 >
-                    {message.sender?.firstName?.charAt(0)}{message.sender?.lastName?.charAt(0)}
+                    {userData?.firstName?.charAt(0)}{userData?.lastName?.charAt(0)}
                 </Avatar>
             )}
 

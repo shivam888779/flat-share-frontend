@@ -65,15 +65,10 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
             .filter((connection: IConnection) => connection.status === 'APPROVED')
             .map((connection: IConnection) => {
                 // Return the user who is not the current user
-                return connection.requesterId === userData.id ? connection.requester : connection.requester;
+                return connection.otherUser;
             })
-            .filter((user: IUserData) => {
-                if (!searchQuery) return true;
-                const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-                return fullName.includes(searchQuery.toLowerCase()) ||
-                    user.phoneNo?.toLowerCase().includes(searchQuery.toLowerCase());
-            })
-            .filter((user: IUserData) => {
+            .filter((user: IUserData | undefined) => {
+                if (!user) return false;
                 // Don't show users we already have chat rooms with
                 return !chatRooms.some(room => {
                     const otherUserId = room.user1Id === userData.id ? room.user2Id : room.user1Id;
@@ -397,7 +392,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                     <ListItem
                                         key={connection?.id}
                                         button
-                                        onClick={() => handleStartNewChat(connection?.id)}
+                                        onClick={() => handleStartNewChat(connection?.id || 0)}
                                         sx={{
                                             py: 1,
                                             '&:hover': {

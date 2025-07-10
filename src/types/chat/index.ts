@@ -29,8 +29,6 @@ export interface IChatMessage {
     isRead: boolean;
     createdAt: string;
     updatedAt: string;
-    sender?: IUserData;
-    receiver?: IUserData;
     sending?: boolean; // For optimistic messages
 }
 

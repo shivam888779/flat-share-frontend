@@ -345,12 +345,7 @@ export default function Header() {
                         overflow: 'visible'
                     }
                 }}
-                sx={{
-                    '& .MuiBackdrop-root': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                        backdropFilter: 'blur(8px)'
-                    }
-                }}
+            
             >
                 <DialogTitle
                     sx={{
