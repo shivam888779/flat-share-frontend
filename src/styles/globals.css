@@ -53,5 +53,7 @@ body {
   min-width: 400px;
 }
 
+
 /* Import chat styles */
 @import './chat.css';
+@import './login.css';

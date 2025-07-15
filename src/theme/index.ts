@@ -88,7 +88,7 @@ export const createAppTheme = (mode: PaletteMode = 'light') => {
         main: colorTokens.primary[500],
         light: colorTokens.primary[300],
         dark: colorTokens.primary[700],
-        contrastText: '#fff',
+        contrastText: colorTokens.grey[900],
       },
       secondary: {
         main: colorTokens.secondary[500],
@@ -262,14 +262,6 @@ export const createAppTheme = (mode: PaletteMode = 'light') => {
         },
       },
 
-      // MuiBackdrop: {
-      //   styleOverrides: {
-      //     root: {
-      //       backgroundColor: alpha('#000', 0.5),
-      //       backdropFilter: 'blur(8px)',
-      //     },
-      //   },
-      // },
 
       // Enhanced Button styles
       MuiButton: {
@@ -282,21 +274,27 @@ export const createAppTheme = (mode: PaletteMode = 'light') => {
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           },
           contained: {
-            boxShadow: 'none',
+            borderRadius: '12px',
+            borderColor: '#ffffff',
+            backgroundColor: colorTokens.primary[500],
+            color: '#ffffff',
+            textTransform: 'none',
+            fontWeight: 500,
             '&:hover': {
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              transform: 'translateY(-1px)',
-            },
-            '&:active': {
-              boxShadow: 'none',
-              transform: 'translateY(0)',
-            },
+              backgroundColor: colorTokens.primary[600],
+            }
+
           },
           outlined: {
             borderWidth: 2,
+            borderRadius: '12px',
+            textTransform: 'none',
+            fontWeight: 500,
             '&:hover': {
               borderWidth: 2,
-            },
+              backgroundColor: 'rgba(108, 92, 231, 0.05)'
+            }
+
           },
         },
         variants: [
@@ -329,12 +327,27 @@ export const createAppTheme = (mode: PaletteMode = 'light') => {
       MuiCard: {
         styleOverrides: {
           root: {
-            borderRadius: 12,
-            boxShadow: isLight
-              ? '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-              : 'none',
-            border: isLight ? 'none' : `1px solid ${colorTokens.grey[800]}`,
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: '16px',
+            overflow: 'visible',
+            position: 'relative',
+            transition: 'all 0.3s ease',
+            border: '1px solid',
+            borderColor: 'rgba(0,0,0,0.08)',
+            '&:hover': {
+              transform: 'translateY(-4px)',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.12)',
+              borderColor: 'rgba(108, 92, 231, 0.2)'
+            }
+          },
+        },
+      },
+      MuiLink: {
+        styleOverrides: {
+          root: {
+            textDecoration: 'none',
           },
         },
       },

@@ -55,7 +55,6 @@ function TabPanel(props: TabPanelProps) {
 const ConnectionsPage: React.FC = () => {
     const { state } = useGlobalContext();
     const { userData } = state;
-    const [connections, setConnections] = useState<IConnection[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -64,6 +63,7 @@ const ConnectionsPage: React.FC = () => {
         status: "all",
     });
     const snackbar = useGlobalSnackbar();
+    const { fetchConnections, state: { connections } } = useGlobalContext();
 
     // Get filtered connections
     const getFilteredConnections = (filterValue: string, currentUserId: number): IConnection[] => {
@@ -81,7 +81,7 @@ const ConnectionsPage: React.FC = () => {
         // Apply search filter
         if (searchQuery) {
             filtered = filtered.filter(conn => {
-                const otherUser = conn.requesterId === currentUserId ? conn.receiver : conn.requester;
+                const otherUser = conn.otherUser;
                 const searchLower = searchQuery.toLowerCase();
                 return (
                     otherUser?.firstName?.toLowerCase().includes(searchLower) ||
@@ -150,7 +150,7 @@ const ConnectionsPage: React.FC = () => {
         try {
             const response = await approveRequestApi(connectionId);
             snackbar.success(response.data.message || "Request approved successfully!");
-            getConnections();
+            fetchConnections();
         } catch (error) {
             snackbar.error("Failed to approve request");
         }
@@ -160,7 +160,7 @@ const ConnectionsPage: React.FC = () => {
         try {
             const response = await rejectRequestApi(connectionId);
             snackbar.success(response.data.message || "Request rejected successfully!");
-            getConnections();
+            fetchConnections();
         } catch (error) {
             snackbar.error("Failed to reject request");
         }
@@ -170,7 +170,7 @@ const ConnectionsPage: React.FC = () => {
         try {
             const response = await cancelRequestApi(connectionId);
             snackbar.success(response.data.message || "Request cancelled successfully!");
-            getConnections();
+            fetchConnections();
         } catch (error) {
             snackbar.error("Failed to cancel request");
         }
@@ -186,27 +186,13 @@ const ConnectionsPage: React.FC = () => {
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        await getConnections();
+        await fetchConnections();
         setRefreshing(false);
     };
 
-    const getConnections = async () => {
-        try {
-            setLoading(true);
-            const response = await getConnectionsApi();
-            const connectionsData = Array.isArray(response?.data?.data) ? response.data?.data : [];
-            setConnections(connectionsData);
-        } catch (error) {
-            console.error("Failed to fetch connections:", error);
-            snackbar.error("Failed to load connections");
-            setConnections([]);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     useEffect(() => {
-        getConnections();
+        fetchConnections();
     }, []);
 
     if (loading) {

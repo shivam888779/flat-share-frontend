@@ -12,7 +12,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <SnackbarProvider>
       <GlobalContextProvider>
         <Header />
-        <Box sx={{ pt: 10, backgroundColor: '#f3f4f6' }}>
+        <Box sx={{ pt: 8, backgroundColor: '#f3f4f6' }}>
           <Component {...pageProps} />
         </Box>
         {/* <Footer /> */}

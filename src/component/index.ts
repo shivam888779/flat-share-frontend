@@ -1,8 +1,7 @@
 import FilterNavbar from "./FilterNavbar";
-import PropertyDetailsCard from "./UserDetailCard"
+import PropertyDetailsCard from "./PropertyDetailsCard"
 import Header from "./Header"
 import Footer from "./Footer";
-import OtpInput from "./OtpInput"
 import LogInForm from "./LogInForm";
 import ConnectUser from "./ConnectUser";
 import PropertyDetails from "./PropertyDetails";
@@ -22,7 +21,6 @@ export {
     PropertyDetailsCard,
     Footer,
     LogInForm,
-    OtpInput,
     ConnectUser,
     PropertyDetails,
     Chips,

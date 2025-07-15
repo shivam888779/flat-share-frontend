@@ -506,6 +506,30 @@ export const getFormConfig = (type: 'property' | 'requirement', globalState?: an
     }
 };
 
+export const getPropertyType = (typeId: number) => {
+    const types: { [key: number]: string } = {
+        1: 'Apartment',
+        2: 'House',
+        3: 'Studio',
+        4: 'Shared Room',
+        5: 'Private Room'
+    };
+    return types[typeId] || 'Property';
+};
+
+// Get gender preference icon and color
+export const getGenderPreference = (gender: string) => {
+    switch (gender) {
+        case 'male':
+            return { label: 'Male Only', color: '#3498db' };
+        case 'female':
+            return { label: 'Female Only', color: '#e84393' };
+        case 'any':
+            return { label: 'Any Gender', color: '#6c5ce7' };
+        default:
+            return { label: 'Any Gender', color: '#6c5ce7' };
+    }
+};
 // Legacy exports for backward compatibility
 export const initialValues = propertyInitialValues;
 export const validationSchema = propertyValidationSchema;

@@ -68,7 +68,7 @@ const LogInForm = () => {
     try {
       const { data } = await sendOtpApi({ phoneNo: values?.mobile });
       if (data?.status) {
-        snackbar.success(data?.message);
+        snackbar.success(data?.message + " " + data?.data?.otp);
         setIsOtpSent(true);
         setMobileNumber(values.mobile);
         setResendTimer(30); // 30 seconds timer
@@ -89,7 +89,7 @@ const LogInForm = () => {
         localStorage.setItem("authToken", data?.data?.token);
         setState({ userData: { ...data?.data, isLoggedIn: true } });
         fetchProfile();
-
+        snackbar.error(data?.message);
         if (data?.data?.verified) {
           router.push("/");
         } else {
@@ -117,44 +117,7 @@ const LogInForm = () => {
 
   return (
     <Box
-      sx={{
-        minHeight: '100vh',
-        background: theme.palette.mode === 'light'
-          ? `linear-gradient(135deg, 
-              rgba(102, 126, 234, 0.05) 0%, 
-              rgba(118, 75, 162, 0.05) 100%)`
-          : theme.palette.background.default,
-        position: 'relative',
-        overflow: 'hidden',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: '-50%',
-          right: '-50%',
-          width: '100%',
-          height: '100%',
-          borderRadius: '50%',
-          background: theme.palette.mode === 'light'
-            ? `radial-gradient(circle, 
-                rgba(102, 126, 234, 0.1) 0%, 
-                transparent 70%)`
-            : 'none',
-        },
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          bottom: '-50%',
-          left: '-50%',
-          width: '100%',
-          height: '100%',
-          borderRadius: '50%',
-          background: theme.palette.mode === 'light'
-            ? `radial-gradient(circle, 
-                rgba(118, 75, 162, 0.1) 0%, 
-                transparent 70%)`
-            : 'none',
-        }
-      }}
+      className="gradient-background"
     >
       <Container maxWidth="sm">
         <Box
@@ -162,48 +125,20 @@ const LogInForm = () => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          minHeight="100vh"
-          py={4}
+          minHeight="93vh"
+          // py={4}
           position="relative"
           zIndex={1}
         >
           <Grow in timeout={800}>
             <Paper
               elevation={3}
-              sx={{
-                width: '100%',
-                p: { xs: 3, sm: 4, md: 5 },
-                borderRadius: 3,
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 4,
-                  background: theme.custom?.gradients?.primary ||
-                    `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                }
-              }}
+              className="paper-card"
             >
               {/* Logo/Icon */}
               <Box display="flex" justifyContent="center" mb={3}>
-                <Box
-                  sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 2,
-                    background: theme.custom?.gradients?.primary ||
-                      `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: theme.shadows[3],
-                  }}
-                >
-                  <PhoneIcon sx={{ fontSize: 40, color: 'white' }} />
+                <Box className="logo-icon-box">
+                  <PhoneIcon />
                 </Box>
               </Box>
 
@@ -269,23 +204,11 @@ const LogInForm = () => {
 
                             <Button
                               type="submit"
-                              variant="contained"
+                              variant="gradient"
                               fullWidth
                               size="large"
                               disabled={isLoading}
-                              sx={{
-                                height: 48,
-                                background: theme.custom?.gradients?.primary,
-                                '&:hover': {
-                                  background: theme.custom?.gradients?.primary,
-                                  filter: 'brightness(0.9)',
-                                  transform: 'translateY(-1px)',
-                                  boxShadow: theme.shadows[4],
-                                },
-                                '&:active': {
-                                  transform: 'translateY(0)',
-                                }
-                              }}
+
                             >
                               {isLoading ? (
                                 <CircularProgress size={24} color="inherit" />
@@ -353,23 +276,11 @@ const LogInForm = () => {
 
                             <Button
                               type="submit"
-                              variant="contained"
+                              variant="gradient"
                               fullWidth
                               size="large"
                               disabled={isLoading}
-                              sx={{
-                                height: 48,
-                                background: theme.custom?.gradients?.primary,
-                                '&:hover': {
-                                  background: theme.custom?.gradients?.primary,
-                                  filter: 'brightness(0.9)',
-                                  transform: 'translateY(-1px)',
-                                  boxShadow: theme.shadows[4],
-                                },
-                                '&:active': {
-                                  transform: 'translateY(0)',
-                                }
-                              }}
+
                             >
                               {isLoading ? (
                                 <CircularProgress size={24} color="inherit" />

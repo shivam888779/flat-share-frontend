@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { SearchPropertyCard } from "@/types/property";
 import { searchPropertiesApi } from "@/api/property";
 import { useRouter } from 'next/router';
-import { generateDummyCards } from "@/component/UserDetailCard";
+import { generateDummyCards } from "@/component/PropertyDetailsCard";
 
 export default function Listing() {
     const { state } = useGlobalContext();

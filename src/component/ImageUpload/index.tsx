@@ -13,9 +13,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
   const [files, setFiles] = useState<File[]>([]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target);
     if (event.target.files) {
       let filesArray = Array.from(event.target.files);
       let newFiles = [...files, ...filesArray].slice(0, maxImages);
+      console.log(newFiles);
       setFiles(newFiles);
       setSelectedFiles(newFiles);
 

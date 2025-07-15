@@ -27,6 +27,7 @@ export interface IUserData {
   verified: boolean;
   isLoggedIn: boolean;
   requirementListed: boolean;
+  connections: number[];
 
 }
 export interface ILoginFormValues {
@@ -42,3 +43,16 @@ export interface IOtpFormValues {
   otp: string;
 }
 
+// Better typing for popular topics
+export interface IPopularTopic {
+  name: string;
+  slug: string;
+}
+
+// Better typing for location
+export interface ILocationData {
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+}
