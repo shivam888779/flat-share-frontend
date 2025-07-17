@@ -163,7 +163,7 @@ const PropertyInfo = () => {
                                 {/* Right Content - Property Details */}
                                 <Box sx={{ flex: 1, width: '100%' }}>
                                     {propertyDetails?.id && (
-                                        <PropertyDetails propertyDetails={propertyDetails as IPropertyDetails} />
+                                        <PropertyDetails propertyDetails={propertyDetails as IPropertyDetails} isMyProperty={false} />
                                     )}
                                 </Box>
                             </Stack>

@@ -8,7 +8,7 @@ const ListProperty = () => {
     const { type } = router.query
 
     return <Box sx={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
-        <ListPropertyForm type={String(type)} />
+        <ListPropertyForm type={String(type)} isEdit={false} />
     </Box>
 }
 

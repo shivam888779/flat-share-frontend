@@ -15,12 +15,14 @@ export const initialStateData: IInitialState = {
         token: "",
         verified: false,
         isLoggedIn: false,
-        requirementListed: false
+        requirementListed: false,
+        connections: []
     },
     highLights: [],
     resources: [],
     preferences: [],
-    notifications:[],
-    connections:[],
-    chatRooms:[]
+    notifications: [],
+    connections: [],
+    chatRooms: [],
+    myProperty: null
 }

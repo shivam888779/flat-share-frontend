@@ -18,6 +18,7 @@ export interface FormFieldSchema {
     max?: number;
     step?: number;
     InputLabelProps?: any;
+    disabled?: boolean;
 }
 
 // Data schemas

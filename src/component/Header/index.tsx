@@ -131,6 +131,12 @@ export default function Header() {
                 </ListItemIcon>
                 <ListItemText>My Profile</ListItemText>
             </MenuItem>
+            <MenuItem onClick={() => { handleNavigation('/my-property'); handleMenuClose(); }}>
+                <ListItemIcon>
+                    <Home fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>My Property</ListItemText>
+            </MenuItem>
             <MenuItem onClick={() => { handleNavigation('/connections'); handleMenuClose(); }}>
                 <ListItemIcon>
                     <Favorite fontSize="small" />
@@ -168,14 +174,14 @@ export default function Header() {
                 title: "Add Property",
                 description: "Add a new property or location for your listing",
                 icon: <Home sx={{ fontSize: 32 }} />,
-                route: "/list-property/list-property",
+                route: "/add-listing/property",
                 gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
             },
             {
                 title: "Add Requirement",
                 description: "Define requirements and prerequisites for your property",
                 icon: <Assignment sx={{ fontSize: 32 }} />,
-                route: "/list-property/list-requirement",
+                route: "/add-listing/requirement",
                 gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
             },
 

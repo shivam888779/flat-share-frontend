@@ -106,19 +106,7 @@ export const editProfileFormSchema: FormFieldSchema[] = [
         required: true,
         placeholder: "Enter your last name",
     },
-    {
-        componentType: "textField",
-        name: "email",
-        type: "email",
-        variant: "outlined",
-        fullWidth: true,
-        fieldKey: undefined,
-        schema: undefined,
-        inputLabel: "Email",
-        propsKey: ["handleChange"],
-        required: false,
-        placeholder: "your.email@example.com",
-    },
+
     {
         componentType: "textField",
         name: "phoneNo",
@@ -130,7 +118,8 @@ export const editProfileFormSchema: FormFieldSchema[] = [
         inputLabel: "Phone Number",
         propsKey: ["handleChange"],
         required: true,
-        placeholder: "9876543210",
+        placeholder: "Enter your phone number",
+        disabled: true,
         // disabled: true, // Phone number is usually not editable
     },
     {

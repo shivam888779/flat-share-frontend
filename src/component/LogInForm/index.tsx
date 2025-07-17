@@ -1,19 +1,6 @@
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import {
-  Button,
-  TextField,
-  Typography,
-  Box,
-  Stack,
-  InputAdornment,
-  Container,
-  Paper,
-  useTheme,
-  CircularProgress,
-  Fade,
-  Grow
-} from "@mui/material";
+import { Button, TextField, Typography, Box, Stack, InputAdornment, Container, Paper, useTheme, CircularProgress, Fade, Grow } from "@mui/material";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LockIcon from "@mui/icons-material/Lock";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -89,7 +76,7 @@ const LogInForm = () => {
         localStorage.setItem("authToken", data?.data?.token);
         setState({ userData: { ...data?.data, isLoggedIn: true } });
         fetchProfile();
-        snackbar.error(data?.message);
+        snackbar.success(data?.message);
         if (data?.data?.verified) {
           router.push("/");
         } else {
@@ -234,16 +221,7 @@ const LogInForm = () => {
                         <Form>
                           <Stack spacing={3}>
                             {/* Show verified number */}
-                            <Box
-                              sx={{
-                                p: 2,
-                                borderRadius: 2,
-                                bgcolor: 'action.hover',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1,
-                              }}
-                            >
+                            <Box p={2} borderRadius={2} bgcolor="action.hover" display="flex" alignItems="center" gap={1}>
                               <CheckCircleIcon color="success" fontSize="small" />
                               <Typography variant="body2">
                                 OTP sent to <strong>+91 {mobileNumber}</strong>

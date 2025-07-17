@@ -9,7 +9,7 @@ import {
     Divider
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { ILocation, IPropertyFormValues } from "@/types/property";
+import { ILocation, IPropertyDetails, IPropertyFormValues } from "@/types/property";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
 import {
@@ -30,9 +30,10 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 
 interface Props {
     type: string;
+    isEdit?: boolean;
 }
 
-const PropertyListingForm = ({ type }: Props) => {
+const ListPropertyForm = ({ type, isEdit }: Props) => {
     const [location, setLocation] = useState<ILocation>();
     const [submitted, setSubmitted] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -41,13 +42,14 @@ const PropertyListingForm = ({ type }: Props) => {
     const snackbar = useGlobalSnackbar();
     const router = useRouter();
     const { state } = useGlobalContext();
+    const myProperty = state.myProperty;
 
     const isValidType = () => {
-        return type === "list-requirement" || type === "list-property";
+        return type === "requirement" || type === "property";
     };
 
     const isRequirementForm = () => {
-        return propType === "list-requirement";
+        return propType === "requirement";
     };
 
     const formConfig = getFormConfig(
@@ -57,7 +59,7 @@ const PropertyListingForm = ({ type }: Props) => {
 
     useEffect(() => {
         if (router.isReady) {
-            if (!isValidType() && router.isReady) {
+            if (!isValidType() && router.isReady && !isEdit) {
                 router.push("/");
             } else {
                 setPropType(type);
@@ -141,6 +143,7 @@ const PropertyListingForm = ({ type }: Props) => {
         return isRequirementForm() ? 'List Requirement' : 'List Property';
     };
 
+    console.log(myProperty);
     return (
         propType && (
             <Box
@@ -159,7 +162,7 @@ const PropertyListingForm = ({ type }: Props) => {
                             color: 'text.primary',
                         }}
                     >
-                        {getFormTitle()}
+                        {isEdit ? 'Edit Your Property' : getFormTitle()}
                     </Typography>
 
                     <Paper
@@ -173,7 +176,10 @@ const PropertyListingForm = ({ type }: Props) => {
                     >
                         <Box sx={{ p: { xs: 3, sm: 4 } }}>
                             <Formik
-                                initialValues={formConfig.initialValues}
+                                initialValues={isEdit ? {
+                                    ...myProperty,
+                                    images: undefined // Reset images for edit mode since we can't convert string[] to File[]
+                                } as PropertyFormValues : formConfig.initialValues}
                                 validationSchema={formConfig.validationSchema}
                                 onSubmit={handleSubmit}
                                 enableReinitialize={true}
@@ -323,4 +329,4 @@ const PropertyListingForm = ({ type }: Props) => {
     );
 };
 
-export default PropertyListingForm;
+export default ListPropertyForm;

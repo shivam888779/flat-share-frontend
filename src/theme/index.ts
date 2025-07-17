@@ -322,6 +322,14 @@ export const createAppTheme = (mode: PaletteMode = 'light') => {
           },
         ],
       },
+      MuiGrid: {
+        styleOverrides: {
+          root: {
+            padding: '0 !important',
+            width: '100%',
+          },
+        },
+      },
 
       // Enhanced Card styles
       MuiCard: {

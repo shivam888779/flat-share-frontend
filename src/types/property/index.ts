@@ -1,15 +1,14 @@
 export interface ILocation {
-    address: string;
-    latitude?: number;
-    longitude?: number;
-  }
+  address: string;
+  latitude?: number;
+  longitude?: number;
+}
 
 export interface IPropertyUser {
   id: number;
   firstName: string;
   lastName: string;
   email: string | null;
-  password: string | null;
   phoneNo: string;
   gender: string; // You could tighten this to 'Male' | 'Female' if values are fixed
   description: string | null;
@@ -26,6 +25,7 @@ export interface IPropertyDetails {
   description: string;
   security: number | null;
   availableFrom: string; // ISO date string
+  createdAt: string; // ISO date-time string
   rent: number;
   deposit: number;
   mobile: string;
@@ -36,25 +36,25 @@ export interface IPropertyDetails {
   resources: number[];
   preferences: number[];
   images: string[] | null;
-  occupancy : string;
+  occupancy: string;
   userResponse: IPropertyUser;
 }
 
-export  interface IPropertyFormValues {
-    typeId: number;
-    rent: number|null; 
-    deposit: number|null;
-    resources: number[];
-    preferences: number[];
-    highLights: number[];
-    availableFrom: string;
-    description: string;
-    partnerGender: string;
+export interface IPropertyFormValues {
+  typeId: number;
+  rent: number | null;
+  deposit: number | null;
+  resources: number[];
+  preferences: number[];
+  highLights: number[];
+  availableFrom: string;
+  description: string;
+  partnerGender: string;
 }
-export  interface IPropertyListSearch {
-    lat:number,
-    lng:number,
-    radiusKm:number
+export interface IPropertyListSearch {
+  lat: number,
+  lng: number,
+  radiusKm: number
 }
 
 export interface SearchPropertyCard {
@@ -69,7 +69,7 @@ export interface SearchPropertyCard {
   distance: number;
   typeId: number;
   partnerGender: 'male' | 'female' | 'any'; // assuming these are the only values
-  userId:number;
+  userId: number;
 }
 
 export interface IRequirement {

@@ -8,6 +8,7 @@ import { getNotifications } from "@/api/notifications";
 import { getProfileApi } from "@/api/profiles/my-profile";
 import { getConnectionsApi } from "@/api/connections";
 import { chatApi } from "@/api/chat";
+import { IPropertyDetails } from "@/types/property";
 
 type GlobalContextType = {
   state: IInitialState;
@@ -25,6 +26,7 @@ const GlobalContext = createContext<GlobalContextType>({
   fetchProfile: async () => { },
   fetchConnections: async () => { },
   fetchChatRooms: async () => { },
+
 });
 
 const simpleReducer = (
@@ -57,7 +59,7 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
   }, [setState]);
 
 
-  const isAuthPage = ["/create-profile", "/list-property", "/my-profile", "/notifications", "/register", "/connections"]
+  const isAuthPage = ["/create-profile", "/add-listing", "/my-profile", "/notifications", "/register", "/connections", "/edit-listing"]
   // Load from localStorage first
   useEffect(() => {
     if (isAuthPage.includes(window.location.pathname) && !state.userData.isLoggedIn) {
