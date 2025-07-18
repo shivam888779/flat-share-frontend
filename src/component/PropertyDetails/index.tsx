@@ -16,7 +16,6 @@ interface IPropertyDetailsProps {
 const PropertyDetails = (props: IPropertyDetailsProps) => {
     const { propertyDetails, isMyProperty } = props;
     const { state } = useGlobalContext();
-    const myProperty = state.myProperty;
     const [isReported, setIsReported] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
 
@@ -27,10 +26,8 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
         availableFrom,
         rent,
         deposit,
-        mobile,
         isZeroDeposit,
         partnerGender,
-        typeId,
         highLights,
         resources,
         preferences,

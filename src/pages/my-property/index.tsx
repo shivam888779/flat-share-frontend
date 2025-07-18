@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { IPropertyDetails, IPropertyUser } from "@/types/property";
+import { IPropertyDetails } from "@/types/property";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useGlobalContext } from "@/global-context";
 import { getPropertyDetailsApi } from "@/api/property";
@@ -18,8 +18,6 @@ import { getPropertyDetailsApi } from "@/api/property";
 const PropertyInfo = () => {
     const { setState, state: { userData } } = useGlobalContext();
     const [propertyDetails, setPropertyDetails] = useState<IPropertyDetails | null>(null);
-
-    const [propertyUser, setPropertyUser] = useState<IPropertyUser>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -31,7 +29,7 @@ const PropertyInfo = () => {
                 setLoading(true);
                 const res = await getPropertyDetailsApi(userData?.propertySlug);
                 setPropertyDetails(res?.data?.data);
-                setState({ myProperty: {...res?.data?.data,availableFrom: res?.data?.data?.availableFrom.substring(0,10)} });
+                setState({ myProperty: { ...res?.data?.data, availableFrom: res?.data?.data?.availableFrom.substring(0, 10) } });
                 setError(null);
             } catch (err) {
                 setError("Failed to fetch property details. Please try again later.");

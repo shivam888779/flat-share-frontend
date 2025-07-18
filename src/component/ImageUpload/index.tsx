@@ -14,11 +14,11 @@ interface ImageUploadProps {
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages = 3, existingImages = [], onRemoveExistingImage }) => {
 
-  const { state: { myProperty } } = useGlobalContext(); 
+  const { state: { myProperty }, setState } = useGlobalContext();
   const router = useRouter();
   const isMyProperty = router.pathname.includes("my-property");
 
-  const [previews, setPreviews] = useState<string[]>(isMyProperty ? myProperty?.images || [] : []); 
+  const [previews, setPreviews] = useState<string[]>(isMyProperty ? myProperty?.images || [] : []);
   const [files, setFiles] = useState<File[]>([]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -27,6 +27,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
       let newFiles = [...files, ...filesArray].slice(0, maxImages - existingImages.length);
       setFiles(newFiles);
       setSelectedFiles(newFiles);
+
 
       const previewPromises = newFiles.map(
         file =>
@@ -38,6 +39,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
       );
       Promise.all(previewPromises).then(setPreviews);
       event.target.value = '';
+      if (isMyProperty) {
+        setPreviews([...myProperty?.images || [], ...previews]);
+      }
     }
   };
 
@@ -46,6 +50,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
     setFiles(newFiles);
     setSelectedFiles(newFiles);
     setPreviews(previews.filter((_, i) => i !== idx));
+    if (isMyProperty && myProperty?.id) {
+      setState({
+        myProperty: {
+          ...myProperty,
+          id: myProperty.id,
+          images: myProperty?.images?.filter((_, i) => i !== idx) || [],
+        },
+      });
+
+    }
   };
 
   return (

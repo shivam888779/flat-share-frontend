@@ -94,7 +94,8 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
         setIsSubmitting(true);
 
         try {
-            let imageUrls: string[] = [...existingImages]; // Start with existing images
+
+            let imageUrls: string[] = isEdit ? myProperty?.images || [] : [...existingImages]; // Start with existing images
 
             if (!isRequirementForm() && selectedFiles.length > 0) {
                 const uploadPromises = selectedFiles.map(file =>
@@ -113,13 +114,15 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
                     console.error("Some images failed to upload.");
                     snackbar.warning("Some images failed to upload. Please try again.");
                 }
-                imageUrls = [...existingImages, ...newUrls];
+                imageUrls = isEdit ? [...myProperty?.images || [], ...newUrls] : [...existingImages, ...newUrls];
             }
 
             const processedData = isRequirementForm()
                 ? processRequirementFormData(values as RequirementFormValues)
                 : processPropertyFormData(values as PropertyFormValues);
 
+            console.log("selectedFiles", selectedFiles, myProperty?.images);
+            console.log("imageUrls", imageUrls);
             const finalSubmission = {
                 ...processedData,
                 location,
@@ -208,7 +211,7 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
                                                 setSelectedFiles={setSelectedFiles} // Remove this from DynamicFormRenderer if not needed
                                             />
 
-                                           
+
 
                                             {/* Submit Button */}
                                             <Button
