@@ -1,15 +1,11 @@
 'use client'
 import * as React from 'react';
-import { styled, alpha, useTheme } from '@mui/material/styles';
-import { Dialog, DialogContent, DialogTitle, useMediaQuery } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import {
-    AppBar,
     Box,
-    Toolbar,
     IconButton,
     Typography,
-    InputBase,
-    Badge,
     MenuItem,
     Menu,
     Button,
@@ -17,37 +13,18 @@ import {
     Divider,
     ListItemIcon,
     ListItemText,
-    Drawer,
-    List,
-    ListItem,
-    ListItemButton,
-    Collapse,
-    Fab,
-    ClickAwayListener,
-    Grow,
-    Paper,
-    Popper
+
 } from '@mui/material';
 import {
-    Search,
     AccountCircle,
-    Notifications,
-    More,
     Home,
-    Apartment,
     Person,
     Settings,
     Logout,
-    Add,
     Favorite,
     Message,
     Close,
-    FilterList,
-    LocationOn,
-    KeyboardArrowDown,
-    Business,
     Assignment,
-    School
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import { useGlobalContext } from '@/global-context';
@@ -56,26 +33,12 @@ import SelectListingCard from '@/component/SelectListingCard';
 import { IUserData } from '@/types/user';
 
 
-const Logo = styled(Typography)(({ theme }) => ({
-    fontWeight: 700,
-    fontSize: '1.5rem',
-    color: theme.palette.common.white,
-    cursor: 'pointer',
-    '&:hover': {
-        opacity: 0.8,
-    },
-    [theme.breakpoints.down('sm')]: {
-        fontSize: '1.2rem',
-    },
-}));
-
 
 export default function Header() {
     const router = useRouter();
     const { state, setState } = useGlobalContext();
     const isLoggedIn = state?.userData?.isLoggedIn;
     const userData = state?.userData;
-    const theme = useTheme();
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -131,17 +94,17 @@ export default function Header() {
                 </ListItemIcon>
                 <ListItemText>My Profile</ListItemText>
             </MenuItem>
-            <MenuItem onClick={() => { handleNavigation('/my-property'); handleMenuClose(); }}>
+           {userData?.requirementListed && <MenuItem onClick={() => { handleNavigation('/my-property'); handleMenuClose(); }}>
                 <ListItemIcon>
                     <Home fontSize="small" />
                 </ListItemIcon>
                 <ListItemText>My Property</ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => { handleNavigation('/connections'); handleMenuClose(); }}>
+            </MenuItem>}
+            <MenuItem onClick={() => { handleNavigation('/chat'); handleMenuClose(); }}>
                 <ListItemIcon>
                     <Favorite fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>Favorites</ListItemText>
+                <ListItemText>Messages</ListItemText>
             </MenuItem>
             <MenuItem onClick={() => { handleNavigation('/connections'); handleMenuClose(); }}>
                 <ListItemIcon>

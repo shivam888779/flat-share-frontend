@@ -260,7 +260,7 @@ const MyProfileComponent = () => {
                 >
                   {({ handleChange, values, touched, errors, setFieldValue, isValid, dirty }) => (
                     <Form>
-                      <Grid container spacing={3}>
+                      <Grid container spacing={3} mx={"auto"} my={3}>
                         <Grid item xs={12}>
                           <DynamicFormRenderer
                             schema={editProfileFormSchema}
@@ -296,7 +296,7 @@ const MyProfileComponent = () => {
                   )}
                 </Formik>
               ) : (
-                <Grid container spacing={3}>
+                <Grid container spacing={3} mx={"auto"} my={3}>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" color="text.secondary" mb={0.5}>
                       First Name

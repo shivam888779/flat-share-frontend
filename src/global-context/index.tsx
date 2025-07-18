@@ -123,6 +123,7 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
   const fetchConnections = useCallback(async () => {
     try {
       const res = await getConnectionsApi();
+      console.log(res?.data?.data);
       setState({ connections: res?.data?.data || [] });
     } catch (e) {
       console.error("Failed to fetch profile", e);

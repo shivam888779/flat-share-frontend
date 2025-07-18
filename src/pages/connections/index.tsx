@@ -64,7 +64,7 @@ const ConnectionsPage: React.FC = () => {
     });
     const snackbar = useGlobalSnackbar();
     const { fetchConnections, state: { connections } } = useGlobalContext();
-
+    console.log(connections);
     // Get filtered connections
     const getFilteredConnections = (filterValue: string, currentUserId: number): IConnection[] => {
         if (!connections || connections.length === 0) {
@@ -192,7 +192,11 @@ const ConnectionsPage: React.FC = () => {
 
 
     useEffect(() => {
-        fetchConnections();
+        const fetchData = async () => {
+            await fetchConnections();
+            setLoading(false);
+        }
+        fetchData();
     }, []);
 
     if (loading) {

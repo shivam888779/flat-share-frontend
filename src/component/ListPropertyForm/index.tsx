@@ -23,7 +23,7 @@ import {
     processRequirementFormData
 } from "@/api/property/list-property-data";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
-import { listPropertyApi } from "@/api/property";
+import { listPropertyApi, updatePropertyApi } from "@/api/property";
 import { useRouter } from "next/router";
 import { useGlobalContext } from "@/global-context";
 import HomeIcon from '@mui/icons-material/Home';
@@ -37,7 +37,7 @@ interface Props {
 }
 
 const ListPropertyForm = ({ type, isEdit }: Props) => {
-    const [location, setLocation] = useState<ILocation>();
+
     const [submitted, setSubmitted] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,11 +46,14 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
     const router = useRouter();
     const { state } = useGlobalContext();
     const myProperty = state.myProperty;
-    const [existingImages, setExistingImages] = useState<string[]>(isEdit ? myProperty?.images || [] : []);
+    const [existingImages, setExistingImages] = useState<string[]>(
+        isEdit ? (myProperty?.images ?? []) : []
+    );
+    const [location, setLocation] = useState<ILocation | null>(
+        isEdit ? (myProperty?.location ?? null) : null
+    );
 
-    const isValidType = () => {
-        return type === "requirement" || type === "property";
-    };
+    const isValidType = () => type === "requirement" || type === "property";
 
     const isRequirementForm = () => {
         return propType === "requirement";
@@ -128,10 +131,15 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
                 location,
                 images: imageUrls,
             };
+            if (isEdit) {
+                const { data } = await updatePropertyApi(finalSubmission);
+                snackbar.success(data?.message || 'Successfully updated!');
+            } else {
+                const { data } = await listPropertyApi(finalSubmission);
+                snackbar.success(data?.message || 'Successfully submitted!');
+            }
 
-            const { data } = await listPropertyApi(finalSubmission);
 
-            snackbar.success(data?.message || 'Successfully submitted!');
             setSubmitted(true);
 
             setTimeout(() => {
