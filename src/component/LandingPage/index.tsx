@@ -17,7 +17,7 @@ import router from 'next/router';
 import { ILocationData, IPopularTopic } from '@/types/user';
 
 const libraries: ("places")[] = ["places"];
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyBkEMXezDZpWUD6XuDFLf07bao3kJq4f_Q";
 
 const LandingPage: React.FC = () => {
   const theme = useTheme();
@@ -216,7 +216,7 @@ const LandingPage: React.FC = () => {
               inputRef={inputRef}
               sx={{
                 backgroundColor: theme.palette.common.white,
-                borderRadius: '9999px'
+                borderRadius: '9999px',
               }}
               InputProps={{
                 sx: {
@@ -234,7 +234,8 @@ const LandingPage: React.FC = () => {
                       boxShadow: '0 15px 50px rgba(0,0,0,0.12)'
                     }
                   },
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  padding: '0 0.25rem'
                 }
               }}
             />
@@ -267,6 +268,8 @@ const LandingPage: React.FC = () => {
 
         {/* Popular Areas */}
         <Box
+          position="relative"
+          zIndex={10}
           sx={{
             mb: theme.spacing(6),
             animation: 'fadeInUp 0.6s ease-out',
@@ -322,29 +325,7 @@ const LandingPage: React.FC = () => {
         </Box>
 
         {/* Illustration Container */}
-        <Box
-          sx={{
-            position: 'relative',
-            height: '24rem',
-            mt: theme.spacing(8),
-            overflow: 'hidden',
-            transition: 'all 0.5s ease',
-            background: isNight
-              ? 'linear-gradient(to bottom, #374151, #1f2937)'
-              : 'linear-gradient(to bottom, transparent, #dbeafe)'
-          }}
-        >
-          {/* Clouds */}
-          <div className="cloud cloud1"></div>
-          <div className="cloud cloud2"></div>
 
-          {/* Buildings */}
-          <div className={`building house1 hover:scale-105 hover-brightness-120 ${isNight ? 'night' : ''}`}></div>
-          <div className={`building building2 hover:scale-105 hover-brightness-120 ${isNight ? 'night' : ''}`}></div>
-          <div className={`building building3 hover:scale-105 hover-brightness-120 ${isNight ? 'night' : ''}`}></div>
-          <div className={`building house4 hover:scale-105 hover-brightness-120 ${isNight ? 'night' : ''}`}></div>
-          <div className={`building building5 hover:scale-105 hover-brightness-120 ${isNight ? 'night' : ''}`}></div>
-        </Box>
       </Box>
     </Box>
   )
