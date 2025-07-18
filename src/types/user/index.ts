@@ -28,7 +28,7 @@ export interface IUserData {
   isLoggedIn: boolean;
   requirementListed: boolean;
   connections: number[];
-
+  propertySlug: string;
 }
 export interface ILoginFormValues {
   email: string;

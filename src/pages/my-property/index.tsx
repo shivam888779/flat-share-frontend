@@ -13,85 +13,36 @@ import { useRouter } from "next/router";
 import { IPropertyDetails, IPropertyUser } from "@/types/property";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useGlobalContext } from "@/global-context";
+import { getPropertyDetailsApi } from "@/api/property";
 
 const PropertyInfo = () => {
-    const { setState } = useGlobalContext();
-    const [propertyDetails, setPropertyDetails] = useState<IPropertyDetails>({
-        "location": {
-            "address": "H9G4+8WH, Morna, Sector 35, Noida, Uttar Pradesh 201307, India",
-            "latitude": 28.5759152,
-            "longitude": 77.35734479999999
-        },
-        "id": 16,
-        "userId": 23,
-        "description": "3e32r32wr3fd",
-        "security": null,
-        "availableFrom": "2025-07-17",
-        "createdAt": "2025-07-02T15:58:35.406461",
-        "rent": 234,
-        "deposit": 322,
-        "mobile": "5884845525",
-        "isZeroDeposit": null,
-        "partnerGender": "female",
-        "typeId": 1,
-        "highLights": [
-            3,
-            7
-        ],
-        "resources": [
-            4,
-            3,
-            7
-        ],
-        "preferences": [
-            2,
-            6,
-            7
-        ],
-        "images": [
-            "http://35.232.250.35/api/upload/image/property-MTc1MTQ3MTkxMzkyNHdhbGxwYXBlcmZs.jpg"
-        ],
-        "userResponse": {
-            "id": 23,
-            "firstName": "aasw",
-            "lastName": "scscc",
-            "email": null,
-            "phoneNo": "5884845525",
-            "gender": "Female",
-            "description": null,
-            "profileImage": "http://35.232.250.35/api/upload/image/profile-MTc1MTQ3MTg1NjYzOHRleHQuamZpZmV5.jfif",
-            "requirementListed": true,
-            "createdAt": "2025-07-02T15:57:39.536189",
-            "updatedAt": "2025-07-02T15:58:35.436275",
-            // "connections": []
-        },
-        "occupancy": "double"
-    });
-    useEffect(() => {
-        setState({ myProperty: propertyDetails });
-    }, []);
+    const { setState, state: { userData } } = useGlobalContext();
+    const [propertyDetails, setPropertyDetails] = useState<IPropertyDetails | null>(null);
+
     const [propertyUser, setPropertyUser] = useState<IPropertyUser>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const { id } = router.query;
 
-    // useEffect(() => {
-    //     const fetchDetails = async () => {
-    //         try {
-    //             setLoading(true);
-    //             const res = await getPropertyDetailsApi(id as string);
-    //             setPropertyDetails(res?.data?.data);
-    //             setError(null);
-    //         } catch (err) {
-    //             setError("Failed to fetch property details. Please try again later.");
-    //             setPropertyDetails(undefined);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-    //     if (id) fetchDetails();
-    // }, [id]);
+    useEffect(() => {
+        const fetchDetails = async () => {
+            try {
+                setLoading(true);
+                const res = await getPropertyDetailsApi(userData?.propertySlug);
+                setPropertyDetails(res?.data?.data);
+                setState({ myProperty: {...res?.data?.data,availableFrom: res?.data?.data?.availableFrom.substring(0,10)} });
+                setError(null);
+            } catch (err) {
+                setError("Failed to fetch property details. Please try again later.");
+                setState({ myProperty: null });
+                setPropertyDetails(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDetails();
+    }, []);
 
     if (loading) {
         return (

@@ -16,6 +16,7 @@ export const initialStateData: IInitialState = {
         verified: false,
         isLoggedIn: false,
         requirementListed: false,
+        propertySlug: "",
         connections: []
     },
     highLights: [],

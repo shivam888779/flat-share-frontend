@@ -6,7 +6,8 @@ import {
     Box,
     Stack,
     Paper,
-    Divider
+    Divider,
+    IconButton
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ILocation, IPropertyDetails, IPropertyFormValues } from "@/types/property";
@@ -27,6 +28,8 @@ import { useRouter } from "next/router";
 import { useGlobalContext } from "@/global-context";
 import HomeIcon from '@mui/icons-material/Home';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import CloseIcon from '@mui/icons-material/Close';
+import ImageUpload from "@/component/ImageUpload";
 
 interface Props {
     type: string;
@@ -43,6 +46,7 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
     const router = useRouter();
     const { state } = useGlobalContext();
     const myProperty = state.myProperty;
+    const [existingImages, setExistingImages] = useState<string[]>(isEdit ? myProperty?.images || [] : []);
 
     const isValidType = () => {
         return type === "requirement" || type === "property";
@@ -67,6 +71,10 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
         }
     }, [router, type]);
 
+    const handleRemoveExistingImage = (url: string) => {
+        setExistingImages((prev) => prev.filter((img) => img !== url));
+    };
+
     const handleSubmit = async (values: PropertyFormValues | RequirementFormValues) => {
         const validation = isRequirementForm()
             ? await validateRequirementForm(values as RequirementFormValues)
@@ -78,7 +86,7 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
             return;
         }
 
-        if (!isRequirementForm() && selectedFiles.length === 0) {
+        if (!isRequirementForm() && selectedFiles.length === 0 && existingImages.length === 0) {
             snackbar.error("Please select at least one image.");
             return;
         }
@@ -86,7 +94,7 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
         setIsSubmitting(true);
 
         try {
-            let imageUrls: string[] = [];
+            let imageUrls: string[] = [...existingImages]; // Start with existing images
 
             if (!isRequirementForm() && selectedFiles.length > 0) {
                 const uploadPromises = selectedFiles.map(file =>
@@ -97,14 +105,15 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
                 );
 
                 const uploadResults = await Promise.all(uploadPromises);
-                imageUrls = uploadResults
+                const newUrls = uploadResults
                     .filter(result => result && result.publicUrl)
                     .map(result => result.publicUrl);
 
-                if (imageUrls.length !== selectedFiles.length) {
+                if (newUrls.length !== selectedFiles.length) {
                     console.error("Some images failed to upload.");
                     snackbar.warning("Some images failed to upload. Please try again.");
                 }
+                imageUrls = [...existingImages, ...newUrls];
             }
 
             const processedData = isRequirementForm()
@@ -196,8 +205,10 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
                                                 handleChange={handleChange}
                                                 setFieldValue={setFieldValue}
                                                 setLocation={setLocation}
-                                                setSelectedFiles={setSelectedFiles}
+                                                setSelectedFiles={setSelectedFiles} // Remove this from DynamicFormRenderer if not needed
                                             />
+
+                                           
 
                                             {/* Submit Button */}
                                             <Button
