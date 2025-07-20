@@ -1,4 +1,4 @@
-import { ConnectUser, PropertyDetails } from "@/component";
+import { ConnectUser, LogInModal, PropertyDetails } from "@/component";
 import {
     Box,
     Stack,
@@ -81,6 +81,7 @@ const PropertyInfo = () => {
                 py: 4,
             }}
         >
+
             <Container maxWidth="xl">
                 <Fade in={true} timeout={600}>
                     <Stack spacing={3}>

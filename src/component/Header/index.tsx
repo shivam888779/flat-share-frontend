@@ -31,14 +31,16 @@ import { useGlobalContext } from '@/global-context';
 import Link from 'next/link';
 import SelectListingCard from '@/component/SelectListingCard';
 import { IUserData } from '@/types/user';
+import LogInModal from '../LogInModal';
 
 
 
 export default function Header() {
     const router = useRouter();
-    const { state, setState } = useGlobalContext();
+    const { state, setState, handleLoginDialog } = useGlobalContext();
     const isLoggedIn = state?.userData?.isLoggedIn;
     const userData = state?.userData;
+
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -57,7 +59,7 @@ export default function Header() {
         handleMenuClose();
         localStorage.clear();
         setState({ userData: { isLoggedIn: false } as IUserData });
-        router.push('/login');
+        router.push('/');
     };
 
     const handleNavigation = (path: string) => {
@@ -84,6 +86,7 @@ export default function Header() {
             PaperProps={{
                 sx: {
                     minWidth: 200,
+
                     mt: 1,
                 },
             }}
@@ -94,7 +97,7 @@ export default function Header() {
                 </ListItemIcon>
                 <ListItemText>My Profile</ListItemText>
             </MenuItem>
-           {userData?.requirementListed && <MenuItem onClick={() => { handleNavigation('/my-property'); handleMenuClose(); }}>
+            {userData?.requirementListed && <MenuItem onClick={() => { handleNavigation('/my-property'); handleMenuClose(); }}>
                 <ListItemIcon>
                     <Home fontSize="small" />
                 </ListItemIcon>
@@ -271,6 +274,7 @@ export default function Header() {
 
     return (
         <>
+            <LogInModal open={state.openLoginDialog} onClose={() => handleLoginDialog(false)} />
             <header className="fixed top-0 w-full  bg-white shadow-md z-50 animate-slideDown">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16  items-center py-2">

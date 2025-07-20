@@ -13,4 +13,5 @@ export interface IInitialState {
     connections: IConnection[]
     chatRooms: IChatRoom[]
     myProperty: IPropertyDetails | null
+    openLoginDialog: boolean
 }

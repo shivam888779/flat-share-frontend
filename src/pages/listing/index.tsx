@@ -149,6 +149,7 @@ export default function Listing() {
                         >
                             {propertyList.map((data, index) => (
                                 <Grow
+                                    className="property-card"
                                     in={true}
                                     key={index}
                                     style={{ transformOrigin: '0 0 0' }}

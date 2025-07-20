@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardMedia,
   Typography,
   Box,
   Stack,
@@ -10,7 +9,6 @@ import {
   Button,
   Avatar,
   Tooltip,
-  LinearProgress,
   CircularProgress,
   Link
 } from '@mui/material';
@@ -19,9 +17,7 @@ import {
   Favorite,
   FavoriteBorder,
   Share,
-  Verified,
   Home,
-  People,
   Chat,
   Phone,
   CalendarToday,
@@ -35,6 +31,7 @@ import { formatDistanceToNow } from '@/utils/dataFormate';
 import { getGenderPreference, getPropertyType } from '@/api/property/list-property-data';
 import { useGlobalContext } from '@/global-context';
 import { useGlobalSnackbar } from '@/hooks/useSnackbar';
+import { useRouter } from 'next/router';
 
 // Simple date formatting without external dependency
 
@@ -49,10 +46,10 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
   // Use provided propertyDetails or fall back to dummy data
   const data = propertyDetails;
   const [isFavorite, setIsFavorite] = useState(false);
-  const { state } = useGlobalContext();
+  const { state, handleLoginDialog } = useGlobalContext();
   const { success } = useGlobalSnackbar()
   const { connections, userData } = state;
-
+  const router = useRouter();
   // Format the date
   const formattedDate = formatDistanceToNow(new Date(data?.listedOn ?? ''), { addSuffix: true });
 
@@ -62,17 +59,35 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
   const genderPref = getGenderPreference(data?.partnerGender ?? '');
   const [openRequestContact, setOpenRequestContact] = useState(false);
 
-  const handleContact = () => {
+  const handleContact = (type: "chat" | "phone") => {
+    if (!userData.isLoggedIn) {
+      handleLoginDialog(true);
+      return;
+    }
     if (userData.connections.includes(data?.userId ?? 0)) {
+      if (type === "phone") {
 
-      const connectionData = connections.find(connection => connection.otherUser?.id === data?.userId);
-      if (connectionData?.otherUser?.phoneNo) {
-        window.location.href = `tel:${connectionData.otherUser.phoneNo}`;
+        const connectionData = connections.find(connection => connection.otherUser?.id === data?.userId);
+        if (connectionData?.otherUser?.phoneNo) {
+          window.location.href = `tel:${connectionData.otherUser.phoneNo}`;
+        }
+
       }
-      success('You are already connected to this user');
-    } else {
+
+      else if (type === "chat") {
+        success('You are already connected to this user');
+      }
+    }
+    else {
       setOpenRequestContact(true);
     }
+  }
+  const handleRoute = (path: string) => {
+    if (!userData.isLoggedIn) {
+      handleLoginDialog(true);
+      return;
+    }
+    router.push(path);
   }
 
   return (<>
@@ -83,6 +98,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
 
       <Box
         sx={{
+          display: { xs: 'none', md: 'flex' },
           position: 'absolute',
           top: -12,
           right: 16,
@@ -90,7 +106,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
           height: 48,
           borderRadius: '12px',
           background: 'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)',
-          display: 'flex',
+
           alignItems: 'center',
           justifyContent: 'center',
           boxShadow: '0 4px 20px rgba(108, 92, 231, 0.3)',
@@ -124,6 +140,8 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
               </Typography>
             </Stack>
           </Box>
+
+
 
           {/* Match Percentage */}
           {data?.matchPercentage && (
@@ -166,7 +184,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
 
       <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', pt: 0 }}>
         {/* Location and Distance */}
-        <Link href={`/property/${data?.slug}`}>
+        <div onClick={() => handleRoute(`/property/${data?.slug}`)} className='cursor-pointer'>
           <Stack spacing={1} mb={2}>
             <Stack direction="row" alignItems="flex-start" spacing={0.5}>
               <LocationOn sx={{ fontSize: 18, mt: 0.5, color: 'text.secondary' }} />
@@ -175,7 +193,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
               </Typography>
             </Stack>
 
-            <Stack direction="row" alignItems="center" spacing={2}>
+            <Stack direction="row" alignItems="center" spacing={2} >
               <Chip
                 icon={<Speed sx={{ fontSize: 16 }} />}
                 label={`${data?.distance?.toFixed(1) ?? 0} km away`}
@@ -186,101 +204,147 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
                   fontWeight: 500
                 }}
               />
+              <Chip
+                label={getPropertyType(data?.typeId ?? 0)}
+                size="small"
+                sx={{
+                  display: { xs: 'none', md: 'block' },
+                  backgroundColor: '#e8f4ff',
+                  color: '#0984e3',
+                  fontWeight: 500
+                }}
+              />
+              <Chip
+                icon={<PersonOutline sx={{ fontSize: 16 }} />}
+                label={genderPref.label}
+                size="small"
+                sx={{
+                  backgroundColor: `${genderPref.color}20`,
+                  color: genderPref.color,
+                  fontWeight: 500
+                }}
+              />
             </Stack>
-          </Stack>
-        </Link>
-        {/* Price Section */}
-        <Box
-          sx={{
-            backgroundColor: '#f8f9fa',
-            borderRadius: '12px',
-            p: 2,
-            mb: 2
-          }}
-        >
-          <Typography
-            variant="h4"
-            sx={{
-              color: '#6c5ce7',
-              fontWeight: 700
-            }}
-          >
-            {data?.rent ?? 0}
-            <Typography
-              component="span"
-              variant="body1"
-              sx={{ color: '#636e72', fontWeight: 400 }}
-            >
-              /month
-            </Typography>
-          </Typography>
-        </Box>
-
-        {/* Property Details */}
-        <Stack spacing={2} mb={2}>
-          <Stack direction="row" spacing={1}>
             <Chip
               label={getPropertyType(data?.typeId ?? 0)}
               size="small"
               sx={{
+                width: 'fit-content',
+                display: { xs: 'flex', md: 'none' },
                 backgroundColor: '#e8f4ff',
                 color: '#0984e3',
                 fontWeight: 500
               }}
             />
-            <Chip
-              icon={<PersonOutline sx={{ fontSize: 16 }} />}
-              label={genderPref.label}
-              size="small"
-              sx={{
-                backgroundColor: `${genderPref.color}20`,
-                color: genderPref.color,
-                fontWeight: 500
-              }}
-            />
+            <Stack direction="row" justifyContent="space-between" alignItems="center" >
+              <Box
+                sx={{
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '12px',
+                  p: { xs: 1, md: 2 },
+                  py: 2
+                }}
+              >
+                <Typography
+                  variant="h4"
+                  sx={{
+                    color: '#6c5ce7',
+                    fontWeight: 700
+                  }}
+                >
+                  {data?.rent ?? 0}
+                  <Typography
+                    component="span"
+                    variant="body1"
+                    sx={{ color: '#636e72', fontWeight: 400 }}
+                  >
+                    /month
+                  </Typography>
+                </Typography>
+              </Box>
+              <Stack direction="row" spacing={1} sx={{ display: { xs: 'flex', md: 'none' } }}>
+                <Tooltip title="Save to favorites">
+                  <IconButton
+                    onClick={() => setIsFavorite(!isFavorite)}
+                    sx={{
+                      border: '2px solid',
+                      borderColor: isFavorite ? '#e84393' : '#e0e0e0',
+                      '&:hover': {
+                        borderColor: '#e84393',
+                        backgroundColor: 'rgba(232, 67, 147, 0.05)'
+                      }
+                    }}
+                  >
+                    {isFavorite ? (
+                      <Favorite sx={{ color: '#e84393' }} />
+                    ) : (
+                      <FavoriteBorder />
+                    )}
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title="Share">
+                  <IconButton
+                    sx={{
+                      border: '2px solid #e0e0e0',
+                      '&:hover': {
+                        borderColor: '#6c5ce7',
+                        backgroundColor: 'rgba(108, 92, 231, 0.05)'
+                      }
+                    }}
+                  >
+                    <Share />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Stack>
+
           </Stack>
-        </Stack>
+        </div>
+        {/* Price Section */}
 
 
         <Stack direction="row" spacing={1} sx={{ mt: 'auto' }}>
-          <Tooltip title="Save to favorites">
-            <IconButton
-              onClick={() => setIsFavorite(!isFavorite)}
-              sx={{
-                border: '2px solid',
-                borderColor: isFavorite ? '#e84393' : '#e0e0e0',
-                '&:hover': {
-                  borderColor: '#e84393',
-                  backgroundColor: 'rgba(232, 67, 147, 0.05)'
-                }
-              }}
-            >
-              {isFavorite ? (
-                <Favorite sx={{ color: '#e84393' }} />
-              ) : (
-                <FavoriteBorder />
-              )}
-            </IconButton>
-          </Tooltip>
+          <Stack direction="row" spacing={1} sx={{ mt: 'auto', display: { xs: 'none', md: 'flex' } }}>
+            <Tooltip title="Save to favorites">
+              <IconButton
+                onClick={() => setIsFavorite(!isFavorite)}
+                sx={{
+                  border: '2px solid',
+                  borderColor: isFavorite ? '#e84393' : '#e0e0e0',
+                  '&:hover': {
+                    borderColor: '#e84393',
+                    backgroundColor: 'rgba(232, 67, 147, 0.05)'
+                  }
+                }}
+              >
+                {isFavorite ? (
+                  <Favorite sx={{ color: '#e84393' }} />
+                ) : (
+                  <FavoriteBorder />
+                )}
+              </IconButton>
+            </Tooltip>
 
-          <Tooltip title="Share">
-            <IconButton
-              sx={{
-                border: '2px solid #e0e0e0',
-                '&:hover': {
-                  borderColor: '#6c5ce7',
-                  backgroundColor: 'rgba(108, 92, 231, 0.05)'
-                }
-              }}
-            >
-              <Share />
-            </IconButton>
-          </Tooltip>
-
+            <Tooltip title="Share">
+              <IconButton
+                sx={{
+                  border: '2px solid #e0e0e0',
+                  '&:hover': {
+                    borderColor: '#6c5ce7',
+                    backgroundColor: 'rgba(108, 92, 231, 0.05)'
+                  }
+                }}
+              >
+                <Share />
+              </IconButton>
+            </Tooltip>
+          </Stack>
           <Button
             variant="outlined"
             fullWidth
             startIcon={<Chat />}
+            onClick={() => handleContact("chat")}
           >
             Message
           </Button>
@@ -290,7 +354,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
             fullWidth
             startIcon={<Phone />}
             // href={`tel:${data?.phoneNo ?? ''}`}
-            onClick={handleContact}
+            onClick={() => handleContact("phone")}
 
           >
             Call

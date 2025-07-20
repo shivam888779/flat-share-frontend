@@ -34,5 +34,11 @@ const formatDistanceToNow = (date: Date, options?: { addSuffix?: boolean }) => {
     const diffInYears = Math.floor(diffInDays / 365);
     return options?.addSuffix ? `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago` : `${diffInYears} year${diffInYears > 1 ? 's' : ''}`;
 };
-
-export { formatDistanceToNow };
+const getFormatedDate = (date: Date) => {
+    return new Date(date).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+};
+export { formatDistanceToNow, getFormatedDate };

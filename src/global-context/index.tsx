@@ -17,6 +17,7 @@ type GlobalContextType = {
   fetchProfile: () => Promise<void>;
   fetchConnections: () => Promise<void>;
   fetchChatRooms: () => Promise<void>;
+  handleLoginDialog: (open: boolean) => void;
 };
 
 const GlobalContext = createContext<GlobalContextType>({
@@ -26,7 +27,7 @@ const GlobalContext = createContext<GlobalContextType>({
   fetchProfile: async () => { },
   fetchConnections: async () => { },
   fetchChatRooms: async () => { },
-
+  handleLoginDialog: () => { },
 });
 
 const simpleReducer = (
@@ -120,6 +121,10 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     }
   }, [setState]);
 
+  const handleLoginDialog = useCallback((open: boolean) => {
+    setState({ openLoginDialog: open });
+  }, [setState]);
+
   const fetchConnections = useCallback(async () => {
     try {
       const res = await getConnectionsApi();
@@ -167,8 +172,9 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     fetchNotification,
     fetchProfile,
     fetchConnections,
-    fetchChatRooms
-  }), [state, fetchNotification, fetchProfile, fetchConnections, fetchChatRooms]);
+    fetchChatRooms,
+    handleLoginDialog
+  }), [state, fetchNotification, fetchProfile, fetchConnections, fetchChatRooms, handleLoginDialog]);
 
   // Save to localStorage when state changes (but not during initial load)
   useEffect(() => {

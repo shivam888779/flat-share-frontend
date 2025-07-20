@@ -38,9 +38,10 @@ const LogInForm = () => {
   const [resendTimer, setResendTimer] = useState(0);
 
   const snackbar = useGlobalSnackbar();
-  const { setState, fetchProfile } = useGlobalContext();
+  const { setState, fetchProfile, handleLoginDialog, state } = useGlobalContext();
   const router = useRouter();
   const theme = useTheme();
+  const openLoginDialog = state?.openLoginDialog;
 
   // Timer for resend OTP
   useState(() => {
@@ -78,7 +79,14 @@ const LogInForm = () => {
         fetchProfile();
         snackbar.success(data?.message);
         if (data?.data?.verified) {
-          router.push("/");
+          console.log(openLoginDialog);
+          if (openLoginDialog) {
+            snackbar.success("Login successful");
+            handleLoginDialog(false);
+          }
+          else {
+            router.push("/");
+          }
         } else {
           router.push('/create-profile');
         }
@@ -103,237 +111,221 @@ const LogInForm = () => {
   };
 
   return (
-    <Box
-      className="gradient-background"
-    >
-      <Container maxWidth="sm">
-        <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="93vh"
-          // py={4}
-          position="relative"
-          zIndex={1}
-        >
-          <Grow in timeout={800}>
-            <Paper
-              elevation={3}
-              className="paper-card"
-            >
-              {/* Logo/Icon */}
-              <Box display="flex" justifyContent="center" mb={3}>
-                <Box className="logo-icon-box">
-                  <PhoneIcon />
-                </Box>
-              </Box>
-
-              {/* Title */}
-              <Typography
-                variant="h4"
-                component="h1"
-                fontWeight="bold"
-                textAlign="center"
-                mb={1}
-                sx={{ letterSpacing: '-0.01562em' }}
-              >
-                Welcome Back
-              </Typography>
-
-              <Typography
-                variant="subtitle1"
-                textAlign="center"
-                color="text.secondary"
-                mb={4}
-              >
-                Sign in with your phone number
-              </Typography>
-
-              {!isOtpSent ? (
-                <Fade in timeout={500}>
-                  <Box>
-                    <Formik
-                      initialValues={mobileInitialValues}
-                      validationSchema={mobileValidationSchema}
-                      onSubmit={handleMobileSubmit}
-                    >
-                      {({ handleChange, values, touched, errors }) => (
-                        <Form>
-                          <Stack spacing={3}>
-                            <TextField
-                              id="mobile"
-                              name="mobile"
-                              label="Mobile Number"
-                              variant="outlined"
-                              fullWidth
-                              value={values.mobile}
-                              onChange={handleChange}
-                              error={touched.mobile && Boolean(errors.mobile)}
-                              helperText={touched.mobile && errors.mobile}
-                              placeholder="Enter 10-digit number"
-                              disabled={isLoading}
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    <Typography color="text.secondary">+91</Typography>
-                                  </InputAdornment>
-                                ),
-                              }}
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  '&:hover fieldset': {
-                                    borderColor: theme.palette.primary.main,
-                                  },
-                                },
-                              }}
-                            />
-
-                            <Button
-                              type="submit"
-                              variant="gradient"
-                              fullWidth
-                              size="large"
-                              disabled={isLoading}
-
-                            >
-                              {isLoading ? (
-                                <CircularProgress size={24} color="inherit" />
-                              ) : (
-                                'Send OTP'
-                              )}
-                            </Button>
-                          </Stack>
-                        </Form>
-                      )}
-                    </Formik>
-                  </Box>
-                </Fade>
-              ) : (
-                <Fade in timeout={500}>
-                  <Box>
-                    <Formik
-                      initialValues={otpInitialValues}
-                      validationSchema={otpValidationSchema}
-                      onSubmit={handleOtpSubmit}
-                    >
-                      {({ handleChange, values, touched, errors }) => (
-                        <Form>
-                          <Stack spacing={3}>
-                            {/* Show verified number */}
-                            <Box p={2} borderRadius={2} bgcolor="action.hover" display="flex" alignItems="center" gap={1}>
-                              <CheckCircleIcon color="success" fontSize="small" />
-                              <Typography variant="body2">
-                                OTP sent to <strong>+91 {mobileNumber}</strong>
-                              </Typography>
-                            </Box>
-
-                            <TextField
-                              id="otp"
-                              name="otp"
-                              label="Enter 6-digit OTP"
-                              variant="outlined"
-                              fullWidth
-                              value={values.otp}
-                              onChange={handleChange}
-                              error={touched.otp && Boolean(errors.otp)}
-                              helperText={touched.otp && errors.otp}
-                              disabled={isLoading}
-                              inputProps={{
-                                maxLength: 6,
-                                style: { textAlign: 'center', letterSpacing: '0.5em' }
-                              }}
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    <LockIcon color="action" />
-                                  </InputAdornment>
-                                ),
-                              }}
-                            />
-
-                            <Button
-                              type="submit"
-                              variant="gradient"
-                              fullWidth
-                              size="large"
-                              disabled={isLoading}
-
-                            >
-                              {isLoading ? (
-                                <CircularProgress size={24} color="inherit" />
-                              ) : (
-                                'Verify OTP'
-                              )}
-                            </Button>
-
-                            {/* Resend OTP and Change Number */}
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                              <Button
-                                size="small"
-                                onClick={handleResendOtp}
-                                disabled={resendTimer > 0 || isLoading}
-                                sx={{ textTransform: 'none' }}
-                              >
-                                {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
-                              </Button>
-
-                              <Button
-                                size="small"
-                                onClick={handleChangeNumber}
-                                disabled={isLoading}
-                                sx={{ textTransform: 'none' }}
-                              >
-                                Change Number
-                              </Button>
-                            </Stack>
-                          </Stack>
-                        </Form>
-                      )}
-                    </Formik>
-                  </Box>
-                </Fade>
-              )}
-
-              {/* Terms */}
-              <Typography
-                variant="caption"
-                display="block"
-                textAlign="center"
-                color="text.secondary"
-                mt={4}
-                sx={{ lineHeight: 1.6 }}
-              >
-                By continuing, you agree to our{' '}
-                <Typography
-                  component="a"
-                  href="/terms"
-                  color="primary"
-                  sx={{
-                    textDecoration: 'none',
-                    '&:hover': { textDecoration: 'underline' }
-                  }}
-                >
-                  Terms of Service
-                </Typography>
-                {' and '}
-                <Typography
-                  component="a"
-                  href="/privacy"
-                  color="primary"
-                  sx={{
-                    textDecoration: 'none',
-                    '&:hover': { textDecoration: 'underline' }
-                  }}
-                >
-                  Privacy Policy
-                </Typography>
-              </Typography>
-            </Paper>
-          </Grow>
+    <Grow in timeout={800}>
+      <Paper
+        elevation={3}
+        className="paper-card"
+      >
+        {/* Logo/Icon */}
+        <Box display="flex" justifyContent="center" mb={3}>
+          <Box className="logo-icon-box">
+            <PhoneIcon />
+          </Box>
         </Box>
-      </Container>
-    </Box>
+
+        {/* Title */}
+        <Typography
+          variant="h4"
+          component="h1"
+          fontWeight="bold"
+          textAlign="center"
+          mb={1}
+          sx={{ letterSpacing: '-0.01562em' }}
+        >
+          Welcome Back
+        </Typography>
+
+        <Typography
+          variant="subtitle1"
+          textAlign="center"
+          color="text.secondary"
+          mb={4}
+        >
+          Sign in with your phone number
+        </Typography>
+
+        {!isOtpSent ? (
+          <Fade in timeout={500}>
+            <Box>
+              <Formik
+                initialValues={mobileInitialValues}
+                validationSchema={mobileValidationSchema}
+                onSubmit={handleMobileSubmit}
+              >
+                {({ handleChange, values, touched, errors }) => (
+                  <Form>
+                    <Stack spacing={3}>
+                      <TextField
+                        id="mobile"
+                        name="mobile"
+                        label="Mobile Number"
+                        variant="outlined"
+                        fullWidth
+                        value={values.mobile}
+                        onChange={handleChange}
+                        error={touched.mobile && Boolean(errors.mobile)}
+                        helperText={touched.mobile && errors.mobile}
+                        placeholder="Enter 10-digit number"
+                        disabled={isLoading}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Typography color="text.secondary">+91</Typography>
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '&:hover fieldset': {
+                              borderColor: theme.palette.primary.main,
+                            },
+                          },
+                        }}
+                      />
+
+                      <Button
+                        type="submit"
+                        variant="gradient"
+                        fullWidth
+                        size="large"
+                        disabled={isLoading}
+
+                      >
+                        {isLoading ? (
+                          <CircularProgress size={24} color="inherit" />
+                        ) : (
+                          'Send OTP'
+                        )}
+                      </Button>
+                    </Stack>
+                  </Form>
+                )}
+              </Formik>
+            </Box>
+          </Fade>
+        ) : (
+          <Fade in timeout={500}>
+            <Box>
+              <Formik
+                initialValues={otpInitialValues}
+                validationSchema={otpValidationSchema}
+                onSubmit={handleOtpSubmit}
+              >
+                {({ handleChange, values, touched, errors }) => (
+                  <Form>
+                    <Stack spacing={3}>
+                      {/* Show verified number */}
+                      <Box p={2} borderRadius={2} bgcolor="action.hover" display="flex" alignItems="center" gap={1}>
+                        <CheckCircleIcon color="success" fontSize="small" />
+                        <Typography variant="body2">
+                          OTP sent to <strong>+91 {mobileNumber}</strong>
+                        </Typography>
+                      </Box>
+
+                      <TextField
+                        id="otp"
+                        name="otp"
+                        label="Enter 6-digit OTP"
+                        variant="outlined"
+                        fullWidth
+                        value={values.otp}
+                        onChange={handleChange}
+                        error={touched.otp && Boolean(errors.otp)}
+                        helperText={touched.otp && errors.otp}
+                        disabled={isLoading}
+                        inputProps={{
+                          maxLength: 6,
+                          style: { textAlign: 'center', letterSpacing: '0.5em' }
+                        }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <LockIcon color="action" />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+
+                      <Button
+                        type="submit"
+                        variant="gradient"
+                        fullWidth
+                        size="large"
+                        disabled={isLoading}
+
+                      >
+                        {isLoading ? (
+                          <CircularProgress size={24} color="inherit" />
+                        ) : (
+                          'Verify OTP'
+                        )}
+                      </Button>
+
+                      {/* Resend OTP and Change Number */}
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Button
+                          size="small"
+                          onClick={handleResendOtp}
+                          disabled={resendTimer > 0 || isLoading}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
+                        </Button>
+
+                        <Button
+                          size="small"
+                          onClick={handleChangeNumber}
+                          disabled={isLoading}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          Change Number
+                        </Button>
+                      </Stack>
+                    </Stack>
+                  </Form>
+                )}
+              </Formik>
+            </Box>
+          </Fade>
+        )}
+
+        {/* Terms */}
+        <Typography
+          variant="caption"
+          display="block"
+          textAlign="center"
+          color="text.secondary"
+          mt={4}
+          sx={{ lineHeight: 1.6 }}
+        >
+          By continuing, you agree to our{' '}
+          <Typography
+            component="a"
+            href="/terms"
+            color="primary"
+            sx={{
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+          >
+            Terms of Service
+          </Typography>
+          {' and '}
+          <Typography
+            component="a"
+            href="/privacy"
+            color="primary"
+            sx={{
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' }
+            }}
+          >
+            Privacy Policy
+          </Typography>
+        </Typography>
+      </Paper>
+    </Grow>
+
   );
 };
 export default LogInForm;

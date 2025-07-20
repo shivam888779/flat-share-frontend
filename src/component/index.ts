@@ -14,6 +14,7 @@ import ImageUpload from "./ImageUpload";
 import LandingPage from "./LandingPage";
 import FilterSidebar from "./FilterSideBar";
 import MyProfileHeader from "./MyProfileHeader";
+import LogInModal from "./LogInModal";
 
 export {
     Header,
@@ -31,7 +32,8 @@ export {
     ImageUpload,
     LandingPage,
     FilterSidebar,
-    MyProfileHeader
+    MyProfileHeader,
+    LogInModal
 }
 
 export * from './Chat';

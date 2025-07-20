@@ -25,5 +25,6 @@ export const initialStateData: IInitialState = {
     notifications: [],
     connections: [],
     chatRooms: [],
-    myProperty: null
+    myProperty: null,
+    openLoginDialog: false
 }

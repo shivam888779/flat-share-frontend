@@ -53,6 +53,17 @@ body {
   min-width: 400px;
 }
 
+.property-card {
+  width: fit-content;
+  max-width: 400px;
+}
+
+@media (max-width: 768px) {
+  .property-card {
+    width: 100%;
+    max-width: 100%;
+  }
+}
 
 /* Import chat styles */
 @import './chat.css';

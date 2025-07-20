@@ -7,6 +7,7 @@ import { Share, LocationOn, ReportProblem, Home, CalendarToday, Payment, Group, 
 
 import { useState } from "react";
 import ListPropertyForm from "../ListPropertyForm";
+import { getFormatedDate } from "@/utils/dataFormate";
 
 interface IPropertyDetailsProps {
     propertyDetails: IPropertyDetails;
@@ -41,6 +42,30 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
     // Calculate days since posted
     const daysSincePosted = Math.floor((new Date().getTime() - new Date(availableFrom).getTime()) / (1000 * 3600 * 24));
 
+    const listingPreferenceSchema = [
+        {
+            icon: <Wc sx={{ color: 'primary.main', mb: 1 }} />,
+            label: "Gender Preference",
+            value: partnerGender
+        },
+        {
+            icon: <Group sx={{ color: 'success.main', mb: 1 }} />,
+            label: "Occupancy",
+            value: occupancy
+        },
+        {
+            icon: <Payment sx={{ color: 'warning.main', mb: 1 }} />,
+            label: "Security Deposit",
+            value: deposit
+        },
+        {
+            icon: <CalendarToday sx={{ color: 'info.main', mb: 1 }} />,
+            label: "Available From",
+            value: getFormatedDate(new Date(availableFrom))
+        }
+
+    ]
+
     return (
         <Stack spacing={3}>
             {isEdit ? <ListPropertyForm type="property" isEdit={isEdit} /> :
@@ -48,21 +73,20 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                     {/* Main Property Card */}
                     <Paper
                         elevation={0}
-                        sx={{
-                            borderRadius: '16px',
-                            backgroundColor: 'white',
-                            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                            overflow: 'hidden',
-                        }}
+
                     >
                         {/* Header Section */}
                         <Box
+                            p={3}
+
                             sx={{
-                                p: 3,
                                 background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
-                                borderBottom: '1px solid',
-                                borderColor: 'divider',
+                                borderTopLeftRadius: 12,
+                                borderTopRightRadius: 12,
                             }}
+                            borderBottom='1px solid'
+                            borderColor='divider'
+
                         >
                             <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                                 <Box>
@@ -121,10 +145,17 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
 
                         {/* Quick Info Grid */}
                         <Box sx={{ p: 3 }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={6} sm={3}>
+                            <Stack direction="row" justifyContent="space-between" flexWrap="wrap" gap={1} width="100%">
+                                {listingPreferenceSchema.map((item, index) => (
                                     <Card
+                                        key={index}
                                         sx={{
+                                            maxWidth: '250px',
+                                            minWidth: { xs: '150px', md: '250px' },
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
                                             p: 2,
                                             textAlign: 'center',
                                             backgroundColor: '#f9fafb',
@@ -133,83 +164,18 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                             borderColor: 'divider',
                                         }}
                                     >
-                                        <Wc sx={{ color: 'primary.main', mb: 1 }} />
+                                        {item.icon}
                                         <Typography variant="caption" color="text.secondary" display="block">
-                                            Gender Preference
+                                            {item.label}
                                         </Typography>
                                         <Typography variant="subtitle2" fontWeight={600}>
-                                            {partnerGender}
+                                            {item.value}
                                         </Typography>
                                     </Card>
-                                </Grid>
+                                ))}
 
-                                <Grid item xs={6} sm={3}>
-                                    <Card
-                                        sx={{
-                                            p: 2,
-                                            textAlign: 'center',
-                                            backgroundColor: '#f9fafb',
-                                            boxShadow: 'none',
-                                            border: '1px solid',
-                                            borderColor: 'divider',
-                                        }}
-                                    >
-                                        <Group sx={{ color: 'success.main', mb: 1 }} />
-                                        <Typography variant="caption" color="text.secondary" display="block">
-                                            Occupancy
-                                        </Typography>
-                                        <Typography variant="subtitle2" fontWeight={600}>
-                                            {occupancy || "Single"}
-                                        </Typography>
-                                    </Card>
-                                </Grid>
+                            </Stack>
 
-                                <Grid item xs={6} sm={3}>
-                                    <Card
-                                        sx={{
-                                            p: 2,
-                                            textAlign: 'center',
-                                            backgroundColor: '#f9fafb',
-                                            boxShadow: 'none',
-                                            border: '1px solid',
-                                            borderColor: 'divider',
-                                        }}
-                                    >
-                                        <Payment sx={{ color: 'warning.main', mb: 1 }} />
-                                        <Typography variant="caption" color="text.secondary" display="block">
-                                            Security Deposit
-                                        </Typography>
-                                        <Typography variant="subtitle2" fontWeight={600}>
-                                            ₹{deposit?.toLocaleString() || '0'}
-                                        </Typography>
-                                    </Card>
-                                </Grid>
-
-                                <Grid item xs={6} sm={3}>
-                                    <Card
-                                        sx={{
-                                            p: 2,
-                                            textAlign: 'center',
-                                            backgroundColor: '#f9fafb',
-                                            boxShadow: 'none',
-                                            border: '1px solid',
-                                            borderColor: 'divider',
-                                        }}
-                                    >
-                                        <CalendarToday sx={{ color: 'info.main', mb: 1 }} />
-                                        <Typography variant="caption" color="text.secondary" display="block">
-                                            Available From
-                                        </Typography>
-                                        <Typography variant="subtitle2" fontWeight={600}>
-                                            {new Date(availableFrom).toLocaleDateString("en-GB", {
-                                                day: "numeric",
-                                                month: "short",
-                                                year: "numeric"
-                                            })}
-                                        </Typography>
-                                    </Card>
-                                </Grid>
-                            </Grid>
                         </Box>
                     </Paper>
 
@@ -261,66 +227,57 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                     )}
 
                     {/* Resources and Preferences Row */}
-                    <Grid container spacing={3} justifyContent="space-between" alignItems="center">
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={3} justifyContent="space-between" alignItems="center">
                         {/* Resources */}
                         {resourcesSchema && resourcesSchema.length > 0 && (
-                            <Grid item xs={12} md={6} >
-                                <Paper
-                                    elevation={0}
-                                    sx={{
-                                        borderRadius: '16px',
-                                        backgroundColor: 'white',
-                                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                                        p: 3,
-                                        height: '100%',
-                                        width: "90%",
-                                    }}
-                                >
-                                    <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                                        <Inventory sx={{ color: 'secondary.main' }} />
-                                        <Typography variant="h6" fontWeight={600}>
-                                            Available Resources
-                                        </Typography>
-                                    </Stack>
-                                    <CustomizedSelectChip
-                                        setFieldValue={undefined}
-                                        fieldKey={undefined}
-                                        schema={resourcesSchema}
-                                        selectedResources={resources}
-                                    />
-                                </Paper>
-                            </Grid>
+                            <Paper
+
+                                elevation={0}
+                                sx={{
+                                    p: 3,
+                                    width: "100%",
+                                }}
+                            >
+                                <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                                    <Inventory sx={{ color: 'secondary.main' }} />
+                                    <Typography variant="h6" fontWeight={600}>
+                                        Available Resources
+                                    </Typography>
+                                </Stack>
+                                <CustomizedSelectChip
+                                    setFieldValue={undefined}
+                                    fieldKey={undefined}
+                                    schema={resourcesSchema}
+                                    selectedResources={resources}
+                                />
+                            </Paper>
                         )}
 
                         {/* Preferences */}
                         {preferencesSchema && preferencesSchema.length > 0 && (
-                            <Grid item xs={12} md={6}>
-                                <Paper
-                                    elevation={0}
-                                    sx={{
-                                        borderRadius: '16px',
-                                        backgroundColor: 'white',
-                                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                                        p: 3,
-                                        height: '100%',
-                                    }}
-                                >
-                                    <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                                        <Person sx={{ color: 'info.main' }} />
-                                        <Typography variant="h6" fontWeight={600}>
-                                            Roommate Preferences
-                                        </Typography>
-                                    </Stack>
-                                    <CustomizedSelectChip
-                                        setFieldValue={undefined}
-                                        fieldKey={undefined}
-                                        schema={preferencesSchema}
-                                        selectedResources={preferences}
-                                    />
-                                </Paper>
-                            </Grid>
+
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 3,
+                                    width: "100%",
+                                }}
+                            >
+                                <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                                    <Person sx={{ color: 'info.main' }} />
+                                    <Typography variant="h6" fontWeight={600}>
+                                        Roommate Preferences
+                                    </Typography>
+                                </Stack>
+                                <CustomizedSelectChip
+                                    setFieldValue={undefined}
+                                    fieldKey={undefined}
+                                    schema={preferencesSchema}
+                                    selectedResources={preferences}
+                                />
+                            </Paper>
                         )}
-                    </Grid>
+                    </Stack>
 
                     {/* About Section */}
                     {description && (
