@@ -1,44 +1,9 @@
 import React, { ReactElement } from "react";
-import {
-    Card,
-    CardContent,
-    Stack,
-    Avatar,
-    Typography,
-    Button,
-    Chip,
-    Box,
-    IconButton,
-    Tooltip,
-    Menu,
-    MenuItem,
-    Divider,
-    useTheme,
-    useMediaQuery,
-} from "@mui/material";
-import { IConnection } from "@/types/connection";
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
-import MessageIcon from '@mui/icons-material/Message';
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import EmailIcon from '@mui/icons-material/Email';
-import PhoneIcon from '@mui/icons-material/Phone';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import CallMadeIcon from '@mui/icons-material/CallMade';
-import CallReceivedIcon from '@mui/icons-material/CallReceived';
-import ReplayIcon from '@mui/icons-material/Replay';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Card, CardContent, Stack, Avatar, Typography, Button, Chip, Box, IconButton, Tooltip, Menu, MenuItem, Divider, useTheme, useMediaQuery } from "@mui/material";
+import { Check, Close, PersonRemove, MoreVert, CalendarToday, CallMade, CallReceived, Visibility } from '@mui/icons-material';
+import { ConnectionCardProps } from "@/types/connection";
+import { useRouter } from "next/router";
 
-interface ConnectionCardProps {
-    connection: IConnection;
-    isIncoming: boolean;
-    currentUserId: number;
-    onApprove?: () => void;
-    onReject?: () => void;
-    onCancel?: () => void;
-    showActions?: boolean;
-}
 
 const ConnectionCard: React.FC<ConnectionCardProps> = ({
     connection,
@@ -51,8 +16,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
 }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-
+    const router = useRouter();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -90,19 +54,19 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
                 return {
                     label: isIncoming ? (isMobile ? 'Incoming' : 'Incoming Request') : (isMobile ? 'Outgoing' : 'Outgoing Request'),
                     color: 'warning' as const,
-                    icon: isIncoming ? <CallReceivedIcon fontSize="small" /> : <CallMadeIcon fontSize="small" />,
+                    icon: isIncoming ? <CallReceived fontSize="small" /> : <CallMade fontSize="small" />,
                 };
             case 'APPROVED':
                 return {
                     label: 'Connected',
                     color: 'success' as const,
-                    icon: <CheckIcon fontSize="small" />,
+                    icon: <Check fontSize="small" />,
                 };
             case 'REJECTED':
                 return {
                     label: 'Rejected',
                     color: 'error' as const,
-                    icon: <CloseIcon fontSize="small" />,
+                    icon: <Close fontSize="small" />,
                 };
             default:
                 return {
@@ -185,6 +149,9 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
                         variant="contained"
                         fullWidth={isMobile}
                         {...buttonProps}
+                        onClick={() => {
+                            router.push(`/chat?id=${connection?.otherUser?.id}`);
+                        }}
                     >
                         Message
                     </Button>
@@ -196,7 +163,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
                                 height: isMobile ? 40 : 48,
                             }}
                         >
-                            <MoreVertIcon fontSize={isMobile ? 'small' : 'medium'} />
+                            <MoreVert fontSize={isMobile ? 'small' : 'medium'} />
                         </IconButton>
                     </Tooltip>
                 </Stack>
@@ -236,24 +203,17 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
     return (
         <Card
             sx={{
-                borderRadius: isMobile ? '8px' : '12px',
-                boxShadow: isMobile
-                    ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
-                    : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                position: 'relative',
-                overflow: 'visible',
-                transition: 'all 0.3s ease',
+
                 border: '1px solid',
                 borderColor: 'divider',
-                '&:hover': !isMobile ? {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                } : {},
+
                 '&::before': {
                     content: '""',
                     position: 'absolute',
                     left: 0,
-                    top: 0,
+                    borderRadius: '12px 0 0 12px',
+                    height: '90%',
+                    top: 8,
                     bottom: 0,
                     width: isMobile ? 3 : 4,
                     backgroundColor: `${statusConfig.color}.main`,
@@ -290,20 +250,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
                                     {otherUser?.firstName?.[0]?.toUpperCase()}
                                     {otherUser?.lastName?.[0]?.toUpperCase()}
                                 </Avatar>
-                                {isOnline && connection.status === 'APPROVED' && (
-                                    <Box
-                                        sx={{
-                                            position: 'absolute',
-                                            bottom: isMobile ? 1 : 2,
-                                            right: isMobile ? 1 : 2,
-                                            width: isMobile ? 12 : 14,
-                                            height: isMobile ? 12 : 14,
-                                            backgroundColor: 'success.main',
-                                            border: '2px solid white',
-                                            borderRadius: '50%',
-                                        }}
-                                    />
-                                )}
+
                             </Box>
 
                             {/* User Info */}
@@ -347,7 +294,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
                                 >
 
                                     <Stack direction="row" spacing={0.5} alignItems="center">
-                                        <CalendarTodayIcon sx={{
+                                        <CalendarToday sx={{
                                             fontSize: isMobile ? 14 : 16,
                                             color: 'text.secondary',
                                             flexShrink: 0,
@@ -441,12 +388,12 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
                 }}
             >
                 <MenuItem onClick={handleMenuClose}>
-                    <VisibilityIcon fontSize="small" sx={{ mr: 1 }} />
+                    <Visibility fontSize="small" sx={{ mr: 1 }} />
                     View Profile
                 </MenuItem>
                 <Divider />
                 <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>
-                    <PersonRemoveIcon fontSize="small" sx={{ mr: 1 }} />
+                    <PersonRemove fontSize="small" sx={{ mr: 1 }} />
                     Remove Connection
                 </MenuItem>
             </Menu>

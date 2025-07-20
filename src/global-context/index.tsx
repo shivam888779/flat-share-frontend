@@ -7,7 +7,7 @@ import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPrefernce
 import { getNotifications } from "@/api/notifications";
 import { getProfileApi } from "@/api/profiles/my-profile";
 import { getConnectionsApi } from "@/api/connections";
-import { chatApi } from "@/api/chat";
+import { getChatRooms } from "@/api/chat";
 import { IPropertyDetails } from "@/types/property";
 
 type GlobalContextType = {
@@ -137,8 +137,8 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
 
   const fetchChatRooms = useCallback(async () => {
     try {
-      const res = await chatApi.getChatRooms();
-      setState({ chatRooms: res?.data || [] });
+      const { data } = await getChatRooms();
+      setState({ chatRooms: data?.data || [] });
     } catch (e) {
       console.error("Failed to fetch chat rooms", e);
     }

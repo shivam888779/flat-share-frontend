@@ -75,7 +75,7 @@ export function useChatWebSocket({ userId, token }: UseChatWebSocketOptions) {
     }
 
     try {
-      const socket = new SockJS('http://localhost:8080/ws');
+      const socket = new SockJS('http://35.232.250.35/ws');
       const stompClient = Stomp.over(socket);
 
       // Disable debug logging in production

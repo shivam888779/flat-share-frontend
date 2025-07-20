@@ -1,25 +1,39 @@
-import React, { use, useEffect, useState } from 'react';
-import { Box, Container, useTheme } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, useTheme } from '@mui/material';
 import ChatContainer from '../../component/Chat/ChatContainer';
-import { IUserData } from '../../types/user';
 import { useGlobalContext } from '@/global-context';
+import { useRouter } from 'next/router';
+import { getOrCreateChatRoom } from '@/api/chat';
 
 const ChatPage: React.FC = () => {
-    const theme = useTheme();
-    const [userId, setUserId] = useState<number | null>(null);
-    const [approvedConnections, setApprovedConnections] = useState<IUserData[]>([]);
-    const [loading, setLoading] = useState(false);
-    const { state,fetchConnections  , fetchChatRooms} = useGlobalContext();
+    const { state, fetchConnections, fetchChatRooms } = useGlobalContext();
     const userData = state?.userData;
-    console.log(state);
+
+    const router = useRouter();
+    const { id } = router.query;
+    useEffect(() => {
+        const fetchUserChatRoom = async () => {
+            if (id) {
+                const { data } = await getOrCreateChatRoom(Number(id));
+                if (data?.status) {
+                    console.log(data);
+                    fetchChatRooms();
+                }
+            }
+            else {
+                fetchChatRooms();
+            }
+        }
+
+
+        fetchUserChatRoom();
+    }, [id, router]);
+
+
 
     useEffect(() => {
-        fetchChatRooms();
+        fetchConnections();
     }, []);
-
- useEffect(() => {
-    fetchConnections();
- }, []);
 
     if (!userData?.id) {
         return (

@@ -6,6 +6,7 @@ import ChatHeader from './ChatHeader';
 import { IUserData } from '../../types/user';
 import { useChatWebSocket, ChatEvent, ChatMessage, WebSocketMessage } from '../../hooks/useChatWebSocket';
 import { useGlobalContext } from '@/global-context';
+import { useRouter } from 'next/router';
 
 interface ChatContainerProps {
     approvedConnections?: IUserData[];
@@ -28,6 +29,16 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
     const [sending, setSending] = useState(false);
+    const router = useRouter();
+    const { id } = router.query;
+    useEffect(() => {
+        if (chatRooms.length > 0) {
+            const chatRoom = chatRooms.find(room => room.otherUser.id === Number(id));
+            if (chatRoom) {
+                handleChatRoomSelect(chatRoom.id.toString());
+            }
+        }
+    }, [id]);
 
     // WebSocket hook
     const { connected, events, sendMessage } = useChatWebSocket({ userId, token });
@@ -314,8 +325,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ approvedConnections = [] 
                                 onTypingStop={handleTypingStop}
                                 onMarkAsRead={handleMarkAsRead}
                                 onDeleteMessage={() => { }}
-                                userData={userData}
-                                typingUsers={Array.from(typingUsers)}
+                                userData={userData} messages={[]}
                             />
                         </>
                     ) : (

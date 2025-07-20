@@ -1,21 +1,6 @@
 import React, { useState } from "react";
-import {
-    Box,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    SelectChangeEvent,
-    IconButton,
-    Popover,
-    Stack,
-    Typography,
-    Chip,
-    Button,
-    Divider,
-} from "@mui/material";
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ClearIcon from '@mui/icons-material/Clear';
+import { Box, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, IconButton, Popover, Stack, Typography, Chip, Button, Divider } from "@mui/material";
+import { FilterList, Clear } from '@mui/icons-material';
 import { IConnectionFilters } from "@/types/connection";
 
 interface ConnectionFiltersProps {
@@ -67,18 +52,18 @@ const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
             <Box sx={{ position: 'relative' }}>
                 <Button
                     variant="outlined"
-                    startIcon={<FilterListIcon />}
+                    startIcon={<FilterList />}
                     onClick={handleClick}
                     sx={{
                         borderRadius: '8px',
-                        borderColor: '#e5e7eb',
+                        borderColor: 'grey.300',
                         color: activeFiltersCount > 0 ? 'primary.main' : 'text.secondary',
-                        backgroundColor: activeFiltersCount > 0 ? 'primary.50' : 'transparent',
+                        backgroundColor: activeFiltersCount > 0 ? 'primary.light' : 'transparent',
                         fontWeight: 500,
                         textTransform: 'none',
                         '&:hover': {
                             borderColor: 'primary.main',
-                            backgroundColor: activeFiltersCount > 0 ? 'primary.100' : 'transparent',
+                            backgroundColor: activeFiltersCount > 0 ? 'primary.dark' : 'transparent',
                         },
                     }}
                     endIcon={
@@ -89,7 +74,7 @@ const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
                                 sx={{
                                     height: 20,
                                     backgroundColor: 'primary.main',
-                                    color: 'white',
+                                    color: 'common.white',
                                     fontSize: '0.75rem',
                                 }}
                             />
@@ -137,7 +122,7 @@ const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
                                     onClick={handleClearFilters}
                                     sx={{ color: 'text.secondary' }}
                                 >
-                                    <ClearIcon fontSize="small" />
+                                    <Clear fontSize="small" />
                                 </IconButton>
                             )}
                         </Stack>
@@ -154,10 +139,10 @@ const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
                                 onChange={handleStatusChange}
                                 sx={{
                                     '& .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#e5e7eb',
+                                        borderColor: 'grey.300',
                                     },
                                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#9ca3af',
+                                        borderColor: 'grey.400',
                                     },
                                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                                         borderColor: 'primary.main',

@@ -75,7 +75,8 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
       }
 
       else if (type === "chat") {
-        success('You are already connected to this user');
+        console.log(data);
+        router.push(`/chat?id=${data?.userId}`);
       }
     }
     else {

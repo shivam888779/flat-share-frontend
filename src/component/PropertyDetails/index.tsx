@@ -151,7 +151,7 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                         key={index}
                                         sx={{
                                             maxWidth: '250px',
-                                            minWidth: { xs: '150px', md: '250px' },
+                                            minWidth: { xs: '150px', md: '215px' },
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',

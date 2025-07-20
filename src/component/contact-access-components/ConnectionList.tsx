@@ -1,24 +1,10 @@
 import React from "react";
-import {
-    Box,
-    Typography,
-    Stack,
-    Button,
-    Fade,
-} from "@mui/material";
-import { IConnection } from "@/types/connection";
+import { Box, Typography, Stack, Button, Fade } from "@mui/material";
+import { SearchOff, PersonSearch } from '@mui/icons-material';
+import { ConnectionListProps } from "@/types/connection";
 import ConnectionCard from "./ConnectionCard";
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import SearchOffIcon from '@mui/icons-material/SearchOff';
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 
-interface ConnectionListProps {
-    connections: IConnection[];
-    currentUserId: number;
-    onApprove: (connectionId: number) => void;
-    onReject: (connectionId: number) => void;
-    onCancel: (connectionId: number) => void;
-}
+
 
 const ConnectionList: React.FC<ConnectionListProps> = ({
     connections,
@@ -36,7 +22,7 @@ const ConnectionList: React.FC<ConnectionListProps> = ({
                         py: 8,
                         px: 4,
                         textAlign: 'center',
-                        backgroundColor: '#f9fafb',
+                        backgroundColor: 'grey.50',
                         borderRadius: '12px',
                         mt: 3,
                     }}
@@ -54,7 +40,7 @@ const ConnectionList: React.FC<ConnectionListProps> = ({
                             mb: 3,
                         }}
                     >
-                        <SearchOffIcon sx={{ fontSize: 48, color: 'grey.400' }} />
+                        <SearchOff sx={{ fontSize: 48, color: 'grey.400' }} />
                     </Box>
                     <Typography
                         variant="h6"
@@ -74,7 +60,7 @@ const ConnectionList: React.FC<ConnectionListProps> = ({
                     <Stack direction="row" spacing={2} justifyContent="center">
                         <Button
                             variant="contained"
-                            startIcon={<PersonSearchIcon />}
+                            startIcon={<PersonSearch />}
                             sx={{
                                 borderRadius: '8px',
                                 textTransform: 'none',

@@ -19,7 +19,7 @@ import { IChatMessage, IChatRoom, IUserData } from '../../types/chat';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import { formatDistanceToNow } from 'date-fns';
-import { chatApi } from '@/api/chat';
+import { getChatHistoryApi } from '@/api/chat';
 
 interface ChatWindowProps {
     events: any[];
@@ -47,7 +47,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     onTypingStop,
     onMarkAsRead,
     onDeleteMessage,
-    userData
+    userData,
 }) => {
     const theme = useTheme();
     const [message, setMessage] = useState('');
@@ -66,7 +66,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
             try {
                 setChatLoading(true);
-                const { data } = await chatApi.getChatHistory(currentChatRoom.id);
+                const { data } = await getChatHistoryApi(currentChatRoom.id);
                 console.log('Chat history response:', data);
 
                 if (data && Array.isArray(data)) {

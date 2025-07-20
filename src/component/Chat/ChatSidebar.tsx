@@ -31,6 +31,7 @@ import { IChatRoom, IUserData } from '../../types/chat';
 import { formatDistanceToNow } from 'date-fns';
 import { useGlobalContext } from '@/global-context';
 import { IConnection } from '@/types/connection';
+import { useRouter } from 'next/router';
 
 interface ChatSidebarProps {
     chatRooms: IChatRoom[];
@@ -56,7 +57,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
     const [showNewChatDialog, setShowNewChatDialog] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const { state } = useGlobalContext();
-
+    const router = useRouter();
     // Safely filter connections
     const filteredConnections = useMemo(() => {
         if (!Array.isArray(state?.connections)) return [];
@@ -120,9 +121,14 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
 
     const handleStartNewChat = (connectionId: number) => {
         // Create a temporary chat room ID or trigger chat room creation
-        onChatRoomSelect(connectionId.toString());
-        setShowNewChatDialog(false);
-        setSearchQuery('');
+        console.log('connectionId', connectionId);
+        router.push(`/chat?id=${connectionId}`).then(() => {
+            setShowNewChatDialog(false);
+            setSearchQuery('');
+        });
+        // onChatRoomSelect(connectionId.toString());
+        // setShowNewChatDialog(false);
+        // setSearchQuery('');
     };
 
     // Calculate total unread count from all chat rooms

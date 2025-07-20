@@ -1,53 +1,16 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import {
-    Box,
-    Typography,
-    Paper,
-    Stack,
-    Fade,
-    CircularProgress,
-    Grid,
-    Card,
-    CardContent,
-    Tabs,
-    Tab,
-    Badge,
-    TextField,
-    InputAdornment,
-    IconButton,
-    Tooltip,
-    Chip,
-} from "@mui/material";
-import { getConnectionsApi, approveRequestApi, rejectRequestApi, cancelRequestApi } from "@/api/connections";
+import { Box, Typography, Paper, Stack, Fade, CircularProgress, Card, CardContent, Tabs, Tab, InputAdornment, TextField, IconButton, Tooltip, Chip } from "@mui/material";
+import { approveRequestApi, rejectRequestApi, cancelRequestApi } from "@/api/connections";
 import { useGlobalContext } from "@/global-context";
-import { IConnection, IConnectionFilters } from "@/types/connection";
+import { CONNECTION_STATUS, DAYS_IN_WEEK, TAB_INDICES, TabPanelProps } from "@/types/connection";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
-import {
-    ConnectionList,
-    ConnectionFilters,
-} from "@/component/contact-access-components";
+import { ConnectionList } from "@/component/contact-access-components";
 import { People, Schedule, Send, FiberNew, Search, Refresh, PersonAdd } from '@mui/icons-material';
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
-}
 
-// Constants
-const DAYS_IN_WEEK = 7;
-const TAB_INDICES = {
-    ALL: 0,
-    RECEIVED: 1,
-    SENT: 2,
-    CONNECTED: 3,
-} as const;
 
-const CONNECTION_STATUS = {
-    PENDING: 'PENDING',
-    APPROVED: 'APPROVED',
-    REJECTED: 'REJECTED',
-} as const;
+
+type TabIndex = typeof TAB_INDICES[keyof typeof TAB_INDICES];
 
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
@@ -73,10 +36,7 @@ const ConnectionsPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [tabValue, setTabValue] = useState(TAB_INDICES.ALL);
-    const [filters, setFilters] = useState<IConnectionFilters>({
-        status: "all",
-    });
+    const [tabValue, setTabValue] = useState<TabIndex>(TAB_INDICES.ALL);
     const snackbar = useGlobalSnackbar();
 
     // Memoized connection categorization
@@ -111,18 +71,13 @@ const ConnectionsPage: React.FC = () => {
         };
     }, [connections, userData.id]);
 
-    // Memoized search and filter logic
+    // Memoized search logic
     const filteredConnections = useMemo(() => {
         const { all } = categorizedConnections;
 
         if (!all.length) return [];
 
         let filtered = all;
-
-        // Apply status filter
-        if (filters.status !== "all") {
-            filtered = filtered.filter(conn => conn.status === filters.status);
-        }
 
         // Apply search filter
         if (searchQuery.trim()) {
@@ -138,7 +93,7 @@ const ConnectionsPage: React.FC = () => {
         }
 
         return filtered;
-    }, [categorizedConnections, filters.status, searchQuery]);
+    }, [categorizedConnections, searchQuery]);
 
     // Memoized tab-specific connections
     const tabConnections = useMemo(() => {
@@ -250,12 +205,10 @@ const ConnectionsPage: React.FC = () => {
     const handleCancelRequest = useCallback((connectionId: number) =>
         handleConnectionAction('cancel', connectionId), [handleConnectionAction]);
 
-    const handleFiltersChange = useCallback((newFilters: IConnectionFilters) => {
-        setFilters(newFilters);
-    }, []);
+
 
     const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
-        setTabValue(newValue);
+        setTabValue(newValue as TabIndex);
     }, []);
 
     const handleRefresh = useCallback(async () => {
@@ -301,7 +254,7 @@ const ConnectionsPage: React.FC = () => {
                         backgroundColor: label === 'Received' ? 'error.main' :
                             label === 'Sent' ? 'warning.main' :
                                 label === 'Connected' ? 'success.main' : 'primary.main',
-                        color: 'white',
+                        color: 'common.white',
                     }}
                 />
             )}
@@ -327,7 +280,7 @@ const ConnectionsPage: React.FC = () => {
         <Box
             sx={{
                 minHeight: '100vh',
-                backgroundColor: '#f3f4f6',
+                backgroundColor: 'grey.50',
                 py: 4,
             }}
         >
@@ -337,7 +290,7 @@ const ConnectionsPage: React.FC = () => {
                         {/* Page Header */}
                         <Box>
                             <Stack
-                                direction={{ xs: 'column', sm: 'row' }}
+                                direction="row"
                                 justifyContent="space-between"
                                 alignItems={{ xs: 'flex-start', sm: 'center' }}
                                 spacing={2}
@@ -365,7 +318,7 @@ const ConnectionsPage: React.FC = () => {
                                             onClick={handleRefresh}
                                             disabled={refreshing}
                                             sx={{
-                                                backgroundColor: 'white',
+                                                backgroundColor: 'background.paper',
                                                 border: '1px solid',
                                                 borderColor: 'divider',
                                             }}
@@ -406,7 +359,7 @@ const ConnectionsPage: React.FC = () => {
                                                     width: 48,
                                                     height: 48,
                                                     borderRadius: '12px',
-                                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                                    backgroundColor: 'primary.light',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
@@ -430,11 +383,10 @@ const ConnectionsPage: React.FC = () => {
 
                         {/* Main Content Card */}
                         <Paper
-                            elevation={0}
+                            elevation={1}
                             sx={{
                                 borderRadius: '16px',
-                                backgroundColor: 'white',
-                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                                backgroundColor: 'background.paper',
                                 overflow: 'hidden',
                             }}
                         >
@@ -455,13 +407,13 @@ const ConnectionsPage: React.FC = () => {
                                             flex: 1,
                                             maxWidth: { sm: 400 },
                                             '& .MuiOutlinedInput-root': {
-                                                backgroundColor: '#f9fafb',
+                                                backgroundColor: 'grey.50',
                                                 borderRadius: '8px',
                                                 '& fieldset': {
-                                                    borderColor: '#e5e7eb',
+                                                    borderColor: 'grey.300',
                                                 },
                                                 '&:hover fieldset': {
-                                                    borderColor: '#9ca3af',
+                                                    borderColor: 'grey.400',
                                                 },
                                                 '&.Mui-focused fieldset': {
                                                     borderColor: 'primary.main',
@@ -477,16 +429,13 @@ const ConnectionsPage: React.FC = () => {
                                             ),
                                         }}
                                     />
-                                    <ConnectionFilters
-                                        filters={filters}
-                                        onFiltersChange={handleFiltersChange}
-                                    />
                                 </Stack>
 
                                 {/* Tabs */}
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <Tabs
                                         value={tabValue}
+                                        variant="scrollable"
                                         onChange={handleTabChange}
                                         sx={{
                                             '& .MuiTabs-indicator': {
