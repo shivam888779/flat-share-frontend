@@ -196,7 +196,8 @@ export interface IConnection {
 
 // Component prop interfaces
 export interface ChatWindowProps {
-    events: ChatEvent[];
+    events: any[];
+    messages: IChatMessage[];
     currentChatRoom: IChatRoom;
     loading: boolean;
     sending: boolean;
@@ -207,7 +208,6 @@ export interface ChatWindowProps {
     onMarkAsRead: () => void;
     onDeleteMessage: (messageId: number) => void;
     userData: IUserData;
-    typingUsers?: string[];
 }
 
 export interface ChatSidebarProps {
@@ -240,3 +240,4 @@ export interface TypingIndicatorProps {
     isTyping?: boolean;
     typingUser?: string;
 }
+

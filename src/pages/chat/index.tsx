@@ -75,7 +75,8 @@ const ChatPage: React.FC = () => {
     return (
         <Box
             sx={{
-                height: '100vh',
+                height: 'calc(100vh - 100px)',
+
                 bgcolor: 'background.default'
             }}
         >

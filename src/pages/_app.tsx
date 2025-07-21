@@ -41,7 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <div className={`building house4 hover:scale-105 hover-brightness-120`}></div>
           <div className={`building building5 hover:scale-105 hover-brightness-120`}></div>
         </Box>}
-        <Footer />
+        {/* <Footer /> */}
       </GlobalContextProvider>
     </SnackbarProvider>
 

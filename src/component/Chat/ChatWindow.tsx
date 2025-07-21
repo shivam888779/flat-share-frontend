@@ -1,40 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-    Box,
-    TextField,
-    IconButton,
-    Typography,
-    CircularProgress,
-    Alert,
-    Paper,
-    useTheme
-} from '@mui/material';
-import {
-    Send as SendIcon,
-    AttachFile as AttachFileIcon,
-    Image as ImageIcon,
-    LocationOn as LocationIcon
-} from '@mui/icons-material';
-import { IChatMessage, IChatRoom, IUserData } from '../../types/chat';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Box, TextField, IconButton, Typography, CircularProgress, Alert, Paper, useTheme, Fade, Zoom, Divider, Tooltip } from '@mui/material';
+import { Send, AttachFile, EmojiEmotions, MoreVert } from '@mui/icons-material';
+import { ChatWindowProps, IChatMessage } from '@/types/chat';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import { formatDistanceToNow } from 'date-fns';
 import { getChatHistoryApi } from '@/api/chat';
-
-interface ChatWindowProps {
-    events: any[];
-    messages: IChatMessage[];
-    currentChatRoom: IChatRoom;
-    loading: boolean;
-    sending: boolean;
-    error: string | null;
-    onSendMessage: (content: string, messageType?: 'TEXT' | 'IMAGE' | 'FILE' | 'LOCATION') => void;
-    onTypingStart: () => void;
-    onTypingStop: () => void;
-    onMarkAsRead: () => void;
-    onDeleteMessage: (messageId: number) => void;
-    userData: IUserData;
-}
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
     events,
@@ -67,7 +38,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             try {
                 setChatLoading(true);
                 const { data } = await getChatHistoryApi(currentChatRoom.id);
-                console.log('Chat history response:', data);
 
                 if (data && Array.isArray(data)) {
                     setMessages(data);
@@ -148,8 +118,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         });
     }, [events, currentChatRoom?.id, userData.id]);
 
-    console.log(messages, 'messages');
-
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -162,14 +130,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         }
     }, [messages, onMarkAsRead]);
 
-    const handleSendMessage = () => {
+    // Memoize receiver ID calculation
+    const receiverId = useMemo(() => {
+        if (currentChatRoom?.otherUser?.id) {
+            return currentChatRoom.otherUser.id;
+        }
+        if (currentChatRoom?.user1Id && currentChatRoom?.user2Id) {
+            return currentChatRoom.user1Id === userData.id ? currentChatRoom.user2Id : currentChatRoom.user1Id;
+        }
+        return 0;
+    }, [currentChatRoom, userData.id]);
+
+    // Handle send message with useCallback
+    const handleSendMessage = useCallback(() => {
         if (message.trim() && !sending) {
             // Create optimistic message
             const optimisticMessage = {
                 id: `temp-${Date.now()}`, // Temporary ID
                 chatRoomId: currentChatRoom.id,
                 senderId: userData.id,
-                receiverId: getReceiverId(),
+                receiverId,
                 message: message.trim(),
                 messageType: 'TEXT' as const,
                 isRead: false,
@@ -190,26 +170,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             setIsTyping(false);
             onTypingStop();
         }
-    };
+    }, [message, sending, currentChatRoom, userData, receiverId, onSendMessage, onTypingStop]);
 
-    const getReceiverId = () => {
-        if (currentChatRoom?.otherUser?.id) {
-            return currentChatRoom.otherUser.id;
-        }
-        if (currentChatRoom?.user1Id && currentChatRoom?.user2Id) {
-            return currentChatRoom.user1Id === userData.id ? currentChatRoom.user2Id : currentChatRoom.user1Id;
-        }
-        return 0;
-    };
-
-    const handleKeyPress = (e: React.KeyboardEvent) => {
+    // Handle key press with useCallback
+    const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage();
         }
-    };
+    }, [handleSendMessage]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Handle input change with useCallback
+    const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(e.target.value);
 
         if (!isTyping) {
@@ -227,18 +199,31 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             setIsTyping(false);
             onTypingStop();
         }, 3000);
-    };
+    }, [isTyping, onTypingStart, onTypingStop]);
 
-    const handleInputBlur = () => {
+    // Handle input blur with useCallback
+    const handleInputBlur = useCallback(() => {
         if (typingTimeoutRef.current) {
             clearTimeout(typingTimeoutRef.current);
         }
         setIsTyping(false);
         onTypingStop();
-    };
+    }, [onTypingStop]);
+
+    // Handle attachment button click
+    const handleAttachmentClick = useCallback(() => {
+        // TODO: Implement file attachment
+        console.log('Attachment clicked');
+    }, []);
+
+    // Handle emoji button click
+    const handleEmojiClick = useCallback(() => {
+        // TODO: Implement emoji picker
+        console.log('Emoji clicked');
+    }, []);
 
     // Transform API response to match component's expected format
-    const transformMessage = (apiMessage: any): IChatMessage => {
+    const transformMessage = useCallback((apiMessage: any): IChatMessage => {
         return {
             id: apiMessage.id,
             chatRoomId: apiMessage.chatRoomId,
@@ -251,9 +236,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             createdAt: apiMessage.createdAt,
             updatedAt: apiMessage.updatedAt || apiMessage.createdAt,
         };
-    };
+    }, []);
 
-    const groupMessagesByDate = (messages: any[]) => {
+    // Group messages by date
+    const groupMessagesByDate = useCallback((messages: any[]) => {
         const groups: { [key: string]: any[] } = {};
 
         messages.forEach(msg => {
@@ -268,10 +254,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             date,
             messages: msgs.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
         }));
-    };
+    }, []);
 
     // Get other user info for typing indicator
-    const getOtherUser = () => {
+    const getOtherUser = useCallback(() => {
         if (currentChatRoom?.otherUser) {
             return currentChatRoom.otherUser;
         }
@@ -279,12 +265,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             return currentChatRoom.user1Id === userData.id ? currentChatRoom.user2 : currentChatRoom.user1;
         }
         return null;
-    };
+    }, [currentChatRoom, userData.id]);
 
-    const messageGroups = groupMessagesByDate(messages);
+    const messageGroups = useMemo(() => groupMessagesByDate(messages), [messages, groupMessagesByDate]);
     const isLoading = loading || chatLoading;
     const otherUser = getOtherUser();
     const isOtherUserTyping = typingUsers.size > 0;
+    const canSend = message.trim() && !sending;
 
     return (
         <Box
@@ -292,96 +279,202 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                bgcolor: 'background.default'
+                position: 'relative',
+                overflow: 'hidden'
             }}
         >
             {/* Messages Area */}
             <Box
+
                 sx={{
                     flex: 1,
                     overflow: 'auto',
-                    p: 2,
+                    p: { xs: 1, sm: 2 },
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 1
+                    gap: 1,
+                    paddingBottom: '120px', // More space for enhanced input area
+                    background: theme.palette.mode === 'dark'
+                        ? 'linear-gradient(180deg, rgba(18, 18, 18, 0.3) 0%, rgba(24, 24, 24, 0.5) 100%)'
+                        : 'linear-gradient(180deg, rgba(248, 250, 252, 0.3) 0%, rgba(241, 245, 249, 0.5) 100%)',
+                    '&::-webkit-scrollbar': {
+                        width: '8px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        bgcolor: 'transparent',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                        borderRadius: '4px',
+                        '&:hover': {
+                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+                        },
+                    },
                 }}
             >
                 {isLoading ? (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            height: '100%'
-                        }}
-                    >
-                        <CircularProgress />
-                    </Box>
+                    <Fade in={isLoading}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: '100%',
+                                flexDirection: 'column',
+                                gap: 3
+                            }}
+                        >
+                            <CircularProgress
+                                size={50}
+                                thickness={4}
+                                sx={{
+                                    color: 'primary.main',
+                                    '& .MuiCircularProgress-circle': {
+                                        strokeLinecap: 'round',
+                                    }
+                                }}
+                            />
+                            <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                Loading conversation...
+                            </Typography>
+                        </Box>
+                    </Fade>
                 ) : messages.length === 0 ? (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            height: '100%',
-                            color: 'text.secondary',
-                            textAlign: 'center'
-                        }}
-                    >
-                        <Typography variant="h6" sx={{ mb: 1 }}>
-                            No messages yet
-                        </Typography>
-                        <Typography variant="body2">
-                            Start the conversation by sending a message
-                        </Typography>
-                    </Box>
+                    <Fade in={messages.length === 0}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '100%',
+                                textAlign: 'center',
+                                gap: 3,
+                                p: 4
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    width: 120,
+                                    height: 120,
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    mb: 2,
+                                    opacity: 0.15,
+                                    boxShadow: theme.shadows[8]
+                                }}
+                            >
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        fontSize: '3.5rem',
+                                        color: 'white'
+                                    }}
+                                >
+                                    💬
+                                </Box>
+                            </Box>
+                            <Box>
+                                <Typography
+                                    variant="h4"
+                                    sx={{
+                                        fontWeight: 700,
+                                        mb: 2,
+                                        background: theme.palette.mode === 'dark'
+                                            ? 'linear-gradient(45deg, #fff 30%, #e0e0e0 90%)'
+                                            : 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        backgroundClip: 'text'
+                                    }}
+                                >
+                                    Start the conversation
+                                </Typography>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        maxWidth: 500,
+                                        lineHeight: 1.7,
+                                        color: 'text.secondary',
+                                        fontWeight: 400
+                                    }}
+                                >
+                                    Send your first message to {otherUser?.firstName} and begin your conversation
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Fade>
                 ) : (
                     <>
                         {messageGroups.map(({ date, messages: groupMessages }) => (
-                            <Box key={date}>
+                            <Box key={date} >
                                 {/* Date Separator */}
                                 <Box
                                     sx={{
                                         display: 'flex',
                                         justifyContent: 'center',
-                                        my: 2
+                                        my: 4
                                     }}
                                 >
-                                    <Paper
-                                        sx={{
-                                            px: 2,
-                                            py: 0.5,
-                                            bgcolor: 'background.paper',
-                                            border: `1px solid ${theme.palette.divider}`
-                                        }}
-                                    >
-                                        <Typography variant="caption" color="text.secondary">
-                                            {formatDistanceToNow(new Date(date), { addSuffix: true })}
-                                        </Typography>
-                                    </Paper>
+                                    <Zoom in={true} timeout={500}>
+                                        <Paper
+                                            elevation={3}
+                                            sx={{
+                                                px: 4,
+                                                py: 1.5,
+                                                background: theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(18, 18, 18, 0.9) 0%, rgba(24, 24, 24, 0.9) 100%)'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%)',
+                                                borderRadius: 25,
+                                                border: `1px solid ${theme.palette.divider}`,
+                                                backdropFilter: 'blur(10px)'
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                                sx={{
+                                                    fontWeight: 600,
+                                                    fontSize: '0.875rem',
+                                                    letterSpacing: 0.5
+                                                }}
+                                            >
+                                                {formatDistanceToNow(new Date(date), { addSuffix: true })}
+                                            </Typography>
+                                        </Paper>
+                                    </Zoom>
                                 </Box>
 
                                 {/* Messages */}
                                 {groupMessages.map((msg, index) => (
-                                    <MessageBubble
-                                        key={msg.id}
-                                        message={transformMessage(msg)}
-                                        isOwnMessage={msg.senderId === userData.id}
-                                        onDelete={() => onDeleteMessage(msg.id)}
-                                        showAvatar={index === 0 || groupMessages[index - 1]?.senderId !== msg.senderId}
-                                        isSending={false} // Pass sending state for optimistic messages
-                                    />
+                                    <Fade key={msg.id} in={true} timeout={400 + index * 100}>
+                                        <Box sx={{ mb: 1 }}>
+                                            <MessageBubble
+                                                message={transformMessage(msg)}
+                                                isOwnMessage={msg.senderId === userData.id}
+                                                onDelete={() => onDeleteMessage(msg.id)}
+                                                showAvatar={index === 0 || groupMessages[index - 1]?.senderId !== msg.senderId}
+                                                isSending={msg.sending || false}
+                                            />
+                                        </Box>
+                                    </Fade>
                                 ))}
                             </Box>
                         ))}
 
                         {/* Typing Indicator */}
                         {isOtherUserTyping && otherUser && (
-                            <TypingIndicator
-                                isTyping={true}
-                                typingUser={`${otherUser.firstName} ${otherUser.lastName}`}
-                            />
+                            <Fade in={isOtherUserTyping}>
+                                <Box sx={{ mt: 2 }}>
+                                    <TypingIndicator
+                                        isTyping={true}
+                                        typingUser={`${otherUser.firstName} ${otherUser.lastName}`}
+                                    />
+                                </Box>
+                            </Fade>
                         )}
 
                         {/* Scroll anchor */}
@@ -392,66 +485,169 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
             {/* Error Display */}
             {error && (
-                <Box sx={{ p: 2 }}>
-                    <Alert severity="error" onClose={() => { }}>
-                        {error}
-                    </Alert>
-                </Box>
+                <Fade in={!!error}>
+                    <Box sx={{ p: 2 }}>
+                        <Alert
+                            severity="error"
+                            onClose={() => { }}
+                            sx={{
+                                borderRadius: 3,
+                                fontWeight: 500
+                            }}
+                        >
+                            {error}
+                        </Alert>
+                    </Box>
+                </Fade>
             )}
 
-            {/* Message Input */}
+            {/* Enhanced Message Input Area */}
             <Box
                 sx={{
-                    p: 2,
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    p: { xs: 2, sm: 3 },
+                    background: theme.palette.mode === 'dark'
+                        ? 'linear-gradient(180deg, rgba(18, 18, 18, 0.95) 0%, rgba(24, 24, 24, 0.98) 100%)'
+                        : 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 100%)',
+                    backdropFilter: 'blur(20px)',
                     borderTop: `1px solid ${theme.palette.divider}`,
-                    bgcolor: 'background.paper'
+                    zIndex: 1000
                 }}
             >
-                <Box
+                <Paper
+                    elevation={8}
                     sx={{
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                        gap: 1
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        border: `2px solid ${canSend ? theme.palette.primary.main + '40' : theme.palette.divider}`,
+                        background: theme.palette.mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(18, 18, 18, 0.9) 0%, rgba(24, 24, 24, 0.9) 100%)'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%)',
+                        transition: 'all 0.3s ease',
+                        '&:focus-within': {
+                            borderColor: theme.palette.primary.main,
+                            boxShadow: `0 0 0 4px ${theme.palette.primary.main}20`
+                        }
                     }}
                 >
-                    {/* Attachment Buttons */}
-                    {/* 
-                    
-                    {/* Message Input */}
-                    <TextField
-                        ref={inputRef}
-                        fullWidth
-                        multiline
-                        maxRows={4}
-                        placeholder="Type a message..."
-                        value={message}
-                        onChange={handleInputChange}
-                        onKeyPress={handleKeyPress}
-                        onBlur={handleInputBlur}
-                        disabled={sending}
+                    <Box
                         sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: 2
-                            }
-                        }}
-                    />
-
-                    {/* Send Button */}
-                    <IconButton
-                        onClick={handleSendMessage}
-                        disabled={!message.trim() || sending}
-                        color="primary"
-                        sx={{
-                            bgcolor: message.trim() ? 'primary.main' : 'action.disabledBackground',
-                            color: message.trim() ? 'primary.contrastText' : 'action.disabled',
-                            '&:hover': {
-                                bgcolor: message.trim() ? 'primary.dark' : 'action.disabledBackground'
-                            }
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            gap: 1.5,
+                            p: 2
                         }}
                     >
-                        {sending ? <CircularProgress size={20} /> : <SendIcon />}
-                    </IconButton>
-                </Box>
+                        {/* Attachment Button */}
+                        <Tooltip title="Attach file">
+                            <IconButton
+                                onClick={handleAttachmentClick}
+                                size="medium"
+                                sx={{
+                                    color: 'text.secondary',
+                                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                    '&:hover': {
+                                        bgcolor: 'primary.main',
+                                        color: 'white',
+                                        transform: 'scale(1.1)'
+                                    },
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                <AttachFile />
+                            </IconButton>
+                        </Tooltip>
+
+                        {/* Message Input */}
+                        <TextField
+                            ref={inputRef}
+                            fullWidth
+                            multiline
+                            maxRows={4}
+                            placeholder={`Message ${otherUser?.firstName || 'user'}...`}
+                            value={message}
+                            onChange={handleInputChange}
+                            onKeyPress={handleKeyPress}
+                            onBlur={handleInputBlur}
+                            disabled={sending}
+                            variant="standard"
+                            InputProps={{
+                                disableUnderline: true,
+                                sx: {
+                                    px: 2,
+                                    py: 1,
+                                    fontSize: '1rem',
+                                    lineHeight: 1.5,
+                                    '& input::placeholder, & textarea::placeholder': {
+                                        color: 'text.secondary',
+                                        opacity: 0.8,
+                                        fontWeight: 400
+                                    }
+                                }
+                            }}
+                        />
+
+                        {/* Emoji Button */}
+                        <Tooltip title="Add emoji">
+                            <IconButton
+                                onClick={handleEmojiClick}
+                                size="medium"
+                                sx={{
+                                    color: 'text.secondary',
+                                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                    '&:hover': {
+                                        bgcolor: 'warning.main',
+                                        color: 'white',
+                                        transform: 'scale(1.1)'
+                                    },
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                <EmojiEmotions />
+                            </IconButton>
+                        </Tooltip>
+
+                        {/* Send Button */}
+                        <Tooltip title={canSend ? "Send message" : "Type a message"}>
+                            <Box>
+                                <IconButton
+                                    onClick={handleSendMessage}
+                                    disabled={!canSend}
+                                    sx={{
+                                        background: canSend
+                                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                            : theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                        color: canSend ? 'white' : 'text.disabled',
+                                        width: 48,
+                                        height: 48,
+                                        '&:hover': {
+                                            background: canSend
+                                                ? 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)'
+                                                : theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                            transform: canSend ? 'scale(1.1) rotate(5deg)' : 'none',
+                                            boxShadow: canSend ? theme.shadows[8] : 'none'
+                                        },
+                                        '&:disabled': {
+                                            background: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                                            color: 'text.disabled'
+                                        },
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        boxShadow: canSend ? theme.shadows[4] : 'none'
+                                    }}
+                                >
+                                    {sending ? (
+                                        <CircularProgress size={24} color="inherit" />
+                                    ) : (
+                                        <Send />
+                                    )}
+                                </IconButton>
+                            </Box>
+                        </Tooltip>
+                    </Box>
+                </Paper>
             </Box>
         </Box>
     );
