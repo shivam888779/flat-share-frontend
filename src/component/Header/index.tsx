@@ -32,12 +32,15 @@ import Link from 'next/link';
 import SelectListingCard from '@/component/SelectListingCard';
 import { IUserData } from '@/types/user';
 import LogInModal from '../LogInModal';
+import { logoutApi } from '@/api/auth';
+import { useGlobalSnackbar } from '@/hooks/useSnackbar';
 
 
 
 export default function Header() {
     const router = useRouter();
     const { state, setState, handleLoginDialog } = useGlobalContext();
+    const snackbar = useGlobalSnackbar();
     const isLoggedIn = state?.userData?.isLoggedIn;
     const userData = state?.userData;
 
@@ -55,11 +58,26 @@ export default function Header() {
     };
 
 
-    const handleLogout = () => {
-        handleMenuClose();
-        localStorage.clear();
-        setState({ userData: { isLoggedIn: false } as IUserData });
-        router.push('/');
+    const handleLogout = async () => {
+        try {
+            // const { data } = await logoutApi();
+            // if (data.status) {
+            // snackbar.success(data.message);
+            snackbar.success("Logged out successfully");
+            handleMenuClose();
+            localStorage.clear();
+            setState({ userData: { isLoggedIn: false } as IUserData });
+            router.push('/');
+            // }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            handleMenuClose();
+            localStorage.clear();
+            setState({ userData: { isLoggedIn: false } as IUserData });
+            router.push('/');
+        }
+
     };
 
     const handleNavigation = (path: string) => {
@@ -116,12 +134,12 @@ export default function Header() {
                 <ListItemText>Connections</ListItemText>
             </MenuItem>
             <Divider />
-            <MenuItem onClick={() => { handleNavigation('/settings'); handleMenuClose(); }}>
+            {/* <MenuItem onClick={() => { handleNavigation('/settings'); handleMenuClose(); }}>
                 <ListItemIcon>
                     <Settings fontSize="small" />
                 </ListItemIcon>
                 <ListItemText>Settings</ListItemText>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
                     <Logout fontSize="small" />

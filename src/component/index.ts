@@ -17,6 +17,7 @@ import MyProfileHeader from "./MyProfileHeader";
 import LogInModal from "./LogInModal";
 import ProfileSkeleton from "../custom-component/CustomizedSkeletons/ProfileSkeleton";
 import PropertyDetailsCardSkeleton from "../custom-component/CustomizedSkeletons/PropertyDetailsCardSkeleton";
+import LandingPageBottomView from "./LandingPageBottomView";
 
 export {
     Header,
@@ -37,7 +38,8 @@ export {
     MyProfileHeader,
     LogInModal,
     ProfileSkeleton,
-    PropertyDetailsCardSkeleton
+    PropertyDetailsCardSkeleton,
+    LandingPageBottomView
 }
 
 export * from './Chat';

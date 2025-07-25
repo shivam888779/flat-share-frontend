@@ -1,9 +1,7 @@
-import { ConnectUser, LogInModal, PropertyDetails } from "@/component";
+import { ConnectUser, PropertyDetails } from "@/component";
 import {
-    Box,
-    Stack,
+    Box, Stack,
     Container,
-    CircularProgress,
     Alert,
     AlertTitle,
     Fade,
