@@ -14,6 +14,7 @@ import {
 import { IPropertyUser } from "@/types/property";
 import { Call, Chat, Person, Email, Phone, WhatsApp, Share, Favorite, FavoriteBorder } from '@mui/icons-material';
 import { useState } from "react";
+import Link from "next/link";
 
 interface IConnectUserProps {
     propertyUser: IPropertyUser;
@@ -21,9 +22,9 @@ interface IConnectUserProps {
 
 const ConnectUser = (props: IConnectUserProps) => {
     const { propertyUser } = props;
-    const { firstName, lastName, gender, profileImage, email, phoneNo } = propertyUser;
+    const { firstName, lastName, gender, profileImage, email, phoneNo, id } = propertyUser;
     const [isFavorite, setIsFavorite] = useState(false);
-
+    console.log(propertyUser);
     return (
         <Card
             elevation={0}
@@ -44,7 +45,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                 }}
             >
                 {/* Action buttons */}
-                <Stack
+                {/* <Stack
                     direction="row"
                     spacing={1}
                     sx={{
@@ -84,41 +85,42 @@ const ConnectUser = (props: IConnectUserProps) => {
                             <Share />
                         </IconButton>
                     </Tooltip>
-                </Stack>
+                </Stack> */}
             </Box>
 
             <CardContent sx={{ textAlign: 'center', px: 3, pb: 3 }}>
                 {/* Profile Image */}
-                <Box sx={{ mt: -5, mb: 2 }}>
-                    <Avatar
-                        src={profileImage}
-                        sx={{
-                            width: 100,
-                            height: 100,
-                            border: '4px solid white',
-                            boxShadow: '0 4px 14px 0 rgba(0, 0, 0, 0.1)',
-                            margin: '0 auto',
-                            backgroundColor: 'primary.light',
-                        }}
-                    >
-                        {firstName?.[0]?.toUpperCase()}{lastName?.[0]?.toUpperCase()}
-                    </Avatar>
-                </Box>
+                <Link href={`/user/${id}`}>
+                    <Box sx={{ mt: -5, mb: 2 }}>
+                        <Avatar
+                            src={profileImage}
+                            sx={{
+                                width: 100,
+                                height: 100,
+                                border: '4px solid white',
+                                boxShadow: '0 4px 14px 0 rgba(0, 0, 0, 0.1)',
+                                margin: '0 auto',
+                                backgroundColor: 'primary.light',
+                            }}
+                        >
+                            {firstName?.[0]?.toUpperCase()}{lastName?.[0]?.toUpperCase()}
+                        </Avatar>
+                    </Box>
 
-                {/* Name and Verification */}
-                <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} mb={1}>
-                    <Typography variant="h6" fontWeight={700}>
-                        {firstName} {lastName}
-                    </Typography>
-                    {/* {verified && (
+                    {/* Name and Verification */}
+                    <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} mb={1}>
+                        <Typography variant="h6" fontWeight={700}>
+                            {firstName} {lastName}
+                        </Typography>
+                        {/* {verified && (
                         <Tooltip title="Verified User">
                             <VerifiedIcon sx={{ color: 'primary.main', fontSize: 20 }} />
                         </Tooltip>
                     )} */}
-                </Stack>
+                    </Stack>
 
-                {/* Rating */}
-                {/* {rating && (
+                    {/* Rating */}
+                    {/* {rating && (
                     <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5} mb={2}>
                         <StarIcon sx={{ color: 'warning.main', fontSize: 18 }} />
                         <Typography variant="body2" fontWeight={600}>
@@ -130,19 +132,19 @@ const ConnectUser = (props: IConnectUserProps) => {
                     </Stack>
                 )} */}
 
-                {/* Gender Chip */}
-                <Chip
-                    icon={<Person />}
-                    label={gender}
-                    size="small"
-                    sx={{
-                        mb: 2,
-                        backgroundColor: gender === 'Male' ? 'info.lighter' : 'secondary.lighter',
-                        color: gender === 'Male' ? 'info.main' : 'secondary.main',
-                        fontWeight: 500,
-                    }}
-                />
-
+                    {/* Gender Chip */}
+                    <Chip
+                        icon={<Person />}
+                        label={gender}
+                        size="small"
+                        sx={{
+                            mb: 2,
+                            backgroundColor: gender === 'Male' ? 'info.lighter' : 'secondary.lighter',
+                            color: gender === 'Male' ? 'info.main' : 'secondary.main',
+                            fontWeight: 500,
+                        }}
+                    />
+                </Link>
                 {/* Location */}
                 {/* {location && (
                     <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5} mb={2}>
@@ -243,7 +245,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                 </Stack>
 
                 {/* Trust Badge */}
-                <Box
+                {/* <Box
                     sx={{
                         mt: 3,
                         p: 1.5,
@@ -256,7 +258,7 @@ const ConnectUser = (props: IConnectUserProps) => {
                     <Typography variant="caption" color="success.dark" fontWeight={500}>
                         ✓ Identity Verified • ✓ Active User
                     </Typography>
-                </Box>
+                </Box> */}
             </CardContent>
         </Card>
     );

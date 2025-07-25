@@ -15,6 +15,8 @@ import LandingPage from "./LandingPage";
 import FilterSidebar from "./FilterSideBar";
 import MyProfileHeader from "./MyProfileHeader";
 import LogInModal from "./LogInModal";
+import ProfileSkeleton from "../custom-component/CustomizedSkeletons/ProfileSkeleton";
+import PropertyDetailsCardSkeleton from "../custom-component/CustomizedSkeletons/PropertyDetailsCardSkeleton";
 
 export {
     Header,
@@ -33,7 +35,9 @@ export {
     LandingPage,
     FilterSidebar,
     MyProfileHeader,
-    LogInModal
+    LogInModal,
+    ProfileSkeleton,
+    PropertyDetailsCardSkeleton
 }
 
 export * from './Chat';

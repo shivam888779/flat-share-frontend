@@ -5,10 +5,9 @@ import { IInitialState } from "./initial-state-type";
 import { initialStateData } from "./initial-state";
 import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPreferncesApi } from "@/api/property";
 import { getNotifications } from "@/api/notifications";
-import { getProfileApi } from "@/api/profiles/my-profile";
+import { getProfileApi } from "@/api/profiles";
 import { getConnectionsApi } from "@/api/connections";
 import { getChatRooms } from "@/api/chat";
-import { IPropertyDetails } from "@/types/property";
 
 type GlobalContextType = {
   state: IInitialState;
@@ -145,26 +144,26 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
   }, [setState]);
 
 
-  useEffect(() => {
-    if (isStorageLoaded) {
-      fetchNotification();
-    }
-  }, [isStorageLoaded]);
+  // useEffect(() => {
+  //   if (isStorageLoaded) {
+  //     fetchNotification();
+  //   }
+  // }, [isStorageLoaded]);
 
   // Fetch notifications and connections on route change
-  useEffect(() => {
-    const handleRouteChange = () => {
-      fetchNotification();
-    };
+  // useEffect(() => {
+  //   const handleRouteChange = () => {
+  //     fetchNotification();
+  //   };
 
-    router.events.on('routeChangeComplete', handleRouteChange);
-    router.events.on('routeChangeStart', handleRouteChange);
+  //   router.events.on('routeChangeComplete', handleRouteChange);
+  //   router.events.on('routeChangeStart', handleRouteChange);
 
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
-      router.events.off('routeChangeStart', handleRouteChange);
-    };
-  }, [router.events]);
+  //   return () => {
+  //     router.events.off('routeChangeComplete', handleRouteChange);
+  //     router.events.off('routeChangeStart', handleRouteChange);
+  //   };
+  // }, [router.events]);
 
   const providerValue = useMemo(() => ({
     state,

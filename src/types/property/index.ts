@@ -70,6 +70,7 @@ export interface SearchPropertyCard {
   typeId: number;
   partnerGender: 'male' | 'female' | 'any'; // assuming these are the only values
   userId: number;
+  userStatus: 'pending' | 'connected' | 'notConnected';
 }
 
 export interface IRequirement {
