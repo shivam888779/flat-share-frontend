@@ -410,7 +410,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 ) : (
                     <>
                         {messageGroups.map(({ date, messages: groupMessages }) => (
-                            <Box key={date} >
+                            <Box key={date} sx={{ scrollBehavior: 'smooth', scrollMarginTop: '100px', maxHeight: '65vh', overflow: 'auto', marginBottom: '100px' }} >
                                 {/* Date Separator */}
                                 <Box
                                     sx={{
@@ -451,13 +451,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                                 {/* Messages */}
                                 {groupMessages.map((msg, index) => (
                                     <Fade key={msg.id} in={true} timeout={400 + index * 100}>
-                                        <Box sx={{ mb: 1 }}>
+                                        <Box sx={{ mb: 1 }} id={msg.id} >
                                             <MessageBubble
                                                 message={transformMessage(msg)}
                                                 isOwnMessage={msg.senderId === userData.id}
                                                 onDelete={() => onDeleteMessage(msg.id)}
                                                 showAvatar={index === 0 || groupMessages[index - 1]?.senderId !== msg.senderId}
-                                                isSending={msg.sending || false}
+                                                // isSending={msg.sending || false}
+                                                isSending={false}
                                             />
                                         </Box>
                                     </Fade>

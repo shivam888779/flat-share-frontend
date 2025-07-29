@@ -51,20 +51,21 @@ const RequestContact: React.FC<RequestContactProps> = ({ open, onClose, userId }
             placeholder="Type your message here..."
           />
         </Box>
+        <DialogActions sx={{ mt: 1, pb: 0 }}>
+          <Button onClick={handleClose} color="secondary" variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRequest}
+            color="primary"
+            variant="contained"
+            disabled={message.trim() === ""}
+          >
+            Request
+          </Button>
+        </DialogActions>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="secondary" variant="outlined">
-          Cancel
-        </Button>
-        <Button
-          onClick={handleRequest}
-          color="primary"
-          variant="contained"
-          disabled={message.trim() === ""}
-        >
-          Request
-        </Button>
-      </DialogActions>
+
     </Dialog>
   );
 };

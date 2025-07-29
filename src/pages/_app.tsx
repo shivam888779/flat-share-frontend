@@ -8,9 +8,12 @@ import { Footer, Header, LandingPageBottomView } from "@/component";
 import { Box } from "@mui/material";
 import { useRouter } from "next/router";
 
+
+
 export default function App({ Component, pageProps }: AppProps) {
 
   const isLandingPage = useRouter().pathname === "/";
+  const hideFooter = useRouter().pathname === "/chat";
 
   return <div className="main"><ThemeProvider >
     <SnackbarProvider>
@@ -20,7 +23,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
         </Box>
         {isLandingPage && <LandingPageBottomView />}
-        <Footer />
+        {!hideFooter && <Footer />}
       </GlobalContextProvider>
     </SnackbarProvider>
 

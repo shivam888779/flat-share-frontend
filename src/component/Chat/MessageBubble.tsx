@@ -36,8 +36,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     isSending = false
 }) => {
     const theme = useTheme();
-    const {state} = useGlobalContext();
-    const {userData,connections} = state;
+    const { state } = useGlobalContext();
+    const { userData, connections } = state;
     const sender = connections.find(c => c.otherUser?.id === message.senderId)?.otherUser;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -246,6 +246,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                         }}
                     >
                         {isSending ? 'Sending...' : formatTime(message.createdAt)}
+                        {formatTime(message.createdAt)}
                     </Typography>
 
                     {isOwnMessage && !isSending && (

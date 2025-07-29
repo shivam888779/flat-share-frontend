@@ -1,4 +1,4 @@
-import { Box, Stack, Typography, Paper, Chip, Grid, IconButton, Tooltip, Card, Button } from "@mui/material";
+import { Box, Stack, Typography, Paper, Chip, Grid, IconButton, Tooltip, Card, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import CustomizedCrousal from "../CustomizedCrousal";
 import { IPropertyDetails } from "@/types/property";
 import { CustomizedRoundedSelect, CustomizedSelectChip } from "@/custom-component";
@@ -8,6 +8,9 @@ import { Share, LocationOn, ReportProblem, Home, CalendarToday, Payment, Group, 
 import { useState } from "react";
 import ListPropertyForm from "../ListPropertyForm";
 import { getFormatedDate } from "@/utils/dataFormate";
+import { deletePropertyApi } from "@/api/property";
+import { useGlobalSnackbar } from "@/hooks/useSnackbar";
+import { useRouter } from "next/router";
 
 interface IPropertyDetailsProps {
     propertyDetails: IPropertyDetails;
@@ -16,7 +19,7 @@ interface IPropertyDetailsProps {
 
 const PropertyDetails = (props: IPropertyDetailsProps) => {
     const { propertyDetails, isMyProperty } = props;
-    const { state } = useGlobalContext();
+    const { state, fetchProfile } = useGlobalContext();
     const [isReported, setIsReported] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
 
@@ -38,9 +41,26 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
 
     const resourcesSchema = state.resources?.filter((data) => resources?.includes(data.id));
     const preferencesSchema = state.preferences?.filter((data) => preferences?.includes(data.id));
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const snackBar = useGlobalSnackbar();
+    const router = useRouter();
 
     // Calculate days since posted
     const daysSincePosted = Math.floor((new Date().getTime() - new Date(availableFrom).getTime()) / (1000 * 3600 * 24));
+
+    const handleDelete = async () => {
+        const { data } = await deletePropertyApi();
+        if (data.status) {
+            snackBar.success(data.message);
+            fetchProfile();
+            router.push("/");
+        } else {
+            snackBar.error(data?.message);
+        }
+        setIsDeleteDialogOpen(false);
+
+
+    }
 
     const listingPreferenceSchema = [
         {
@@ -68,6 +88,17 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
 
     return (
         <Stack spacing={3}>
+            <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
+                <DialogTitle>Delete Property</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete this property?</Typography>
+                    <DialogActions sx={{ mt: 1, pb: 0 }}>
+                        <Button variant="outlined" color="primary" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
+                        <Button variant="outlined" color="error" onClick={() => handleDelete()}>Delete</Button>
+                    </DialogActions>
+                </DialogContent>
+
+            </Dialog>
             {isEdit ? <ListPropertyForm type="property" isEdit={isEdit} /> :
                 <>
                     {/* Main Property Card */}
@@ -138,7 +169,10 @@ const PropertyDetails = (props: IPropertyDetailsProps) => {
                                         </IconButton>
                                     </Tooltip>
                                 </Stack> :
-                                    <Button variant="outlined" color="primary" onClick={() => setIsEdit(true)}>Edit</Button>
+                                    <Stack direction="row" spacing={1}>
+                                        <Button variant="outlined" color="primary" onClick={() => setIsEdit(true)}>Edit</Button>
+                                        <Button variant="outlined" color="error" onClick={() => setIsDeleteDialogOpen(true)}>Delete</Button>
+                                    </Stack>
                                 }
                             </Stack>
                         </Box>

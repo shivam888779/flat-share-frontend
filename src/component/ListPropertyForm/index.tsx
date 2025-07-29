@@ -44,7 +44,7 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
     const [propType, setPropType] = useState("");
     const snackbar = useGlobalSnackbar();
     const router = useRouter();
-    const { state } = useGlobalContext();
+    const { state, fetchProfile } = useGlobalContext();
     const myProperty = state.myProperty;
     const [existingImages, setExistingImages] = useState<string[]>(
         isEdit ? (myProperty?.images ?? []) : []
@@ -136,10 +136,11 @@ const ListPropertyForm = ({ type, isEdit }: Props) => {
                 snackbar.success(data?.message || 'Successfully updated!');
             } else {
                 const { data } = await listPropertyApi(finalSubmission);
+
                 snackbar.success(data?.message || 'Successfully submitted!');
             }
 
-
+            fetchProfile();
             setSubmitted(true);
 
             setTimeout(() => {

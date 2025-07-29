@@ -301,9 +301,9 @@ export default function Header() {
                             onClick={() => handleNavigation('/')}
                         >
                             <h1 className="text-3xl font-bold text-purple-600">
-                                Learn<span className="text-green-500">Mate</span>
+                                Flat<span className="text-green-500">Share</span>
                             </h1>
-                            <span className="text-sm">📚</span>
+                            {/* <span className="text-sm">🏠</span> */}
                         </div>
 
                         <div className="flex gap-3">
