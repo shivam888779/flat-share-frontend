@@ -5,7 +5,7 @@ import { useGlobalContext } from '@/global-context';
 import { useRouter } from 'next/router';
 import { getOrCreateChatRoom } from '@/api/chat';
 
-const ChatPage: React.FC = () => {
+const ChatPage: any = () => {
     const { state, fetchConnections, fetchChatRooms } = useGlobalContext();
     const userData = state?.userData;
 
@@ -85,4 +85,7 @@ const ChatPage: React.FC = () => {
     );
 };
 
-export default ChatPage; 
+
+ChatPage.hideFooter = true;
+
+export default ChatPage;

@@ -28,6 +28,11 @@ const getPropertyPreferncesApi = () => {
     return api.get(`requirements/preferences`)
 }
 
+const deletePropertyApi = () => {
+    return authApi.delete(`property`)
+}
+
+
 export {
     listPropertyApi,
     searchPropertiesApi,
@@ -35,5 +40,6 @@ export {
     getPropertyHighlightsApi,
     getPropertyResourcesApi,
     getPropertyPreferncesApi,
-    updatePropertyApi
+    updatePropertyApi,
+    deletePropertyApi
 }

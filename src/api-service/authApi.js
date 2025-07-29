@@ -5,11 +5,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const authApi = axios.create({
   baseURL: BASE_URL,
-   withCredentials: true,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    
   },
+  withCredentials: true,
 });
 
 authApi.interceptors.request.use(

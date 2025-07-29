@@ -22,30 +22,167 @@ export const properyOccupancySchema = [
 
 // Fallback data in case global context is not available
 export const fallbackResources = [
-    { id: 1, name: "Gym", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 2, name: "Park", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 3, name: "Swimming Pool", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 4, name: "Maid Service", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 5, name: "AC", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 6, name: "Fan", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 7, name: "Cooler", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-    { id: 8, name: "Water Supply", imgSrc: "https://www.flatmate.in/dumbbell.png" },
-];
+    {
+        "id": 1,
+        "name": "Bed",
+        "imgSrc": null
+    },
+    {
+        "id": 2,
+        "name": "Table",
+        "imgSrc": null
+    },
+    {
+        "id": 3,
+        "name": "Chair",
+        "imgSrc": null
+    },
+    {
+        "id": 4,
+        "name": "Fan",
+        "imgSrc": null
+    },
+    {
+        "id": 5,
+        "name": "Wardrobe",
+        "imgSrc": null
+    },
+    {
+        "id": 6,
+        "name": "Mattress",
+        "imgSrc": null
+    },
+    {
+        "id": 7,
+        "name": "Refrigerator",
+        "imgSrc": null
+    },
+    {
+        "id": 8,
+        "name": "Washing Machine",
+        "imgSrc": null
+    },
+    {
+        "id": 9,
+        "name": "Curtains",
+        "imgSrc": null
+    },
+    {
+        "id": 10,
+        "name": "TV",
+        "imgSrc": null
+    }
+]
 
-export const fallbackPropertyHighlights = [
-    { id: 1, name: "Furnished", imgSrc: "https://www.flatmate.in/furnished.png" },
-    { id: 2, name: "Semi-Furnished", imgSrc: "https://www.flatmate.in/semi-furnished.png" },
-    { id: 3, name: "Unfurnished", imgSrc: "https://www.flatmate.in/unfurnished.png" },
-    { id: 4, name: "Pet Friendly", imgSrc: "https://www.flatmate.in/pet-friendly.png" },
-    { id: 5, name: "Balcony", imgSrc: "https://www.flatmate.in/balcony.png" },
-    { id: 6, name: "Parking", imgSrc: "https://www.flatmate.in/parking.png" },
-];
+export const fallbackPropertyHighlights = [{
+    "id": 1,
+    "name": "Security",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTEyIDJMMyA3bDkgMTcgOS0xN3oiLz48cGF0aCBkPSJNMTIgMnYyMCIvPjxwYXRoIGQ9Ik04IDExbDQgNCA4LTgiLz48L3N2Zz4="
+},
+{
+    "id": 2,
+    "name": "Furnished",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTQgN1Y0YTIgMiAwIDAgMSAyLTJoMTJhMiAyIDAgMCAxIDIgMnYzIi8+PHBhdGggZD0iTTQgN2gxNiIvPjxwYXRoIGQ9Ik00IDd2MTFhMiAyIDAgMCAwIDIgMmgxMmEyIDIgMCAwIDAgMi0yVjciLz48cGF0aCBkPSJNOCAxMXY2Ii8+PHBhdGggZD0iTTE2IDExdjYiLz48cGF0aCBkPSJNMTIgMTF2NiIvPjwvc3ZnPg=="
+},
+{
+    "id": 3,
+    "name": "AC Room",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjgiIHJ4PSIyIi8+PHBhdGggZD0iTTcgMTV2NCIvPjxwYXRoIGQ9Ik0xMiAxNXY0Ii8+PHBhdGggZD0iTTE3IDE1djQiLz48cGF0aCBkPSJNNyAxOWgxMCIvPjxjaXJjbGUgY3g9IjgiIGN5PSI3IiByPSIxIi8+PGNpcmNsZSBjeD0iMTYiIGN5PSI3IiByPSIxIi8+PC9zdmc+"
+},
+{
+    "id": 4,
+    "name": "WiFi",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTUgMTNhMTAgMTAgMCAwIDEgMTQgMCIvPjxwYXRoIGQ9Ik04IDE2YTYgNiAwIDAgMSA4IDAiLz48cGF0aCBkPSJNMTEgMTlhMiAyIDAgMCAxIDIgMCIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMjAiIHI9IjEiLz48L3N2Zz4="
+},
+{
+    "id": 5,
+    "name": "Power Backup",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHJlY3QgeD0iNiIgeT0iNiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiByeD0iMiIvPjxwYXRoIGQ9Ik04IDZWNGEyIDIgMCAwIDEgMi0yaDRhMiAyIDAgMCAxIDIgMnYyIi8+PHBhdGggZD0iTTEyIDEwdjQiLz48cGF0aCBkPSJNMTAgMTJoNCIvPjxwYXRoIGQ9Ik04IDE4aDgiLz48L3N2Zz4="
+},
+{
+    "id": 6,
+    "name": "Water Supply",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTEyIDIuNjlsNS42NiA1LjY2YTggOCAwIDEgMS0xMS4zMSAweiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTMiIHI9IjMiLz48L3N2Zz4="
+},
+{
+    "id": 7,
+    "name": "Parking",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTE0IDE2SDltMTAgMGgzdjRhMSAxIDAgMCAxLTEgMUgzYTEgMSAwIDAgMS0xLTF2LTRoM20xMiAwVjZhMSAxIDAgMCAwLTEtMUg0YTEgMSAwIDAgMC0xIDF2MTAiLz48Y2lyY2xlIGN4PSI2LjUiIGN5PSIxNi41IiByPSIyLjUiLz48Y2lyY2xlIGN4PSIxNy41IiBjeT0iMTYuNSIgcj0iMi41Ii8+PC9zdmc+"
+},
+{
+    "id": 8,
+    "name": "Laundry",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iMiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTMiIHI9IjUiLz48Y2lyY2xlIGN4PSI4IiBjeT0iNyIgcj0iMSIvPjxjaXJjbGUgY3g9IjExIiBjeT0iNyIgcj0iMSIvPjxwYXRoIGQ9Ik0xMiAxMHY2Ii8+PHBhdGggZD0iTTkgMTNoNiIvPjwvc3ZnPg=="
+},
+{
+    "id": 9,
+    "name": "Geyser",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHJlY3QgeD0iNiIgeT0iNCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjE2IiByeD0iMiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iOSIgcj0iMiIvPjxwYXRoIGQ9Ik04IDE1aDgiLz48cGF0aCBkPSJNOCAxN2g4Ii8+PHBhdGggZD0iTTEwIDJ2MiIvPjxwYXRoIGQ9Ik0xNCAydjIiLz48cGF0aCBkPSJNMTIgNnY2Ii8+PC9zdmc+"
+},
+{
+    "id": 10,
+    "name": "CCTV",
+    "imgSrc": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTE0LjgyOCAxNC44MjhhNCA0IDAgMCAxLTUuNjU2IDAiLz48cGF0aCBkPSJNOSA5YTMgMyAwIDEgMSA2IDAiLz48cGF0aCBkPSJNMTcuNSA2LjVMMTkgNSIvPjxwYXRoIGQ9Ik02IDZMNSA1Ii8+PHJlY3QgeD0iNCIgeT0iOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjEwIiByeD0iMiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTMiIHI9IjMiLz48L3N2Zz4="
+}
+]
+const fallbackPreferences = [
+    {
+        "id": 1,
+        "name": "Non-smoker",
+        "imgSrc": null
+    },
+    {
+        "id": 2,
+        "name": "Vegetarian",
+        "imgSrc": null
+    },
+    {
+        "id": 3,
+        "name": "Working Professional",
+        "imgSrc": null
+    },
+    {
+        "id": 4,
+        "name": "Student",
+        "imgSrc": null
+    },
+    {
+        "id": 5,
+        "name": "Early Riser",
+        "imgSrc": null
+    },
+    {
+        "id": 6,
+        "name": "Late Night Worker",
+        "imgSrc": null
+    },
+    {
+        "id": 7,
+        "name": "Pet Friendly",
+        "imgSrc": null
+    },
+    {
+        "id": 8,
+        "name": "Quiet Person",
+        "imgSrc": null
+    },
+    {
+        "id": 9,
+        "name": "Friendly",
+        "imgSrc": null
+    },
+    {
+        "id": 10,
+        "name": "Fitness Enthusiast",
+        "imgSrc": null
+    }
+]
 
 // Dynamic schema generation functions
 export const createPropertySchema = (globalState?: any): FormFieldSchema[] => {
     const highlights = globalState?.highLights || fallbackPropertyHighlights;
     const resources = globalState?.resources || fallbackResources;
-    const preferences = globalState?.preferences || fallbackResources;
+    const preferences = globalState?.preferences || fallbackPreferences;
 
     return [
         {

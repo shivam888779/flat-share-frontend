@@ -337,7 +337,7 @@ const ConnectionsPage: React.FC = () => {
                                 </Stack>
                             </Stack>
                             <Typography display={{ xs: 'none', md: 'flex' }} variant="body1" color="text.secondary">
-                                Manage your learning network and connection requests
+                                Manage your network and connection requests
                             </Typography>
                         </Box>
 
