@@ -13,10 +13,18 @@ export const initialStateData: IInitialState = {
         createdAt: "",
         updatedAt: "",
         token: "",
-        verified: false
+        verified: false,
+        isLoggedIn: false,
+        requirementListed: false,
+        propertySlug: "",
+        connections: []
     },
     highLights: [],
     resources: [],
     preferences: [],
-    notifications:[]
+    notifications: [],
+    connections: [],
+    chatRooms: [],
+    myProperty: null,
+    openLoginDialog: false
 }

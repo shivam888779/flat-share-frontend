@@ -1,5 +1,6 @@
 import { FormFieldSchema } from "@/custom-component/CustomizedSchemaBasedForm/formSchema";
 import { ICreateProfilePayLoad } from "@/types/user";
+import * as Yup from "yup";
 
 // Create Profile Form Schema
 
@@ -106,19 +107,7 @@ export const editProfileFormSchema: FormFieldSchema[] = [
         required: true,
         placeholder: "Enter your last name",
     },
-    {
-        componentType: "textField",
-        name: "email",
-        type: "email",
-        variant: "outlined",
-        fullWidth: true,
-        fieldKey: undefined,
-        schema: undefined,
-        inputLabel: "Email",
-        propsKey: ["handleChange"],
-        required: false,
-        placeholder: "your.email@example.com",
-    },
+
     {
         componentType: "textField",
         name: "phoneNo",
@@ -130,7 +119,8 @@ export const editProfileFormSchema: FormFieldSchema[] = [
         inputLabel: "Phone Number",
         propsKey: ["handleChange"],
         required: true,
-        placeholder: "9876543210",
+        placeholder: "Enter your phone number",
+        disabled: true,
         // disabled: true, // Phone number is usually not editable
     },
     {
@@ -205,3 +195,21 @@ export const subscriptionPlans = {
         period: "per month"
     }
 };
+
+export const myProfileValidationSchema = Yup.object({
+    firstName: Yup.string()
+        .min(2, "First name must be at least 2 characters")
+        .max(50, "First name must be less than 50 characters")
+        .required("First name is required"),
+    lastName: Yup.string()
+        .min(2, "Last name must be at least 2 characters")
+        .max(50, "Last name must be less than 50 characters")
+        .required("Last name is required"),
+    email: Yup.string()
+        .email("Please enter a valid email address"),
+    gender: Yup.string()
+        .oneOf(["Male", "Female", "Other"], "Please select a valid gender")
+        .required("Gender is required"),
+    description: Yup.string()
+        .max(500, "Description must be less than 500 characters"),
+});

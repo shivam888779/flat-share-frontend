@@ -94,6 +94,7 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                         rows={props.rows}
                         placeholder={props.placeholder}
                         size="small"
+                        disabled={props.disabled}
                         // inputProps={{
                         //     min: props.min,
                         //     // max: props.max,

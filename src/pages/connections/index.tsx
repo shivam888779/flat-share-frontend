@@ -1,38 +1,16 @@
-import React, { useEffect, useState } from "react";
-import {
-    Box,
-    Typography,
-    Paper,
-    Stack,
-    Fade,
-    CircularProgress,
-    Grid,
-    Card,
-    CardContent,
-    Tabs,
-    Tab,
-    Badge,
-    TextField,
-    InputAdornment,
-    IconButton,
-    Tooltip,
-    Chip,
-} from "@mui/material";
-import { getConnectionsApi, approveRequestApi, rejectRequestApi, cancelRequestApi } from "@/api/connections";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { Box, Typography, Paper, Stack, Fade, CircularProgress, Card, CardContent, Tabs, Tab, InputAdornment, TextField, IconButton, Tooltip, Chip } from "@mui/material";
+import { approveRequestApi, rejectRequestApi, cancelRequestApi } from "@/api/connections";
 import { useGlobalContext } from "@/global-context";
-import { IConnection, IConnectionFilters } from "@/types/connection";
+import { CONNECTION_STATUS, DAYS_IN_WEEK, TAB_INDICES, TabPanelProps } from "@/types/connection";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
-import {
-    ConnectionList,
-    ConnectionFilters,
-} from "@/component/contact-access-components";
+import { ConnectionList } from "@/component/contact-access-components";
 import { People, Schedule, Send, FiberNew, Search, Refresh, PersonAdd } from '@mui/icons-material';
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
-}
+
+
+
+type TabIndex = typeof TAB_INDICES[keyof typeof TAB_INDICES];
 
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
@@ -53,36 +31,59 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const ConnectionsPage: React.FC = () => {
-    const { state } = useGlobalContext();
-    const { userData } = state;
-    const [connections, setConnections] = useState<IConnection[]>([]);
+    const { state, fetchConnections } = useGlobalContext();
+    const { userData, connections } = state;
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [tabValue, setTabValue] = useState(0);
-    const [filters, setFilters] = useState<IConnectionFilters>({
-        status: "all",
-    });
+    const [tabValue, setTabValue] = useState<TabIndex>(TAB_INDICES.ALL);
     const snackbar = useGlobalSnackbar();
 
-    // Get filtered connections
-    const getFilteredConnections = (filterValue: string, currentUserId: number): IConnection[] => {
-        if (!connections || connections.length === 0) {
-            return [];
+    // Memoized connection categorization
+    const categorizedConnections = useMemo(() => {
+        if (!connections?.length) {
+            return {
+                all: [],
+                incoming: [],
+                sent: [],
+                connected: [],
+                rejected: [],
+            };
         }
 
-        let filtered = connections;
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - DAYS_IN_WEEK);
 
-        // Apply status filter
-        if (filterValue !== "all") {
-            filtered = filtered.filter(conn => conn.status === filterValue);
-        }
+        return {
+            all: connections,
+            incoming: connections.filter(
+                conn => conn.receiverId === userData.id && conn.status === CONNECTION_STATUS.PENDING
+            ),
+            sent: connections.filter(
+                conn => conn.requesterId === userData.id && conn.status === CONNECTION_STATUS.PENDING
+            ),
+            connected: connections.filter(
+                conn => conn.status === CONNECTION_STATUS.APPROVED
+            ),
+            rejected: connections.filter(
+                conn => conn.status === CONNECTION_STATUS.REJECTED
+            ),
+        };
+    }, [connections, userData.id]);
+
+    // Memoized search logic
+    const filteredConnections = useMemo(() => {
+        const { all } = categorizedConnections;
+
+        if (!all.length) return [];
+
+        let filtered = all;
 
         // Apply search filter
-        if (searchQuery) {
+        if (searchQuery.trim()) {
+            const searchLower = searchQuery.toLowerCase().trim();
             filtered = filtered.filter(conn => {
-                const otherUser = conn.requesterId === currentUserId ? conn.receiver : conn.requester;
-                const searchLower = searchQuery.toLowerCase();
+                const { otherUser } = conn;
                 return (
                     otherUser?.firstName?.toLowerCase().includes(searchLower) ||
                     otherUser?.lastName?.toLowerCase().includes(searchLower) ||
@@ -92,122 +93,173 @@ const ConnectionsPage: React.FC = () => {
         }
 
         return filtered;
-    };
+    }, [categorizedConnections, searchQuery]);
 
-    // Get filtered connections
-    const filteredConnections = getFilteredConnections(filters.status, userData.id);
+    // Memoized tab-specific connections
+    const tabConnections = useMemo(() => {
+        const { incoming, sent, connected } = categorizedConnections;
 
-    // Categorize connections
-    const allConnections = connections;
-    const incomingRequests = connections.filter(
-        conn => conn.receiverId === userData.id && conn.status === 'PENDING'
-    );
-    const sentRequests = connections.filter(
-        conn => conn.requesterId === userData.id && conn.status === 'PENDING'
-    );
-    const connectedUsers = connections.filter(
-        conn => conn.status === 'APPROVED'
-    );
-    const rejectedConnections = connections.filter(
-        conn => conn.status === 'REJECTED'
-    );
-
-    // Get tab-specific connections
-    const getTabConnections = () => {
         switch (tabValue) {
-            case 0: // All
-                return filteredConnections;
-            case 1: // Received
-                return filteredConnections.filter(conn =>
-                    conn.receiverId === userData.id && conn.status === 'PENDING'
-                );
-            case 2: // Sent
-                return filteredConnections.filter(conn =>
-                    conn.requesterId === userData.id && conn.status === 'PENDING'
-                );
-            case 3: // Connected
-                return filteredConnections.filter(conn => conn.status === 'APPROVED');
+            case TAB_INDICES.RECEIVED:
+                return searchQuery.trim() ?
+                    filteredConnections.filter(conn =>
+                        conn.receiverId === userData.id && conn.status === CONNECTION_STATUS.PENDING
+                    ) : incoming;
+            case TAB_INDICES.SENT:
+                return searchQuery.trim() ?
+                    filteredConnections.filter(conn =>
+                        conn.requesterId === userData.id && conn.status === CONNECTION_STATUS.PENDING
+                    ) : sent;
+            case TAB_INDICES.CONNECTED:
+                return searchQuery.trim() ?
+                    filteredConnections.filter(conn => conn.status === CONNECTION_STATUS.APPROVED) : connected;
             default:
                 return filteredConnections;
         }
-    };
+    }, [tabValue, filteredConnections, categorizedConnections, userData.id, searchQuery]);
 
-    // Stats calculations
-    const stats = {
-        total: connectedUsers.length,
-        pending: incomingRequests.length,
-        sent: sentRequests.length,
-        new: incomingRequests.filter(conn => {
-            // Handle potential undefined createdAt by providing default date
+    // Memoized stats
+    const stats = useMemo(() => {
+        const { connected, incoming } = categorizedConnections;
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - DAYS_IN_WEEK);
+
+        const newThisWeek = incoming.filter(conn => {
             const createdDate = new Date(conn.createdAt || new Date());
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
             return createdDate > weekAgo;
-        }).length,
-    };
+        }).length;
 
-    const handleApprove = async (connectionId: number) => {
-        try {
-            const response = await approveRequestApi(connectionId);
-            snackbar.success(response.data.message || "Request approved successfully!");
-            getConnections();
-        } catch (error) {
-            snackbar.error("Failed to approve request");
+        return {
+            total: connected.length,
+            pending: incoming.length,
+            sent: categorizedConnections.sent.length,
+            new: newThisWeek,
+        };
+    }, [categorizedConnections]);
+
+    // Memoized connection card schema
+    const connectionCardSchema = useMemo(() => [
+        {
+            title: "Total Connections",
+            icon: <People sx={{ color: 'primary.main' }} />,
+            value: stats.total,
+            count: categorizedConnections.all.length,
+        },
+        {
+            title: "Pending Requests",
+            icon: <Schedule sx={{ color: 'warning.main' }} />,
+            value: stats.pending,
+            count: categorizedConnections.incoming.length,
+        },
+        {
+            title: "Sent Requests",
+            icon: <Send sx={{ color: 'secondary.main' }} />,
+            value: stats.sent,
+            count: categorizedConnections.sent.length,
+        },
+        {
+            title: "New This Week",
+            icon: <FiberNew sx={{ color: 'success.main' }} />,
+            value: stats.new,
+            count: stats.new,
         }
-    };
+    ], [stats, categorizedConnections]);
 
-    const handleReject = async (connectionId: number) => {
+    // Optimized action handlers with useCallback
+    const handleConnectionAction = useCallback(async (
+        action: 'approve' | 'reject' | 'cancel',
+        connectionId: number
+    ) => {
         try {
-            const response = await rejectRequestApi(connectionId);
-            snackbar.success(response.data.message || "Request rejected successfully!");
-            getConnections();
+            const apiCall = {
+                approve: approveRequestApi,
+                reject: rejectRequestApi,
+                cancel: cancelRequestApi,
+            }[action];
+
+            const response = await apiCall(connectionId);
+            const messages = {
+                approve: "Request approved successfully!",
+                reject: "Request rejected successfully!",
+                cancel: "Request cancelled successfully!",
+            };
+
+            snackbar.success(response.data.message || messages[action]);
+            await fetchConnections();
         } catch (error) {
-            snackbar.error("Failed to reject request");
+            const errorMessages = {
+                approve: "Failed to approve request",
+                reject: "Failed to reject request",
+                cancel: "Failed to cancel request",
+            };
+            snackbar.error(errorMessages[action]);
         }
-    };
+    }, [snackbar, fetchConnections]);
 
-    const handleCancelRequest = async (connectionId: number) => {
-        try {
-            const response = await cancelRequestApi(connectionId);
-            snackbar.success(response.data.message || "Request cancelled successfully!");
-            getConnections();
-        } catch (error) {
-            snackbar.error("Failed to cancel request");
-        }
-    };
+    const handleApprove = useCallback((connectionId: number) =>
+        handleConnectionAction('approve', connectionId), [handleConnectionAction]);
 
-    const handleFiltersChange = (newFilters: IConnectionFilters) => {
-        setFilters(newFilters);
-    };
+    const handleReject = useCallback((connectionId: number) =>
+        handleConnectionAction('reject', connectionId), [handleConnectionAction]);
 
-    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-        setTabValue(newValue);
-    };
+    const handleCancelRequest = useCallback((connectionId: number) =>
+        handleConnectionAction('cancel', connectionId), [handleConnectionAction]);
 
-    const handleRefresh = async () => {
-        setRefreshing(true);
-        await getConnections();
-        setRefreshing(false);
-    };
 
-    const getConnections = async () => {
-        try {
-            setLoading(true);
-            const response = await getConnectionsApi();
-            const connectionsData = Array.isArray(response?.data?.data) ? response.data?.data : [];
-            setConnections(connectionsData);
-        } catch (error) {
-            console.error("Failed to fetch connections:", error);
-            snackbar.error("Failed to load connections");
-            setConnections([]);
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    useEffect(() => {
-        getConnections();
+    const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue as TabIndex);
     }, []);
+
+    const handleRefresh = useCallback(async () => {
+        setRefreshing(true);
+        try {
+            await fetchConnections();
+        } catch (error) {
+            snackbar.error("Failed to refresh connections");
+        } finally {
+            setRefreshing(false);
+        }
+    }, [fetchConnections, snackbar]);
+
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    }, []);
+
+    // Initialize data
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await fetchConnections();
+            } catch (error) {
+                snackbar.error("Failed to load connections");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [fetchConnections, snackbar]);
+
+    // Render tab label with count
+    const renderTabLabel = useCallback((label: string, count: number, showBadge = true) => (
+        <Stack direction="row" spacing={1} alignItems="center">
+            <span>{label}</span>
+            {(showBadge && count > 0) && (
+                <Chip
+                    label={count}
+                    size="small"
+                    sx={{
+                        height: 20,
+                        fontSize: '0.75rem',
+                        backgroundColor: label === 'Received' ? 'error.main' :
+                            label === 'Sent' ? 'warning.main' :
+                                label === 'Connected' ? 'success.main' : 'primary.main',
+                        color: 'common.white',
+                    }}
+                />
+            )}
+        </Stack>
+    ), []);
 
     if (loading) {
         return (
@@ -228,7 +280,7 @@ const ConnectionsPage: React.FC = () => {
         <Box
             sx={{
                 minHeight: '100vh',
-                backgroundColor: '#f3f4f6',
+                backgroundColor: 'grey.50',
                 py: 4,
             }}
         >
@@ -238,7 +290,7 @@ const ConnectionsPage: React.FC = () => {
                         {/* Page Header */}
                         <Box>
                             <Stack
-                                direction={{ xs: 'column', sm: 'row' }}
+                                direction="row"
                                 justifyContent="space-between"
                                 alignItems={{ xs: 'flex-start', sm: 'center' }}
                                 spacing={2}
@@ -266,7 +318,7 @@ const ConnectionsPage: React.FC = () => {
                                             onClick={handleRefresh}
                                             disabled={refreshing}
                                             sx={{
-                                                backgroundColor: 'white',
+                                                backgroundColor: 'background.paper',
                                                 border: '1px solid',
                                                 borderColor: 'divider',
                                             }}
@@ -284,173 +336,57 @@ const ConnectionsPage: React.FC = () => {
                                     </Tooltip>
                                 </Stack>
                             </Stack>
-                            <Typography variant="body1" color="text.secondary">
+                            <Typography display={{ xs: 'none', md: 'flex' }} variant="body1" color="text.secondary">
                                 Manage your learning network and connection requests
                             </Typography>
                         </Box>
 
                         {/* Stats Cards */}
-                        <Grid container spacing={2}>
-                            <Grid item xs={6} sm={3}>
+                        <Stack direction="row" display={{ xs: 'none', md: 'flex' }} gap={2} flexWrap="wrap" justifyContent="space-between">
+                            {connectionCardSchema.map((item, index) => (
                                 <Card
+                                    key={index}
                                     sx={{
-                                        borderRadius: '12px',
-                                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                        },
+                                        height: 'fit-content',
+                                        width: 'fit-content',
+                                        minWidth: '260px',
                                     }}
                                 >
                                     <CardContent>
-                                        <Stack spacing={1}>
+                                        <Stack direction="row" gap={2}>
                                             <Box
                                                 sx={{
                                                     width: 48,
                                                     height: 48,
                                                     borderRadius: '12px',
-                                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                                    backgroundColor: 'primary.light',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                 }}
                                             >
-                                                <People sx={{ color: 'primary.main' }} />
+                                                {item.icon}
                                             </Box>
-                                            <Typography variant="h4" fontWeight={700}>
-                                                {stats.total}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Total Connections
-                                            </Typography>
+                                            <Stack direction="column" spacing={1}>
+                                                <Typography variant="h4" fontWeight={700}>
+                                                    {item.value}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {item.title}
+                                                </Typography>
+                                            </Stack>
                                         </Stack>
                                     </CardContent>
                                 </Card>
-                            </Grid>
-
-                            <Grid item xs={6} sm={3}>
-                                <Card
-                                    sx={{
-                                        borderRadius: '12px',
-                                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                        },
-                                    }}
-                                >
-                                    <CardContent>
-                                        <Stack spacing={1}>
-                                            <Box
-                                                sx={{
-                                                    width: 48,
-                                                    height: 48,
-                                                    borderRadius: '12px',
-                                                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}
-                                            >
-                                                <Schedule sx={{ color: 'warning.main' }} />
-                                            </Box>
-                                            <Typography variant="h4" fontWeight={700}>
-                                                {stats.pending}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Pending Requests
-                                            </Typography>
-                                        </Stack>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-
-                            <Grid item xs={6} sm={3}>
-                                <Card
-                                    sx={{
-                                        borderRadius: '12px',
-                                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                        },
-                                    }}
-                                >
-                                    <CardContent>
-                                        <Stack spacing={1}>
-                                            <Box
-                                                sx={{
-                                                    width: 48,
-                                                    height: 48,
-                                                    borderRadius: '12px',
-                                                    backgroundColor: 'rgba(118, 75, 162, 0.1)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}
-                                            >
-                                                <Send sx={{ color: 'secondary.main' }} />
-                                            </Box>
-                                            <Typography variant="h4" fontWeight={700}>
-                                                {stats.sent}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Sent Requests
-                                            </Typography>
-                                        </Stack>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-
-                            <Grid item xs={6} sm={3}>
-                                <Card
-                                    sx={{
-                                        borderRadius: '12px',
-                                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                        },
-                                    }}
-                                >
-                                    <CardContent>
-                                        <Stack spacing={1}>
-                                            <Box
-                                                sx={{
-                                                    width: 48,
-                                                    height: 48,
-                                                    borderRadius: '12px',
-                                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}
-                                            >
-                                                <FiberNew sx={{ color: 'success.main' }} />
-                                            </Box>
-                                            <Typography variant="h4" fontWeight={700}>
-                                                {stats.new}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                New This Week
-                                            </Typography>
-                                        </Stack>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        </Grid>
+                            ))}
+                        </Stack>
 
                         {/* Main Content Card */}
                         <Paper
-                            elevation={0}
+                            elevation={1}
                             sx={{
                                 borderRadius: '16px',
-                                backgroundColor: 'white',
-                                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                                backgroundColor: 'background.paper',
                                 overflow: 'hidden',
                             }}
                         >
@@ -465,19 +401,19 @@ const ConnectionsPage: React.FC = () => {
                                     <TextField
                                         placeholder="Search connections..."
                                         value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onChange={handleSearchChange}
                                         size="small"
                                         sx={{
                                             flex: 1,
                                             maxWidth: { sm: 400 },
                                             '& .MuiOutlinedInput-root': {
-                                                backgroundColor: '#f9fafb',
+                                                backgroundColor: 'grey.50',
                                                 borderRadius: '8px',
                                                 '& fieldset': {
-                                                    borderColor: '#e5e7eb',
+                                                    borderColor: 'grey.300',
                                                 },
                                                 '&:hover fieldset': {
-                                                    borderColor: '#9ca3af',
+                                                    borderColor: 'grey.400',
                                                 },
                                                 '&.Mui-focused fieldset': {
                                                     borderColor: 'primary.main',
@@ -493,16 +429,13 @@ const ConnectionsPage: React.FC = () => {
                                             ),
                                         }}
                                     />
-                                    <ConnectionFilters
-                                        filters={filters}
-                                        onFiltersChange={handleFiltersChange}
-                                    />
                                 </Stack>
 
                                 {/* Tabs */}
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <Tabs
                                         value={tabValue}
+                                        variant="scrollable"
                                         onChange={handleTabChange}
                                         sx={{
                                             '& .MuiTabs-indicator': {
@@ -511,118 +444,25 @@ const ConnectionsPage: React.FC = () => {
                                             },
                                         }}
                                     >
-                                        <Tab
-                                            label={
-                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                    <span>All</span>
-                                                    <Chip
-                                                        label={allConnections.length}
-                                                        size="small"
-                                                        sx={{
-                                                            height: 20,
-                                                            fontSize: '0.75rem',
-                                                            backgroundColor: 'primary.main',
-                                                            color: 'white',
-                                                        }}
-                                                    />
-                                                </Stack>
-                                            }
-                                        />
-                                        <Tab
-                                            label={
-                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                    <span>Received</span>
-                                                    {incomingRequests.length > 0 && (
-                                                        <Chip
-                                                            label={incomingRequests.length}
-                                                            size="small"
-                                                            sx={{
-                                                                height: 20,
-                                                                fontSize: '0.75rem',
-                                                                backgroundColor: 'error.main',
-                                                                color: 'white',
-                                                            }}
-                                                        />
-                                                    )}
-                                                </Stack>
-                                            }
-                                        />
-                                        <Tab
-                                            label={
-                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                    <span>Sent</span>
-                                                    {sentRequests.length > 0 && (
-                                                        <Chip
-                                                            label={sentRequests.length}
-                                                            size="small"
-                                                            sx={{
-                                                                height: 20,
-                                                                fontSize: '0.75rem',
-                                                                backgroundColor: 'warning.main',
-                                                                color: 'white',
-                                                            }}
-                                                        />
-                                                    )}
-                                                </Stack>
-                                            }
-                                        />
-                                        <Tab
-                                            label={
-                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                    <span>Connected</span>
-                                                    <Chip
-                                                        label={connectedUsers.length}
-                                                        size="small"
-                                                        sx={{
-                                                            height: 20,
-                                                            fontSize: '0.75rem',
-                                                            backgroundColor: 'success.main',
-                                                            color: 'white',
-                                                        }}
-                                                    />
-                                                </Stack>
-                                            }
-                                        />
+                                        <Tab label={renderTabLabel('All', categorizedConnections.all.length)} />
+                                        <Tab label={renderTabLabel('Received', categorizedConnections.incoming.length)} />
+                                        <Tab label={renderTabLabel('Sent', categorizedConnections.sent.length)} />
+                                        <Tab label={renderTabLabel('Connected', categorizedConnections.connected.length)} />
                                     </Tabs>
                                 </Box>
 
                                 {/* Tab Panels */}
-                                <TabPanel value={tabValue} index={0}>
-                                    <ConnectionList
-                                        connections={getTabConnections()}
-                                        currentUserId={userData.id}
-                                        onApprove={handleApprove}
-                                        onReject={handleReject}
-                                        onCancel={handleCancelRequest}
-                                    />
-                                </TabPanel>
-                                <TabPanel value={tabValue} index={1}>
-                                    <ConnectionList
-                                        connections={getTabConnections()}
-                                        currentUserId={userData.id}
-                                        onApprove={handleApprove}
-                                        onReject={handleReject}
-                                        onCancel={handleCancelRequest}
-                                    />
-                                </TabPanel>
-                                <TabPanel value={tabValue} index={2}>
-                                    <ConnectionList
-                                        connections={getTabConnections()}
-                                        currentUserId={userData.id}
-                                        onApprove={handleApprove}
-                                        onReject={handleReject}
-                                        onCancel={handleCancelRequest}
-                                    />
-                                </TabPanel>
-                                <TabPanel value={tabValue} index={3}>
-                                    <ConnectionList
-                                        connections={getTabConnections()}
-                                        currentUserId={userData.id}
-                                        onApprove={handleApprove}
-                                        onReject={handleReject}
-                                        onCancel={handleCancelRequest}
-                                    />
-                                </TabPanel>
+                                {[TAB_INDICES.ALL, TAB_INDICES.RECEIVED, TAB_INDICES.SENT, TAB_INDICES.CONNECTED].map((index) => (
+                                    <TabPanel key={index} value={tabValue} index={index}>
+                                        <ConnectionList
+                                            connections={tabConnections}
+                                            currentUserId={userData.id}
+                                            onApprove={handleApprove}
+                                            onReject={handleReject}
+                                            onCancel={handleCancelRequest}
+                                        />
+                                    </TabPanel>
+                                ))}
                             </Box>
                         </Paper>
                     </Stack>

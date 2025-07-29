@@ -1,4 +1,4 @@
-import { api } from "@/api-service";
+import { api, authApi } from "@/api-service";
 import { ISendOTPPayLoad, IVerifyOTPPayLoad } from "@/types/user";
 
 const sendOtpApi = (payload: ISendOTPPayLoad) => {
@@ -7,5 +7,8 @@ const sendOtpApi = (payload: ISendOTPPayLoad) => {
 const verifyOtpApi = (payload: IVerifyOTPPayLoad) => {
     return api.post("auth/verify-otp", payload)
 }
+const logoutApi = () => {
+    return authApi.post("auth/logout")
+}
 
-export {sendOtpApi,verifyOtpApi}
+export { sendOtpApi, verifyOtpApi, logoutApi }
