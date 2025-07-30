@@ -5,9 +5,11 @@ import { IPropertyFormValues, IPropertyListSearch } from "@/types/property";
 const listPropertyApi = (payload: IPropertyFormValues | any) => {
     return authApi.post('property', payload)
 }
-
+const updatePropertyApi = (payload: IPropertyFormValues | any) => {
+    return authApi.put('property/update', payload)
+}
 const searchPropertiesApi = (payload: IPropertyListSearch) => {
-    return api.get(`property/search?lat=${payload.lat}&lng=${payload?.lng}&radiusKm=${payload.radiusKm}`)
+    return authApi.get(`property/search?lat=${payload.lat}&lng=${payload?.lng}&radiusKm=${payload.radiusKm}`)
 }
 
 const getPropertyDetailsApi = (id: string) => {
@@ -26,11 +28,18 @@ const getPropertyPreferncesApi = () => {
     return api.get(`requirements/preferences`)
 }
 
+const deletePropertyApi = () => {
+    return authApi.delete(`property`)
+}
+
+
 export {
     listPropertyApi,
     searchPropertiesApi,
     getPropertyDetailsApi,
     getPropertyHighlightsApi,
     getPropertyResourcesApi,
-    getPropertyPreferncesApi
+    getPropertyPreferncesApi,
+    updatePropertyApi,
+    deletePropertyApi
 }

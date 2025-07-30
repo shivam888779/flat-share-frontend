@@ -2,22 +2,32 @@ import React, { useState, ChangeEvent } from "react";
 import { Box, Button, Stack, IconButton, Typography } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloseIcon from '@mui/icons-material/Close';
+import { useGlobalContext } from "@/global-context";
+import { useRouter } from "next/router";
 
 interface ImageUploadProps {
   setSelectedFiles: (files: File[]) => void;
   maxImages?: number;
+  existingImages?: string[];
+  onRemoveExistingImage?: (url: string) => void;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages = 3 }) => {
-  const [previews, setPreviews] = useState<string[]>([]);
+const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages = 3, existingImages = [], onRemoveExistingImage }) => {
+
+  const { state: { myProperty }, setState } = useGlobalContext();
+  const router = useRouter();
+  const isMyProperty = router.pathname.includes("my-property");
+
+  const [previews, setPreviews] = useState<string[]>(isMyProperty ? myProperty?.images || [] : []);
   const [files, setFiles] = useState<File[]>([]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       let filesArray = Array.from(event.target.files);
-      let newFiles = [...files, ...filesArray].slice(0, maxImages);
+      let newFiles = [...files, ...filesArray].slice(0, maxImages - existingImages.length);
       setFiles(newFiles);
       setSelectedFiles(newFiles);
+
 
       const previewPromises = newFiles.map(
         file =>
@@ -29,6 +39,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
       );
       Promise.all(previewPromises).then(setPreviews);
       event.target.value = '';
+      if (isMyProperty) {
+        setPreviews([...myProperty?.images || [], ...previews]);
+      }
     }
   };
 
@@ -37,6 +50,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
     setFiles(newFiles);
     setSelectedFiles(newFiles);
     setPreviews(previews.filter((_, i) => i !== idx));
+    if (isMyProperty && myProperty?.id) {
+      setState({
+        myProperty: {
+          ...myProperty,
+          id: myProperty.id,
+          images: myProperty?.images?.filter((_, i) => i !== idx) || [],
+        },
+      });
+
+    }
   };
 
   return (
@@ -63,14 +86,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
           multiple={maxImages > 1}
           onChange={handleFileChange}
           style={{ display: 'none' }}
-          disabled={files.length >= maxImages}
+          disabled={files.length + existingImages.length >= maxImages}
         />
 
         <Stack direction="row" alignItems="center" spacing={2}>
           <Button
             variant="outlined"
             size="small"
-            disabled={files.length >= maxImages}
+            disabled={files.length + existingImages.length >= maxImages}
             sx={{
               borderColor: '#e5e7eb',
               backgroundColor: 'white',
@@ -94,7 +117,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
               document.getElementById('file-upload-input')?.click();
             }}
           >
-            Choose files | {files.length === 0 ? 'No file chosen' : `${files.length} file(s) chosen`}
+            Choose files | {files.length + existingImages.length === 0 ? 'No file chosen' : `${files.length + existingImages.length} file(s) chosen`}
           </Button>
 
           <Typography
@@ -109,11 +132,53 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setSelectedFiles, maxImages =
         </Stack>
       </Box>
 
-      {previews.length > 0 && (
+      {(existingImages.length > 0 || previews.length > 0) && (
         <Stack direction="row" spacing={1} sx={{ mt: 2 }} flexWrap="wrap">
+          {/* Existing images */}
+          {existingImages.map((url, idx) => (
+            <Box
+              key={url}
+              sx={{
+                position: 'relative',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                width: 100,
+                height: 100,
+                mb: 1,
+              }}
+            >
+              <img
+                src={url}
+                alt={`Existing Preview ${idx + 1}`}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+              />
+              <IconButton
+                size="small"
+                onClick={() => onRemoveExistingImage && onRemoveExistingImage(url)}
+                sx={{
+                  position: 'absolute',
+                  top: 4,
+                  right: 4,
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  width: 24,
+                  height: 24,
+                  '&:hover': {
+                    backgroundColor: 'white',
+                  },
+                }}
+              >
+                <CloseIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Box>
+          ))}
+          {/* New file previews */}
           {previews.map((src, idx) => (
             <Box
-              key={idx}
+              key={src}
               sx={{
                 position: 'relative',
                 borderRadius: '8px',

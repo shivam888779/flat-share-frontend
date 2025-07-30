@@ -1,35 +1,32 @@
 'use client'
-import React, {
-  createContext,
-  useContext,
-  useMemo,
-  useReducer,
-  ReactNode,
-  Dispatch,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from "react";
+import React, { createContext, useContext, useMemo, useReducer, ReactNode, Dispatch, useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { IInitialState } from "./initial-state-type";
 import { initialStateData } from "./initial-state";
 import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPreferncesApi } from "@/api/property";
 import { getNotifications } from "@/api/notifications";
-import { getProfileApi } from "@/api/profiles/my-profile";
+import { getProfileApi } from "@/api/profiles";
+import { getConnectionsApi } from "@/api/connections";
+import { getChatRooms } from "@/api/chat";
 
 type GlobalContextType = {
   state: IInitialState;
   setState: Dispatch<Partial<IInitialState>>;
   fetchNotification: () => Promise<void>;
   fetchProfile: () => Promise<void>;
-  };
+  fetchConnections: () => Promise<void>;
+  fetchChatRooms: () => Promise<void>;
+  handleLoginDialog: (open: boolean) => void;
+};
 
 const GlobalContext = createContext<GlobalContextType>({
   state: initialStateData,
   setState: () => { },
-  fetchNotification: async () => {},
-  fetchProfile: async () => {},
+  fetchNotification: async () => { },
+  fetchProfile: async () => { },
+  fetchConnections: async () => { },
+  fetchChatRooms: async () => { },
+  handleLoginDialog: () => { },
 });
 
 const simpleReducer = (
@@ -52,18 +49,24 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
   const isInitialized = useRef(false);
   const router = useRouter();
 
-  const fetchNotification = async () => {
+  const fetchNotification = useCallback(async () => {
     try {
       const res = await getNotifications();
       setState({ notifications: res?.data?.data || [] });
     } catch (e) {
       console.error("Failed to fetch notifications", e);
     }
-  };
+  }, [setState]);
 
 
-
+  const isAuthPage = ["/create-profile", "/add-listing", "/my-profile", "/notifications", "/register", "/connections", "/edit-listing"]
   // Load from localStorage first
+  useEffect(() => {
+    if (isAuthPage.includes(window.location.pathname) && !state.userData.isLoggedIn) {
+      router.push("/");
+    }
+  }, [state]);
+
   useEffect(() => {
     try {
       const savedState = localStorage.getItem("state");
@@ -107,43 +110,70 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     fetchRequirements();
     isInitialized.current = true;
   }, [isStorageLoaded, state]);
-  
+
   const fetchProfile = useCallback(async () => {
     try {
       const res = await getProfileApi();
-      setState({ userData:{ ...res?.data?.data, isLoggedIn: true } });
+      setState({ userData: { ...res?.data?.data, isLoggedIn: true } });
     } catch (e) {
       console.error("Failed to fetch profile", e);
     }
-  }, [setState,state]);
-  // Fetch notifications on initial load
-  useEffect(() => {
-    if (isStorageLoaded) {
-      fetchNotification();
+  }, [setState]);
+
+  const handleLoginDialog = useCallback((open: boolean) => {
+    setState({ openLoginDialog: open });
+  }, [setState]);
+
+  const fetchConnections = useCallback(async () => {
+    try {
+      const res = await getConnectionsApi();
+      console.log(res?.data?.data);
+      setState({ connections: res?.data?.data || [] });
+    } catch (e) {
+      console.error("Failed to fetch profile", e);
     }
-  }, [isStorageLoaded]);
+  }, [setState]);
+
+  const fetchChatRooms = useCallback(async () => {
+    try {
+      const { data } = await getChatRooms();
+      setState({ chatRooms: data?.data || [] });
+    } catch (e) {
+      console.error("Failed to fetch chat rooms", e);
+    }
+  }, [setState]);
+
+
+  // useEffect(() => {
+  //   if (isStorageLoaded) {
+  //     fetchNotification();
+  //   }
+  // }, [isStorageLoaded]);
 
   // Fetch notifications and connections on route change
-  useEffect(() => {
-    const handleRouteChange = () => {
-      fetchNotification();
-    };
+  // useEffect(() => {
+  //   const handleRouteChange = () => {
+  //     fetchNotification();
+  //   };
 
-    router.events.on('routeChangeComplete', handleRouteChange);
-    router.events.on('routeChangeStart', handleRouteChange);
+  //   router.events.on('routeChangeComplete', handleRouteChange);
+  //   router.events.on('routeChangeStart', handleRouteChange);
 
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
-      router.events.off('routeChangeStart', handleRouteChange);
-    };
-  }, [router.events]);
+  //   return () => {
+  //     router.events.off('routeChangeComplete', handleRouteChange);
+  //     router.events.off('routeChangeStart', handleRouteChange);
+  //   };
+  // }, [router.events]);
 
-  const providerValue = useMemo(() => ({ 
-    state, 
-    setState, 
+  const providerValue = useMemo(() => ({
+    state,
+    setState,
     fetchNotification,
     fetchProfile,
-  }), [state, fetchNotification, fetchProfile]);
+    fetchConnections,
+    fetchChatRooms,
+    handleLoginDialog
+  }), [state, fetchNotification, fetchProfile, fetchConnections, fetchChatRooms, handleLoginDialog]);
 
   // Save to localStorage when state changes (but not during initial load)
   useEffect(() => {

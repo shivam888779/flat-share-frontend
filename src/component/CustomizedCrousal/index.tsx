@@ -11,7 +11,9 @@ const CustomizedCrousal = (props: ICustomizedCrousalProps) => {
 
     return (
         <div className="px-6 mx-auto my-6 max-h-96">
-            <Carousel>
+            <Carousel
+                showThumbs={false}
+            >
                 {images.map((image, index) => (
                     <div key={index} style={{ width: "100%", height: "400px", position: "relative" }}>
                         <Image

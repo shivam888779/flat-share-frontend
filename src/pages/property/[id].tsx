@@ -1,9 +1,7 @@
 import { ConnectUser, PropertyDetails } from "@/component";
 import {
-    Box,
-    Stack,
+    Box, Stack,
     Container,
-    CircularProgress,
     Alert,
     AlertTitle,
     Fade,
@@ -81,6 +79,7 @@ const PropertyInfo = () => {
                 py: 4,
             }}
         >
+
             <Container maxWidth="xl">
                 <Fade in={true} timeout={600}>
                     <Stack spacing={3}>
@@ -163,7 +162,7 @@ const PropertyInfo = () => {
                                 {/* Right Content - Property Details */}
                                 <Box sx={{ flex: 1, width: '100%' }}>
                                     {propertyDetails?.id && (
-                                        <PropertyDetails propertyDetails={propertyDetails as IPropertyDetails} />
+                                        <PropertyDetails propertyDetails={propertyDetails as IPropertyDetails} isMyProperty={false} />
                                     )}
                                 </Box>
                             </Stack>

@@ -6,10 +6,11 @@ import {
     Box,
     Stack,
     Paper,
-    Divider
+    Divider,
+    IconButton
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { ILocation, IPropertyFormValues } from "@/types/property";
+import { ILocation, IPropertyDetails, IPropertyFormValues } from "@/types/property";
 import generateSignedUrl from "@/utils/generateSignedUrl";
 import DynamicFormRenderer from "@/custom-component/CustomizedSchemaBasedForm/DynamicFormRenderer";
 import {
@@ -22,32 +23,40 @@ import {
     processRequirementFormData
 } from "@/api/property/list-property-data";
 import { useGlobalSnackbar } from "@/hooks/useSnackbar";
-import { listPropertyApi } from "@/api/property";
+import { listPropertyApi, updatePropertyApi } from "@/api/property";
 import { useRouter } from "next/router";
 import { useGlobalContext } from "@/global-context";
 import HomeIcon from '@mui/icons-material/Home';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import CloseIcon from '@mui/icons-material/Close';
+import ImageUpload from "@/component/ImageUpload";
 
 interface Props {
     type: string;
+    isEdit?: boolean;
 }
 
-const PropertyListingForm = ({ type }: Props) => {
-    const [location, setLocation] = useState<ILocation>();
+const ListPropertyForm = ({ type, isEdit }: Props) => {
+
     const [submitted, setSubmitted] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [propType, setPropType] = useState("");
     const snackbar = useGlobalSnackbar();
     const router = useRouter();
-    const { state } = useGlobalContext();
+    const { state, fetchProfile } = useGlobalContext();
+    const myProperty = state.myProperty;
+    const [existingImages, setExistingImages] = useState<string[]>(
+        isEdit ? (myProperty?.images ?? []) : []
+    );
+    const [location, setLocation] = useState<ILocation | null>(
+        isEdit ? (myProperty?.location ?? null) : null
+    );
 
-    const isValidType = () => {
-        return type === "list-requirement" || type === "list-property";
-    };
+    const isValidType = () => type === "requirement" || type === "property";
 
     const isRequirementForm = () => {
-        return propType === "list-requirement";
+        return propType === "requirement";
     };
 
     const formConfig = getFormConfig(
@@ -57,13 +66,17 @@ const PropertyListingForm = ({ type }: Props) => {
 
     useEffect(() => {
         if (router.isReady) {
-            if (!isValidType() && router.isReady) {
+            if (!isValidType() && router.isReady && !isEdit) {
                 router.push("/");
             } else {
                 setPropType(type);
             }
         }
     }, [router, type]);
+
+    const handleRemoveExistingImage = (url: string) => {
+        setExistingImages((prev) => prev.filter((img) => img !== url));
+    };
 
     const handleSubmit = async (values: PropertyFormValues | RequirementFormValues) => {
         const validation = isRequirementForm()
@@ -76,7 +89,7 @@ const PropertyListingForm = ({ type }: Props) => {
             return;
         }
 
-        if (!isRequirementForm() && selectedFiles.length === 0) {
+        if (!isRequirementForm() && selectedFiles.length === 0 && existingImages.length === 0) {
             snackbar.error("Please select at least one image.");
             return;
         }
@@ -84,7 +97,8 @@ const PropertyListingForm = ({ type }: Props) => {
         setIsSubmitting(true);
 
         try {
-            let imageUrls: string[] = [];
+
+            let imageUrls: string[] = isEdit ? myProperty?.images || [] : [...existingImages]; // Start with existing images
 
             if (!isRequirementForm() && selectedFiles.length > 0) {
                 const uploadPromises = selectedFiles.map(file =>
@@ -95,29 +109,38 @@ const PropertyListingForm = ({ type }: Props) => {
                 );
 
                 const uploadResults = await Promise.all(uploadPromises);
-                imageUrls = uploadResults
+                const newUrls = uploadResults
                     .filter(result => result && result.publicUrl)
                     .map(result => result.publicUrl);
 
-                if (imageUrls.length !== selectedFiles.length) {
+                if (newUrls.length !== selectedFiles.length) {
                     console.error("Some images failed to upload.");
                     snackbar.warning("Some images failed to upload. Please try again.");
                 }
+                imageUrls = isEdit ? [...myProperty?.images || [], ...newUrls] : [...existingImages, ...newUrls];
             }
 
             const processedData = isRequirementForm()
                 ? processRequirementFormData(values as RequirementFormValues)
                 : processPropertyFormData(values as PropertyFormValues);
 
+            console.log("selectedFiles", selectedFiles, myProperty?.images);
+            console.log("imageUrls", imageUrls);
             const finalSubmission = {
                 ...processedData,
                 location,
                 images: imageUrls,
             };
+            if (isEdit) {
+                const { data } = await updatePropertyApi(finalSubmission);
+                snackbar.success(data?.message || 'Successfully updated!');
+            } else {
+                const { data } = await listPropertyApi(finalSubmission);
 
-            const { data } = await listPropertyApi(finalSubmission);
+                snackbar.success(data?.message || 'Successfully submitted!');
+            }
 
-            snackbar.success(data?.message || 'Successfully submitted!');
+            fetchProfile();
             setSubmitted(true);
 
             setTimeout(() => {
@@ -141,6 +164,7 @@ const PropertyListingForm = ({ type }: Props) => {
         return isRequirementForm() ? 'List Requirement' : 'List Property';
     };
 
+    console.log(myProperty);
     return (
         propType && (
             <Box
@@ -159,7 +183,7 @@ const PropertyListingForm = ({ type }: Props) => {
                             color: 'text.primary',
                         }}
                     >
-                        {getFormTitle()}
+                        {isEdit ? 'Edit Your Property' : getFormTitle()}
                     </Typography>
 
                     <Paper
@@ -173,7 +197,10 @@ const PropertyListingForm = ({ type }: Props) => {
                     >
                         <Box sx={{ p: { xs: 3, sm: 4 } }}>
                             <Formik
-                                initialValues={formConfig.initialValues}
+                                initialValues={isEdit ? {
+                                    ...myProperty,
+                                    images: undefined // Reset images for edit mode since we can't convert string[] to File[]
+                                } as PropertyFormValues : formConfig.initialValues}
                                 validationSchema={formConfig.validationSchema}
                                 onSubmit={handleSubmit}
                                 enableReinitialize={true}
@@ -190,8 +217,10 @@ const PropertyListingForm = ({ type }: Props) => {
                                                 handleChange={handleChange}
                                                 setFieldValue={setFieldValue}
                                                 setLocation={setLocation}
-                                                setSelectedFiles={setSelectedFiles}
+                                                setSelectedFiles={setSelectedFiles} // Remove this from DynamicFormRenderer if not needed
                                             />
+
+
 
                                             {/* Submit Button */}
                                             <Button
@@ -323,4 +352,4 @@ const PropertyListingForm = ({ type }: Props) => {
     );
 };
 
-export default PropertyListingForm;
+export default ListPropertyForm;

@@ -1,8 +1,7 @@
 import FilterNavbar from "./FilterNavbar";
-import PropertyDetailsCard from "./UserDetailCard"
+import PropertyDetailsCard from "./PropertyDetailsCard"
 import Header from "./Header"
 import Footer from "./Footer";
-import OtpInput from "./OtpInput"
 import LogInForm from "./LogInForm";
 import ConnectUser from "./ConnectUser";
 import PropertyDetails from "./PropertyDetails";
@@ -15,6 +14,10 @@ import ImageUpload from "./ImageUpload";
 import LandingPage from "./LandingPage";
 import FilterSidebar from "./FilterSideBar";
 import MyProfileHeader from "./MyProfileHeader";
+import LogInModal from "./LogInModal";
+import ProfileSkeleton from "../custom-component/CustomizedSkeletons/ProfileSkeleton";
+import PropertyDetailsCardSkeleton from "../custom-component/CustomizedSkeletons/PropertyDetailsCardSkeleton";
+import LandingPageBottomView from "./LandingPageBottomView";
 
 export {
     Header,
@@ -22,7 +25,6 @@ export {
     PropertyDetailsCard,
     Footer,
     LogInForm,
-    OtpInput,
     ConnectUser,
     PropertyDetails,
     Chips,
@@ -33,5 +35,11 @@ export {
     ImageUpload,
     LandingPage,
     FilterSidebar,
-    MyProfileHeader
+    MyProfileHeader,
+    LogInModal,
+    ProfileSkeleton,
+    PropertyDetailsCardSkeleton,
+    LandingPageBottomView
 }
+
+export * from './Chat';

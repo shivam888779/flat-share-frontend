@@ -1,12 +1,12 @@
-import { Box, Button, Divider, Stack, CircularProgress, Typography, Fade, Grow } from "@mui/material";
-import { FilterNavbar, Footer, Header, PropertyDetailsCard } from "@/component";
+// Listing.tsx - Main listing page component
+import { Box, Button, Divider, Stack, CircularProgress, Typography, Fade, Grow, Container } from "@mui/material";
+import { FilterNavbar, Footer, Header, PropertyDetailsCard, PropertyDetailsCardSkeleton } from "@/component";
 import { KeyboardDoubleArrowDown } from "@mui/icons-material";
 import { useGlobalContext } from "@/global-context";
 import { useEffect, useState } from "react";
 import { SearchPropertyCard } from "@/types/property";
 import { searchPropertiesApi } from "@/api/property";
 import { useRouter } from 'next/router';
-import { generateDummyCards } from "@/component/UserDetailCard";
 
 export default function Listing() {
     const { state } = useGlobalContext();
@@ -48,7 +48,7 @@ export default function Listing() {
                 const payLoad = {
                     lng: location?.longitude,
                     lat: location?.latitude,
-                    radiusKm: 5000
+                    radiusKm: 1000
                 };
                 const response = await searchPropertiesApi(payLoad);
                 setPropetyList(response?.data?.data);
@@ -70,22 +70,24 @@ export default function Listing() {
                 overflow: 'hidden'
             }}
         >
-            {/* Animated Background Buildings */}
+            {/* Animated Background Buildings - Responsive */}
             <Box
                 sx={{
                     position: 'fixed',
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: '200px',
+                    height: { xs: '120px', sm: '150px', md: '200px' },
                     pointerEvents: 'none',
-                    opacity: 0.05,
+                    opacity: { xs: 0.03, sm: 0.04, md: 0.05 },
                     zIndex: 0,
+                    display: { xs: 'none', sm: 'block' }, // Hide on very small screens
                     '& .building': {
                         position: 'absolute',
                         bottom: 0,
                         background: 'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)',
                         animation: 'float 6s ease-in-out infinite',
+                        borderRadius: '4px 4px 0 0'
                     },
                     '@keyframes float': {
                         '0%, 100%': { transform: 'translateY(0)' },
@@ -93,27 +95,66 @@ export default function Listing() {
                     }
                 }}
             >
-                <Box className="building" sx={{ left: '5%', width: 60, height: 80 }} />
-                <Box className="building" sx={{ left: '25%', width: 80, height: 100, animationDelay: '1s' }} />
-                <Box className="building" sx={{ left: '50%', width: 70, height: 120, animationDelay: '2s' }} />
-                <Box className="building" sx={{ right: '25%', width: 65, height: 90, animationDelay: '3s' }} />
-                <Box className="building" sx={{ right: '5%', width: 75, height: 110, animationDelay: '4s' }} />
+                <Box className="building" sx={{
+                    left: '5%',
+                    width: { sm: 40, md: 60 },
+                    height: { sm: 60, md: 80 }
+                }} />
+                <Box className="building" sx={{
+                    left: '25%',
+                    width: { sm: 50, md: 80 },
+                    height: { sm: 80, md: 100 },
+                    animationDelay: '1s'
+                }} />
+                <Box className="building" sx={{
+                    left: '50%',
+                    width: { sm: 45, md: 70 },
+                    height: { sm: 90, md: 120 },
+                    animationDelay: '2s'
+                }} />
+                <Box className="building" sx={{
+                    right: '25%',
+                    width: { sm: 35, md: 65 },
+                    height: { sm: 70, md: 90 },
+                    animationDelay: '3s'
+                }} />
+                <Box className="building" sx={{
+                    right: '5%',
+                    width: { sm: 55, md: 75 },
+                    height: { sm: 85, md: 110 },
+                    animationDelay: '4s'
+                }} />
             </Box>
 
-            <Box mx="auto" maxWidth="1240px" px={3} pt={4} position="relative" zIndex={1}>
+            {/* Main Content Container */}
+            <Container
+                maxWidth='xl'
+                disableGutters
+                sx={{
+                    maxWidth: '1200px',
+                    position: 'relative',
+                    zIndex: 1,
+                    px: { xs: 2, sm: 3, md: 4 },
+                    pt: { xs: 2, sm: 3, md: 4 }
+                }}
+            >
                 <FilterNavbar setLocation={setLocation} />
 
-                <Divider sx={{ mb: 3, borderColor: 'rgba(108, 92, 231, 0.1)' }} />
+                <Divider sx={{
+                    mb: { xs: 2, sm: 3 },
+                    borderColor: 'rgba(108, 92, 231, 0.1)'
+                }} />
 
-                {/* Results Count */}
+                {/* Results Count - Responsive Typography */}
                 {propertyList.length > 0 && (
                     <Fade in={true}>
                         <Typography
                             variant="body1"
                             sx={{
-                                mb: 3,
+                                mb: { xs: 2, sm: 3 },
                                 color: '#636e72',
-                                fontWeight: 500
+                                fontWeight: 500,
+                                fontSize: { xs: '0.875rem', sm: '1rem' }
                             }}
                         >
                             Found {propertyList.length} properties near you
@@ -124,29 +165,39 @@ export default function Listing() {
                 {/* Loading State */}
                 {loading ? (
                     <Box
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        minHeight="400px"
-                        flexDirection="column"
-                        gap={2}
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: {
+                                xs: '1fr', // 1 column on mobile
+                                sm: 'repeat(2, 1fr)', // 2 columns on small tablets
+                                md: 'repeat(2, 1fr)', // 2 columns on medium screens
+                                lg: 'repeat(3, 1fr)', // 3 columns on large screens
+                                xl: 'repeat(4, 1fr)' // 4 columns on extra large screens
+                            },
+                            gap: { xs: 2, sm: 2.5, md: 3 },
+                            mb: { xs: 3, sm: 4 }
+                        }}
                     >
-                        <CircularProgress
-                            size={60}
-                            sx={{ color: '#6c5ce7' }}
-                        />
-                        <Typography color="text.secondary">
-                            Finding the best properties for you...
-                        </Typography>
+                        {Array.from({ length: 10 }).map((_, index) => (
+                            <PropertyDetailsCardSkeleton key={index} />
+                        ))}
                     </Box>
                 ) : (
                     <>
-                        {/* Property Grid */}
+                        {/* Property Grid - Fully Responsive */}
                         <Box
-                            display={"flex"}
-                            flexWrap={"wrap"}
-                            gap={2}
-                            justifyContent={"space-between"}
+                            sx={{
+                                display: 'grid',
+                                gridTemplateColumns: {
+                                    xs: '1fr', // 1 column on mobile
+                                    sm: 'repeat(2, 1fr)', // 2 columns on small tablets
+                                    md: 'repeat(2, 1fr)', // 2 columns on medium screens
+                                    lg: 'repeat(3, 1fr)', // 3 columns on large screens
+                                    xl: 'repeat(4, 1fr)' // 4 columns on extra large screens
+                                },
+                                gap: { xs: 2, sm: 2.5, md: 3 },
+                                mb: { xs: 3, sm: 4 }
+                            }}
                         >
                             {propertyList.map((data, index) => (
                                 <Grow
@@ -159,23 +210,21 @@ export default function Listing() {
                                         <PropertyDetailsCard propertyDetails={data as SearchPropertyCard} />
                                     </Box>
                                 </Grow>
-                            ))
-                            }
-
+                            ))}
                         </Box>
 
-                        {/* Load More Button */}
+                        {/* Load More Button - Responsive */}
                         {propertyList.length > 0 && (
-                            <Box display="flex" justifyContent="center" my={4}>
+                            <Box display="flex" justifyContent="center" mb={{ xs: 3, sm: 4 }}>
                                 <Button
                                     variant="contained"
                                     startIcon={<KeyboardDoubleArrowDown />}
                                     sx={{
                                         borderRadius: '50px',
                                         backgroundColor: '#6c5ce7',
-                                        px: 4,
-                                        py: 1.5,
-                                        fontSize: '1rem',
+                                        px: { xs: 3, sm: 4 },
+                                        py: { xs: 1.2, sm: 1.5 },
+                                        fontSize: { xs: '0.875rem', sm: '1rem' },
                                         textTransform: 'none',
                                         boxShadow: '0 4px 20px rgba(108, 92, 231, 0.3)',
                                         '&:hover': {
@@ -191,20 +240,25 @@ export default function Listing() {
                             </Box>
                         )}
 
-                        {/* Empty State */}
+                        {/* Empty State - Responsive */}
                         {!loading && propertyList.length === 0 && location?.latitude && (
                             <Box
                                 display="flex"
                                 flexDirection="column"
                                 alignItems="center"
                                 justifyContent="center"
-                                minHeight="400px"
+                                minHeight={{ xs: '300px', sm: '400px' }}
                                 gap={2}
+                                px={2}
                             >
                                 <Typography
                                     variant="h5"
                                     color="text.secondary"
-                                    sx={{ fontWeight: 600 }}
+                                    sx={{
+                                        fontWeight: 600,
+                                        fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                                        textAlign: 'center'
+                                    }}
                                 >
                                     No properties found
                                 </Typography>
@@ -212,6 +266,7 @@ export default function Listing() {
                                     variant="body1"
                                     color="text.secondary"
                                     textAlign="center"
+                                    sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
                                 >
                                     Try adjusting your search filters or location
                                 </Typography>
@@ -219,8 +274,7 @@ export default function Listing() {
                         )}
                     </>
                 )}
-
-            </Box>
+            </Container>
         </Box>
     );
 }

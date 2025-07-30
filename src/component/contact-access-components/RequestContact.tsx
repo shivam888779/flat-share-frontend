@@ -1,21 +1,31 @@
 import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, TextField, Box } from "@mui/material";
 import { requestConnectionApi } from "@/api/connections";
+import { useGlobalSnackbar } from "@/hooks/useSnackbar";
+import { useGlobalContext } from "@/global-context";
 
 interface RequestContactProps {
   open: boolean;
   onClose: () => void;
-  userId:number
+  userId: number
 }
 
 const RequestContact: React.FC<RequestContactProps> = ({ open, onClose, userId }) => {
   const [message, setMessage] = useState("");
-
-  const handleRequest = async () =>
-    {
-      const response = await requestConnectionApi({message:message,receiverId:userId})
-
+  const snackBar = useGlobalSnackbar();
+  const { fetchProfile } = useGlobalContext();
+  const handleRequest = async () => {
+    const { data } = await requestConnectionApi({ message: message, receiverId: userId })
+    if (data?.status) {
+      snackBar.success(data?.message);
+      handleClose();
+      onClose();
+    } else {
+      snackBar.error(data?.message);
+      handleClose();
     }
+
+  }
 
 
   const handleClose = () => {
@@ -41,20 +51,21 @@ const RequestContact: React.FC<RequestContactProps> = ({ open, onClose, userId }
             placeholder="Type your message here..."
           />
         </Box>
+        <DialogActions sx={{ mt: 1, pb: 0 }}>
+          <Button onClick={handleClose} color="secondary" variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRequest}
+            color="primary"
+            variant="contained"
+            disabled={message.trim() === ""}
+          >
+            Request
+          </Button>
+        </DialogActions>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="secondary" variant="outlined">
-          Cancel
-        </Button>
-        <Button
-          onClick={handleRequest}
-          color="primary"
-          variant="contained"
-          disabled={message.trim() === ""}
-        >
-          Request
-        </Button>
-      </DialogActions>
+
     </Dialog>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { InputLabel, TextField, TextFieldVariants, Box } from '@mui/material';
+import { TextField, Box, InputLabel } from '@mui/material';
 import { FormFieldSchema } from './formSchema';
 import {
     LocationSearch,
@@ -94,6 +94,7 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                         rows={props.rows}
                         placeholder={props.placeholder}
                         size="small"
+                        disabled={props.disabled}
                         // inputProps={{
                         //     min: props.min,
                         //     // max: props.max,
@@ -186,9 +187,10 @@ const DynamicFormRenderer: React.FC<DynamicFormRendererProps> = ({
                         shrink
                         sx={{
                             color: '#6b7280',
-                            fontSize: '0.875rem',
-                            fontWeight: 500,
-                            mb: 0.5,
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            // mb: 0.5,
+                            mt: 1,
                         }}
                     >
                         {fieldSchema.inputLabel}
