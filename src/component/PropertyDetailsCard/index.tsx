@@ -128,7 +128,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
         sx={{
           width: '100%',
           // maxWidth: '100%',
-          minWidth: { xs: 2, sm: 2.5, md: 390 },
+          minWidth: { xs: 2, sm: 2.5 },
           maxWidth: { xs: "100%", sm: "100%", md: 390 },
           height: 'fit-content',
           position: 'relative',
@@ -362,7 +362,7 @@ export default function PropertyDetailsCard({ propertyDetails, dummyIndex = 0 }:
                   alignItems="center"
                   spacing={{ xs: 0.5, sm: 1 }}
                   flexWrap="wrap"
-                  gap={{ xs: 0.5, sm: 1 }}
+                  overflow="scroll"
                 >
                   <Chip
                     icon={<Speed sx={{ fontSize: { xs: 12, sm: 16 } }} />}

@@ -18,7 +18,9 @@ import {
     Switch,
     FormGroup,
     Checkbox,
-    Badge
+    Badge,
+    useTheme,
+    alpha
 } from '@mui/material';
 import {
     Close,
@@ -53,6 +55,7 @@ interface Filters {
 }
 
 const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, onFiltersChange }) => {
+    const theme = useTheme();
     const [filters, setFilters] = useState<Filters>({
         radius: 10,
         priceRange: [500, 2000],
@@ -150,38 +153,88 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, onFiltersC
             sx={{
                 '& .MuiDrawer-paper': {
                     width: { xs: '100%', sm: 400 },
-                    maxWidth: '90vw'
+                    maxWidth: '90vw',
+                    backgroundColor: theme.palette.background.paper,
+                    borderLeft: `1px solid ${theme.palette.divider}`
                 }
             }}
         >
             <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 {/* Header */}
-                <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Box sx={{
+                    p: 3,
+                    borderBottom: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: theme.palette.background.paper
+                }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Stack direction="row" alignItems="center" spacing={1}>
-                            <FilterList sx={{ color: '#6c5ce7' }} />
-                            <Typography variant="h6" fontWeight={600}>
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                            <Box sx={{
+                                p: 1,
+                                borderRadius: 2,
+                                backgroundColor: alpha(theme.palette.primary.main, 0.1)
+                            }}>
+                                <FilterList sx={{
+                                    color: theme.palette.primary.main,
+                                    fontSize: 20
+                                }} />
+                            </Box>
+                            <Typography variant="h6" fontWeight={600} color="text.primary">
                                 Filters
                             </Typography>
                             {getActiveFiltersCount() > 0 && (
-                                <Badge badgeContent={getActiveFiltersCount()} color="primary" />
+                                <Badge
+                                    badgeContent={getActiveFiltersCount()}
+                                    color="primary"
+                                    sx={{
+                                        '& .MuiBadge-badge': {
+                                            backgroundColor: theme.palette.primary.main,
+                                            color: theme.palette.primary.contrastText,
+                                            fontSize: '0.75rem',
+                                            fontWeight: 600
+                                        }
+                                    }}
+                                />
                             )}
                         </Stack>
-                        <IconButton onClick={onClose} size="small">
+                        <IconButton
+                            onClick={onClose}
+                            size="small"
+                            sx={{
+                                color: theme.palette.text.secondary,
+                                '&:hover': {
+                                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                                    color: theme.palette.primary.main
+                                }
+                            }}
+                        >
                             <Close />
                         </IconButton>
                     </Stack>
                 </Box>
 
                 {/* Filter Content */}
-                <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+                <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
                     <Stack spacing={3}>
                         {/* Search Radius */}
-                        <Paper elevation={0} sx={{ p: 2, backgroundColor: '#f8f9fa', borderRadius: 2 }}>
-                            <Stack spacing={2}>
-                                <Stack direction="row" alignItems="center" spacing={1}>
-                                    <LocationOn sx={{ color: '#6c5ce7', fontSize: 20 }} />
-                                    <Typography variant="subtitle1" fontWeight={600}>
+                        <Paper elevation={0} sx={{
+                            p: 3,
+                            backgroundColor: alpha(theme.palette.background.default, 0.5),
+                            borderRadius: 3,
+                            border: `1px solid ${theme.palette.divider}`
+                        }}>
+                            <Stack spacing={2.5}>
+                                <Stack direction="row" alignItems="center" spacing={1.5}>
+                                    <Box sx={{
+                                        p: 0.75,
+                                        borderRadius: 1.5,
+                                        backgroundColor: alpha(theme.palette.primary.main, 0.1)
+                                    }}>
+                                        <LocationOn sx={{
+                                            color: theme.palette.primary.main,
+                                            fontSize: 18
+                                        }} />
+                                    </Box>
+                                    <Typography variant="subtitle1" fontWeight={600} color="text.primary">
                                         Search Radius
                                     </Typography>
                                 </Stack>
@@ -194,9 +247,23 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, onFiltersC
                                         valueLabelDisplay="auto"
                                         valueLabelFormat={(value) => `${value} km`}
                                         sx={{
-                                            color: '#6c5ce7',
+                                            color: theme.palette.primary.main,
                                             '& .MuiSlider-thumb': {
-                                                backgroundColor: '#6c5ce7'
+                                                backgroundColor: theme.palette.primary.main,
+                                                width: 20,
+                                                height: 20,
+                                                '&:hover': {
+                                                    boxShadow: `0 0 0 8px ${alpha(theme.palette.primary.main, 0.16)}`
+                                                }
+                                            },
+                                            '& .MuiSlider-track': {
+                                                height: 4,
+                                                borderRadius: 2
+                                            },
+                                            '& .MuiSlider-rail': {
+                                                height: 4,
+                                                borderRadius: 2,
+                                                backgroundColor: theme.palette.divider
                                             }
                                         }}
                                     />
@@ -212,11 +279,25 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, onFiltersC
                         </Paper>
 
                         {/* Price Range */}
-                        <Paper elevation={0} sx={{ p: 2, backgroundColor: '#f8f9fa', borderRadius: 2 }}>
-                            <Stack spacing={2}>
-                                <Stack direction="row" alignItems="center" spacing={1}>
-                                    <AttachMoney sx={{ color: '#6c5ce7', fontSize: 20 }} />
-                                    <Typography variant="subtitle1" fontWeight={600}>
+                        <Paper elevation={0} sx={{
+                            p: 3,
+                            backgroundColor: alpha(theme.palette.background.default, 0.5),
+                            borderRadius: 3,
+                            border: `1px solid ${theme.palette.divider}`
+                        }}>
+                            <Stack spacing={2.5}>
+                                <Stack direction="row" alignItems="center" spacing={1.5}>
+                                    <Box sx={{
+                                        p: 0.75,
+                                        borderRadius: 1.5,
+                                        backgroundColor: alpha(theme.palette.success.main, 0.1)
+                                    }}>
+                                        <AttachMoney sx={{
+                                            color: theme.palette.success.main,
+                                            fontSize: 18
+                                        }} />
+                                    </Box>
+                                    <Typography variant="subtitle1" fontWeight={600} color="text.primary">
                                         Monthly Rent
                                     </Typography>
                                 </Stack>
@@ -230,9 +311,23 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, onFiltersC
                                         valueLabelDisplay="auto"
                                         valueLabelFormat={(value) => `$${value}`}
                                         sx={{
-                                            color: '#6c5ce7',
+                                            color: theme.palette.success.main,
                                             '& .MuiSlider-thumb': {
-                                                backgroundColor: '#6c5ce7'
+                                                backgroundColor: theme.palette.success.main,
+                                                width: 20,
+                                                height: 20,
+                                                '&:hover': {
+                                                    boxShadow: `0 0 0 8px ${alpha(theme.palette.success.main, 0.16)}`
+                                                }
+                                            },
+                                            '& .MuiSlider-track': {
+                                                height: 4,
+                                                borderRadius: 2
+                                            },
+                                            '& .MuiSlider-rail': {
+                                                height: 4,
+                                                borderRadius: 2,
+                                                backgroundColor: theme.palette.divider
                                             }
                                         }}
                                     />
@@ -248,11 +343,25 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, onFiltersC
                         </Paper>
 
                         {/* Gender Preference */}
-                        <Paper elevation={0} sx={{ p: 2, backgroundColor: '#f8f9fa', borderRadius: 2 }}>
-                            <Stack spacing={2}>
-                                <Stack direction="row" alignItems="center" spacing={1}>
-                                    <People sx={{ color: '#6c5ce7', fontSize: 20 }} />
-                                    <Typography variant="subtitle1" fontWeight={600}>
+                        <Paper elevation={0} sx={{
+                            p: 3,
+                            backgroundColor: alpha(theme.palette.background.default, 0.5),
+                            borderRadius: 3,
+                            border: `1px solid ${theme.palette.divider}`
+                        }}>
+                            <Stack spacing={2.5}>
+                                <Stack direction="row" alignItems="center" spacing={1.5}>
+                                    <Box sx={{
+                                        p: 0.75,
+                                        borderRadius: 1.5,
+                                        backgroundColor: alpha(theme.palette.info.main, 0.1)
+                                    }}>
+                                        <People sx={{
+                                            color: theme.palette.info.main,
+                                            fontSize: 18
+                                        }} />
+                                    </Box>
+                                    <Typography variant="subtitle1" fontWeight={600} color="text.primary">
                                         Looking For
                                     </Typography>
                                 </Stack>
@@ -260,50 +369,94 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, onFiltersC
                                     <RadioGroup
                                         value={filters.gender}
                                         onChange={handleGenderChange}
-                                        sx={{ gap: 1 }}
+                                        sx={{ gap: 1.5 }}
                                     >
                                         <FormControlLabel
                                             value="any"
-                                            control={<Radio sx={{ color: '#6c5ce7', '&.Mui-checked': { color: '#6c5ce7' } }} />}
+                                            control={
+                                                <Radio
+                                                    sx={{
+                                                        color: theme.palette.primary.main,
+                                                        '&.Mui-checked': {
+                                                            color: theme.palette.primary.main
+                                                        }
+                                                    }}
+                                                />
+                                            }
                                             label="Any Gender"
+                                            sx={{ color: 'text.primary' }}
                                         />
                                         <FormControlLabel
                                             value="male"
-                                            control={<Radio sx={{ color: '#6c5ce7', '&.Mui-checked': { color: '#6c5ce7' } }} />}
+                                            control={
+                                                <Radio
+                                                    sx={{
+                                                        color: theme.palette.primary.main,
+                                                        '&.Mui-checked': {
+                                                            color: theme.palette.primary.main
+                                                        }
+                                                    }}
+                                                />
+                                            }
                                             label="Male Only"
+                                            sx={{ color: 'text.primary' }}
                                         />
                                         <FormControlLabel
                                             value="female"
-                                            control={<Radio sx={{ color: '#6c5ce7', '&.Mui-checked': { color: '#6c5ce7' } }} />}
+                                            control={
+                                                <Radio
+                                                    sx={{
+                                                        color: theme.palette.primary.main,
+                                                        '&.Mui-checked': {
+                                                            color: theme.palette.primary.main
+                                                        }
+                                                    }}
+                                                />
+                                            }
                                             label="Female Only"
+                                            sx={{ color: 'text.primary' }}
                                         />
                                         <FormControlLabel
                                             value="coed"
-                                            control={<Radio sx={{ color: '#6c5ce7', '&.Mui-checked': { color: '#6c5ce7' } }} />}
+                                            control={
+                                                <Radio
+                                                    sx={{
+                                                        color: theme.palette.primary.main,
+                                                        '&.Mui-checked': {
+                                                            color: theme.palette.primary.main
+                                                        }
+                                                    }}
+                                                />
+                                            }
                                             label="Co-ed"
+                                            sx={{ color: 'text.primary' }}
                                         />
                                     </RadioGroup>
                                 </FormControl>
                             </Stack>
                         </Paper>
-
-
                     </Stack>
                 </Box>
 
                 {/* Footer Actions */}
-                <Box sx={{ p: 2, borderTop: '1px solid #e0e0e0' }}>
+                <Box sx={{
+                    p: 3,
+                    borderTop: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: theme.palette.background.paper
+                }}>
                     <Stack direction="row" spacing={2}>
                         <Button
                             variant="outlined"
                             onClick={handleClearFilters}
                             sx={{
                                 flex: 1,
-                                borderColor: '#e0e0e0',
-                                color: '#666',
+                                borderColor: theme.palette.divider,
+                                color: theme.palette.text.secondary,
+                                borderRadius: 2,
                                 '&:hover': {
-                                    borderColor: '#6c5ce7',
-                                    backgroundColor: '#f3f0ff'
+                                    borderColor: theme.palette.primary.main,
+                                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                                    color: theme.palette.primary.main
                                 }
                             }}
                         >
@@ -314,9 +467,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, onFiltersC
                             onClick={handleApplyFilters}
                             sx={{
                                 flex: 2,
-                                backgroundColor: '#6c5ce7',
+                                backgroundColor: theme.palette.primary.main,
+                                borderRadius: 2,
                                 '&:hover': {
-                                    backgroundColor: '#5f3dc4'
+                                    backgroundColor: theme.palette.primary.dark,
+                                    boxShadow: theme.shadows[4]
                                 }
                             }}
                         >
@@ -334,21 +489,44 @@ export const FilterIconButton: React.FC<{ onFilterClick: () => void; activeFilte
     onFilterClick,
     activeFiltersCount
 }) => {
+    const theme = useTheme();
+
     return (
         <IconButton
             onClick={onFilterClick}
             sx={{
-                border: '1px solid',
-                borderColor: activeFiltersCount > 0 ? '#6c5ce7' : '#e0e0e0',
-                backgroundColor: activeFiltersCount > 0 ? '#f3f0ff' : 'transparent',
+                border: `1px solid ${activeFiltersCount > 0 ? theme.palette.primary.main : theme.palette.divider}`,
+                backgroundColor: activeFiltersCount > 0
+                    ? alpha(theme.palette.primary.main, 0.08)
+                    : 'transparent',
+                borderRadius: 2,
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                    backgroundColor: '#f3f0ff',
-                    borderColor: '#6c5ce7'
+                    backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                    borderColor: theme.palette.primary.main,
+                    transform: 'translateY(-1px)',
+                    boxShadow: theme.shadows[4]
                 }
             }}
         >
-            <Badge badgeContent={activeFiltersCount} color="primary">
-                <FilterList sx={{ fontSize: 20, color: activeFiltersCount > 0 ? '#6c5ce7' : '#636e72' }} />
+            <Badge
+                badgeContent={activeFiltersCount}
+                color="primary"
+                sx={{
+                    '& .MuiBadge-badge': {
+                        backgroundColor: theme.palette.primary.main,
+                        color: theme.palette.primary.contrastText,
+                        fontSize: '0.75rem',
+                        fontWeight: 600
+                    }
+                }}
+            >
+                <FilterList sx={{
+                    fontSize: 20,
+                    color: activeFiltersCount > 0
+                        ? theme.palette.primary.main
+                        : theme.palette.text.secondary
+                }} />
             </Badge>
         </IconButton>
     );

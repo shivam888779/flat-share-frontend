@@ -1,8 +1,18 @@
 import { IUserData } from "@/types/user";
-import { IPropertyDetails, IRequirement } from "@/types/property";
+import { IPropertyDetails, IRequirement, SearchPropertyCard } from "@/types/property";
 import { IUserNotification } from "@/types/notifications";
 import { IConnection } from "@/types/connection";
 import { IChatRoom } from "@/types/chat";
+
+export interface ISearchPayload {
+    lng: number;
+    lat: number;
+    radiusKm: number;
+    priceRange?: [number, number];
+    lookingFor?: string; // gender filter
+    propertyType?: string[]; // flat, flatMate
+    filters?: any; // Additional filters can be added here
+}
 
 export interface IInitialState {
     userData: IUserData;
@@ -14,4 +24,8 @@ export interface IInitialState {
     chatRooms: IChatRoom[]
     myProperty: IPropertyDetails | null
     openLoginDialog: boolean
+    // Property listing cache
+    propertyList: SearchPropertyCard[];
+    searchPayload: ISearchPayload | null;
+    isPropertyListLoading: boolean;
 }

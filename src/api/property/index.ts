@@ -9,7 +9,20 @@ const updatePropertyApi = (payload: IPropertyFormValues | any) => {
     return authApi.put('property/update', payload)
 }
 const searchPropertiesApi = (payload: IPropertyListSearch) => {
-    return authApi.get(`property/search?lat=${payload.lat}&lng=${payload?.lng}&radiusKm=${payload.radiusKm}`)
+    let queryParams = `lat=${payload.lat}&lng=${payload.lng}&radiusKm=${payload.radiusKm}`;
+
+    // Add optional filters
+    if (payload.priceRange) {
+        queryParams += `&minPrice=${payload.priceRange[0]}&maxPrice=${payload.priceRange[1]}`;
+    }
+    if (payload.lookingFor) {
+        queryParams += `&lookingFor=${payload.lookingFor}`;
+    }
+    if (payload.propertyType && payload.propertyType.length > 0) {
+        queryParams += `&propertyType=${payload.propertyType.join(',')}`;
+    }
+
+    return authApi.get(`property/search?${queryParams}`)
 }
 
 const getPropertyDetailsApi = (id: string) => {

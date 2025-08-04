@@ -26,5 +26,9 @@ export const initialStateData: IInitialState = {
     connections: [],
     chatRooms: [],
     myProperty: null,
-    openLoginDialog: false
+    openLoginDialog: false,
+    // Property listing cache
+    propertyList: [],
+    searchPayload: null,
+    isPropertyListLoading: false
 }

@@ -3,16 +3,18 @@ import { Box, Button, Divider, Stack, CircularProgress, Typography, Fade, Grow, 
 import { FilterNavbar, Footer, Header, PropertyDetailsCard, PropertyDetailsCardSkeleton } from "@/component";
 import { KeyboardDoubleArrowDown } from "@mui/icons-material";
 import { useGlobalContext } from "@/global-context";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { SearchPropertyCard } from "@/types/property";
-import { searchPropertiesApi } from "@/api/property";
 import { useRouter } from 'next/router';
 
 export default function Listing() {
-    const { state } = useGlobalContext();
+    const { state, fetchPropertyList } = useGlobalContext();
     const [location, setLocation] = useState<any>([]);
-    const [propertyList, setPropetyList] = useState<Array<SearchPropertyCard>>([]);
-    const [loading, setLoading] = useState(false);
+    const [currentFilters, setCurrentFilters] = useState({
+        priceRange: [500, 2000] as [number, number],
+        lookingFor: 'any' as string,
+        propertyType: [] as string[]
+    });
     const router = useRouter();
 
     // Restore location from query params on mount
@@ -40,29 +42,34 @@ export default function Listing() {
         }
     }, [location]);
 
+    // Fetch properties when location or filters change
     useEffect(() => {
-        const fetchProperties = async () => {
-            if (!location?.longitude || !location?.latitude) return;
-            setLoading(true);
-            try {
-                const payLoad = {
-                    lng: location?.longitude,
-                    lat: location?.latitude,
-                    radiusKm: 1000
-                };
-                const response = await searchPropertiesApi(payLoad);
-                setPropetyList(response?.data?.data);
-            } finally {
-                setLoading(false);
-            }
+        if (!location?.longitude || !location?.latitude) return;
+
+        const payload = {
+            lng: location.longitude,
+            lat: location.latitude,
+            radiusKm: 1000,
+            priceRange: currentFilters.priceRange,
+            lookingFor: currentFilters.lookingFor,
+            propertyType: currentFilters.propertyType
         };
-        fetchProperties();
-    }, [location, setLocation]);
+
+        fetchPropertyList(payload);
+    }, [location, currentFilters, fetchPropertyList]);
+
+    // Handle filter changes from FilterNavbar
+    const handleFiltersChange = useCallback((filters: any) => {
+        setCurrentFilters({
+            priceRange: filters.priceRange || [500, 2000],
+            lookingFor: filters.lookingFor || 'any',
+            propertyType: filters.propertyType || []
+        });
+    }, []);
 
     return (
         <Box
             width="100%"
-
             sx={{
                 backgroundColor: '#f8f9fa',
                 minHeight: '100vh',
@@ -138,33 +145,29 @@ export default function Listing() {
                     pt: { xs: 2, sm: 3, md: 4 }
                 }}
             >
-                <FilterNavbar setLocation={setLocation} />
-
-                <Divider sx={{
-                    mb: { xs: 2, sm: 3 },
-                    borderColor: 'rgba(108, 92, 231, 0.1)'
-                }} />
+                <FilterNavbar setLocation={setLocation} onFiltersChange={handleFiltersChange} />
 
                 {/* Results Count - Responsive Typography */}
-                {propertyList.length > 0 && (
+                {state.propertyList.length > 0 && (
                     <Fade in={true}>
                         <Typography
                             variant="body1"
                             sx={{
-                                mb: { xs: 2, sm: 3 },
+                                my: { xs: 2, sm: 3 },
                                 color: '#636e72',
                                 fontWeight: 500,
                                 fontSize: { xs: '0.875rem', sm: '1rem' }
                             }}
                         >
-                            Found {propertyList.length} properties near you
+                            Found {state.propertyList.length} properties near you
                         </Typography>
                     </Fade>
                 )}
 
                 {/* Loading State */}
-                {loading ? (
+                {state.isPropertyListLoading ? (
                     <Box
+                        mt={4}
                         sx={{
                             display: 'grid',
                             gridTemplateColumns: {
@@ -199,7 +202,7 @@ export default function Listing() {
                                 mb: { xs: 3, sm: 4 }
                             }}
                         >
-                            {propertyList.map((data, index) => (
+                            {state.propertyList.map((data, index) => (
                                 <Grow
                                     in={true}
                                     key={index}
@@ -214,7 +217,7 @@ export default function Listing() {
                         </Box>
 
                         {/* Load More Button - Responsive */}
-                        {propertyList.length > 0 && (
+                        {state.propertyList.length > 0 && (
                             <Box display="flex" justifyContent="center" mb={{ xs: 3, sm: 4 }}>
                                 <Button
                                     variant="contained"
@@ -241,7 +244,7 @@ export default function Listing() {
                         )}
 
                         {/* Empty State - Responsive */}
-                        {!loading && propertyList.length === 0 && location?.latitude && (
+                        {!state.isPropertyListLoading && state.propertyList.length === 0 && location?.latitude && (
                             <Box
                                 display="flex"
                                 flexDirection="column"

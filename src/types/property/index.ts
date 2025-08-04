@@ -52,10 +52,14 @@ export interface IPropertyFormValues {
   description: string;
   partnerGender: string;
 }
+
 export interface IPropertyListSearch {
-  lat: number,
-  lng: number,
-  radiusKm: number
+  lat: number;
+  lng: number;
+  radiusKm: number;
+  priceRange?: [number, number];
+  lookingFor?: string; // gender filter
+  propertyType?: string[]; // flat, flatMate
 }
 
 export interface SearchPropertyCard {

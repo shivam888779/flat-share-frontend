@@ -14,7 +14,7 @@ const PropertyDetailsCardSkeleton = () => {
         <Card
             sx={{
                 width: '100%',
-                minWidth: { xs: 2, sm: 2.5, md: 390 },
+                minWidth: { xs: 2, sm: 2.5 },
                 maxWidth: { xs: "100%", sm: "100%", md: 390 },
                 height: 'fit-content',
                 position: 'relative',

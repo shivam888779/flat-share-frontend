@@ -1,13 +1,15 @@
 'use client'
 import React, { createContext, useContext, useMemo, useReducer, ReactNode, Dispatch, useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/router";
-import { IInitialState } from "./initial-state-type";
+import { IInitialState, ISearchPayload } from "./initial-state-type";
 import { initialStateData } from "./initial-state";
 import { getPropertyHighlightsApi, getPropertyResourcesApi, getPropertyPreferncesApi } from "@/api/property";
 import { getNotifications } from "@/api/notifications";
 import { getProfileApi } from "@/api/profiles";
 import { getConnectionsApi } from "@/api/connections";
 import { getChatRooms } from "@/api/chat";
+import { searchPropertiesApi } from "@/api/property";
+import { SearchPropertyCard } from "@/types/property";
 
 type GlobalContextType = {
   state: IInitialState;
@@ -17,6 +19,7 @@ type GlobalContextType = {
   fetchConnections: () => Promise<void>;
   fetchChatRooms: () => Promise<void>;
   handleLoginDialog: (open: boolean) => void;
+  fetchPropertyList: (payload: ISearchPayload) => Promise<void>;
 };
 
 const GlobalContext = createContext<GlobalContextType>({
@@ -27,6 +30,7 @@ const GlobalContext = createContext<GlobalContextType>({
   fetchConnections: async () => { },
   fetchChatRooms: async () => { },
   handleLoginDialog: () => { },
+  fetchPropertyList: async () => { },
 });
 
 const simpleReducer = (
@@ -58,6 +62,32 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     }
   }, [setState]);
 
+  const fetchPropertyList = useCallback(async (payload: ISearchPayload) => {
+    // Check if we have cached data for the same payload
+    if (state.searchPayload &&
+      state.searchPayload.lng === payload.lng &&
+      state.searchPayload.lat === payload.lat &&
+      state.searchPayload.radiusKm === payload.radiusKm &&
+      JSON.stringify(state.searchPayload.filters) === JSON.stringify(payload.filters)) {
+      console.log("Using cached property list - same search payload");
+      return;
+    }
+
+    setState({ isPropertyListLoading: true });
+    try {
+      const response = await searchPropertiesApi(payload);
+      const propertyList = response?.data?.data || [];
+      setState({
+        propertyList,
+        searchPayload: payload,
+        isPropertyListLoading: false
+      });
+      console.log("Fetched and cached new property list");
+    } catch (error) {
+      console.error("Failed to fetch property list", error);
+      setState({ isPropertyListLoading: false });
+    }
+  }, [state.searchPayload, setState]);
 
   const isAuthPage = ["/create-profile", "/add-listing", "/my-profile", "/notifications", "/register", "/connections", "/edit-listing"]
   // Load from localStorage first
@@ -143,7 +173,6 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     }
   }, [setState]);
 
-
   // useEffect(() => {
   //   if (isStorageLoaded) {
   //     fetchNotification();
@@ -172,8 +201,9 @@ const GlobalContextProvider: React.FC<GlobalContextProviderProps> = ({
     fetchProfile,
     fetchConnections,
     fetchChatRooms,
-    handleLoginDialog
-  }), [state, fetchNotification, fetchProfile, fetchConnections, fetchChatRooms, handleLoginDialog]);
+    handleLoginDialog,
+    fetchPropertyList
+  }), [state, fetchNotification, fetchProfile, fetchConnections, fetchChatRooms, handleLoginDialog, fetchPropertyList]);
 
   // Save to localStorage when state changes (but not during initial load)
   useEffect(() => {
