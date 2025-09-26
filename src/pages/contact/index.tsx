@@ -21,14 +21,13 @@ const contactValidationSchema = Yup.object({
 
 const ContactUs: React.FC = () => {
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
-    const { snackbar } = useGlobalSnackbar();
-
+    const snackbar = useGlobalSnackbar();
     const contactInfo = [
         {
             icon: <Email />,
             title: 'Email',
             value: 'hello@flatshare.com',
-            description: 'We\'ll respond within 24 hours'
+            description: 'We&apos;ll respond within 24 hours'
         },
         {
             icon: <Phone />,
@@ -49,11 +48,11 @@ const ContactUs: React.FC = () => {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            snackbar.success('Thank you for your message! We\'ll get back to you soon.');
+            snackbar.success('Thank you for your message! We&apos;ll get back to you soon.');
             setIsSubmitted(true);
             resetForm();
         } catch (error) {
-            snackbar.error('Failed to send message. Please try again.');
+            snackbar.error(error as string);
         } finally {
             setSubmitting(false);
         }
@@ -86,7 +85,7 @@ const ContactUs: React.FC = () => {
                             Contact Us
                         </Typography>
                         <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-                            Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                            Have questions? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
                         </Typography>
                     </Box>
 
@@ -121,7 +120,7 @@ const ContactUs: React.FC = () => {
                                 <Stack direction="row" alignItems="center" spacing={1}>
                                     <CheckCircle />
                                     <Typography>
-                                        Thank you! Your message has been sent successfully. We'll get back to you soon.
+                                        Thank you! Your message has been sent successfully. We&apos;ll get back to you soon.
                                     </Typography>
                                 </Stack>
                             </Alert>
@@ -224,7 +223,7 @@ const ContactUs: React.FC = () => {
                                     How do I report a user?
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Use the "Report" button on any user profile or contact us directly with details.
+                                    Use the &quot;Report&quot; button on any user profile or contact us directly with details.
                                 </Typography>
                             </Box>
                             <Box>
@@ -240,7 +239,7 @@ const ContactUs: React.FC = () => {
                                     How do I update my payment information?
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Go to your profile settings and select "Payment Methods" to update your information.
+                                    Go to your profile settings and select &quot;Payment Methods&quot; to update your information.
                                 </Typography>
                             </Box>
                         </Stack>
