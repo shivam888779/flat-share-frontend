@@ -66,6 +66,7 @@ export default function Listing() {
             propertyType: filters.propertyType || []
         });
     }, []);
+    console.log(currentFilters);
 
     return (
         <Box
