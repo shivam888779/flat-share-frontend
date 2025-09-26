@@ -3,11 +3,12 @@ import { Box } from "@mui/material";
 const LandingPageBottomView = () => {
     return <Box
         mt={-12}
+        position={"relative"}
+        height={'24rem'}
+        overflow={"hidden"}
         sx={{
             // Hide on mobile and tablet, show only on desktop
             display: { xs: 'none', sm: 'block', md: 'block' },
-            height: '24rem',
-            overflow: 'hidden',
             transition: 'all 0.5s ease',
             background: 'linear-gradient(to bottom, transparent, #dbeafe)'
         }}
